@@ -15,28 +15,44 @@ function getFormattedDate(date) {
   return Utilities.formatDate(new Date(date), "UTC", "yyyy-MM-dd   HH:mm:ss");
 }
 
-// TODO - use Utilities.formatDate()
 // Takes String length
-// Gets the length in the format "HH:mm:ss"
+// Gets the length in the appropriate format: "h:mm:ss", "m:ss", or "s"
 // Returns String
 function getFormattedLength(length) {
-  for (var i = 0; i < length.length; i++) {
-    if (length.charAt(i) == "T" && length.charAt(i + 2) == "S")
-      length = length.replace("PT", "0:0");
-    else if (length.charAt(i) == "T" && length.charAt(i + 3) == "S")
-      length = length.replace("PT", "0:");
-    else if (length.charAt(i) == "M" && length.charAt(i + 2) == "S")
-      length = length.replace("M", ":0");
-    if (length.charAt(i) == "H" && length.charAt(i + 2) == "M")
-      length = length.replace("H", ":0");
+  var date = new Date();
+
+  if (length.includes("H")) {
+    date.setHours(length.replace(/(PT|H.*)/g, ""));
+  }
+  else {
+    date.setHours(0);
   }
 
-  if (length.indexOf("S") == -1)
-    length += "00";
+  if (length.includes("M")) {
+    date.setMinutes(length.replace(/(PT|.*H|M.*)/g, ""));
+  }
+  else {
+    date.setMinutes(0);
+  }
 
-  length = length.replace("PT", "").replace("H", ":").replace("M", ":").replace("S", "");
+  if (length.includes("S")) {
+    date.setSeconds(length.replace(/(PT|.*H|.*M|S.*)/g, ""));
+  }
+  else {
+    date.setSeconds(0);
+  }
 
-  return length;
+  if (length.includes("H")) {
+    date = Utilities.formatDate(date, "UTC", "h:mm:ss");
+  }
+  else if (length.includes("M")) {
+    date = Utilities.formatDate(date, "UTC", "m:ss");
+  }
+  else {
+    date = Utilities.formatDate(date, "UTC", "s");
+  }
+
+  return date;
 }
 
 // Takes String videoId
@@ -110,9 +126,9 @@ function getPlaylistItems(playlistId) {
   var nextPageToken = "";
 
   while (nextPageToken != null) {
-    var playlistResponse = YouTube.PlaylistItems.list('snippet', {playlistId: playlistId, maxResults: 50, pageToken: nextPageToken});
-    playlistResponse.items.forEach(function(item) {playlistItems.push(item)});
-    nextPageToken = playlistResponse.nextPageToken;
+    var playlist = YouTube.PlaylistItems.list('snippet', {playlistId: playlistId, maxResults: 50, pageToken: nextPageToken});
+    playlist.items.forEach(function(item) {playlistItems.push(getVideo(item.snippet.resourceId))});
+    nextPageToken = playlist.nextPageToken;
   }
 
   return playlistItems;
@@ -141,12 +157,36 @@ function addToPlaylist(videoId, playlistId) {
 // Sheets Utilities //
 //////////////////////
 
+// Takes Sheet sheet, [Array[Object] | Class]
+// Gets a range of data from a spreadsheet
+// Returns null
+function insertRow(sheet, object) {
+  sheet.insertRowAfter(sheet.getLastRow());
+  var values = [];
+
+  for (var index in object) {
+    values.push(object[index]);
+  }
+
+  sheet.getRange(sheet.getLastRow(), 1, 1, sheet.getLastColumn()).setValues([values]);
+}
+
+// Takes Sheet sheet
+// Gets a range of data from a spreadsheet
+// Returns Array[Object]
+function getRange(sheet) {
+  var data = sheet.getDataRange().getValues();
+  data.shift(); // Ignore the header row
+  return data;
+}
+
 // Takes Sheet sheet, Integer column, Boolean ascending
 // Sorts the given range of the spreadsheet
 // Returns null
 function sortRange(sheet, column, ascending) {
   ascending = ascending ? true : false;
-  sheet.getDataRange().sort({column: column, ascending: ascending});
+  // Sort everything but the header row
+  sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).sort({column: column, ascending: ascending});
 }
 
 
@@ -177,8 +217,8 @@ function getCategoryMembers(wikiName, categoryName) {
     Object.keys(params).forEach(function(key) {url += "&" + key + "=" + params[key]});
 
     try {
-      var response = UrlFetchApp.fetch(url);
-      var json = JSON.parse(response.getContentText());
+      var request = UrlFetchApp.fetch(url);
+      var json = JSON.parse(request.getContentText());
       categoryMembers = categoryMembers.concat(json.query.categorymembers);
       cmcontinue = json.continue ? json.continue.cmcontinue : null;
     }

@@ -6,15 +6,16 @@ function runTests() {
   var pageName = "The Inn - Fire Emblem";
   var channelId = "UCYGz7FZImRL8oI68pD7NoKg";
   var playlistId = "PLn8P5M1uNQk7hJWh8jPlpbhvvxex_QfI5";
-  var sheet = SpreadsheetApp.openById("1B7b9jEaWiqZI8Z8CzvFN1cBvLVYwjb5xzhWtrgs4anI").getSheetByName("SiIvaGunner2");
-  var column = 5;
+  var sheet = SpreadsheetApp.openById("11XxOGk3IVJdiOs3nFzcdFxhedXep4_JLRSXTs8E-2v8").getSheetByName("Testing");
+  var video = ["aaa", "aaa", "aaa", "aaa", "aaa", "aaa", "aaa", "aaa", "aaa", "aaa"];
+  var column = 3;
   var categoryName = "Rips with sentence mixing";
 
   var formattedDate = getFormattedDate(date);
   Logger.log(formattedDate);
 
-  var length = getFormattedLength(length);
-  Logger.log(length);
+  var formattedLength = getFormattedLength(length);
+  Logger.log(formattedLength);
 
   var youtubeHyperlink = getYouTubeHyperlink(videoId);
   Logger.log(youtubeHyperlink);
@@ -42,6 +43,12 @@ function runTests() {
 
   var add = addToPlaylist(videoId, playlistId);
   Logger.log(add);
+
+  var insert = insertRow(sheet, video);
+  Logger.log(insert);
+
+  var range = getRange(sheet);
+  Logger.log(range);
 
   var sort = sortRange(sheet, column);
   Logger.log(sort);
