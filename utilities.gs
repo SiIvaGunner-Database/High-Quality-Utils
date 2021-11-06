@@ -2,59 +2,54 @@
 // 1. General
 // 2. YouTube
 // 3. Sheets
-// 5. Fetch
+// 4. Fetch
 
 ///////////////////////
 // General Utilities //
 ///////////////////////
 
 /**
- * Gets the date in the format "yyyy-MM-dd   HH:mm:ss".
+ * Returns a date in the format "yyyy-MM-dd   HH:mm:ss".
  *
- * @param {String | Date} date The date to be formatted
- * @returns {Date} Returns the formatted date
+ * @param {String | Date} date The date to be formatted.
+ * @returns {Date} Returns the formatted date.
  */
-function getFormattedDate(date) {
+function formatDate(date) {
   return Utilities.formatDate(new Date(date), "UTC", "yyyy-MM-dd   HH:mm:ss");
 }
 
 /**
- * Gets the length in the appropriate format: "h:mm:ss", "m:ss", or "s".
+ * Returns a string in the appropriate format: "h:mm:ss", "m:ss", or "s".
  *
- * @param {String} length The length to be formatted
- * @returns {String} Returns the formatted length
+ * @param {String} length The length to be formatted.
+ * @returns {String} Returns the formatted length.
  */
-function getFormattedLength(length) {
-  var date = new Date();
+function formatLength(length) {
+  let date = new Date();
 
   if (length.includes("H")) {
     date.setHours(length.replace(/(PT|H.*)/g, ""));
-  }
-  else {
+  } else {
     date.setHours(0);
   }
 
   if (length.includes("M")) {
     date.setMinutes(length.replace(/(PT|.*H|M.*)/g, ""));
-  }
-  else {
+  } else {
     date.setMinutes(0);
   }
 
   if (length.includes("S")) {
     date.setSeconds(length.replace(/(PT|.*H|.*M|S.*)/g, ""));
-  }
-  else {
+  } else {
     date.setSeconds(0);
   }
 
   if (length.includes("H")) {
     date = Utilities.formatDate(date, "UTC", "h:mm:ss");
-  }
-  else if (length.includes("M")) {
+  } else if (length.includes("M")) {
     date = Utilities.formatDate(date, "UTC", "m:ss");
-  }
-  else {
+  } else {
     date = Utilities.formatDate(date, "UTC", "s");
   }
 
@@ -62,44 +57,44 @@ function getFormattedLength(length) {
 }
 
 /**
- * Gets a sheet hyperlink to a YouTube video URL.
+ * Returns a sheet hyperlink to a YouTube video URL.
  *
- * @param {String} videoId The YouTube video ID
- * @returns {String} Returns the formatted hyperlink
+ * @param {String} videoId The YouTube video ID.
+ * @returns {String} Returns the formatted hyperlink.
  */
-function getYouTubeHyperlink(videoId) {
+function formatYouTubeHyperlink(videoId) {
   return '=HYPERLINK("https://www.youtube.com/watch?v=' + videoId + '", "' + videoId + '")';
 }
 
 /**
- * Gets a sheet hyperlink to a Fandom page URL.
+ * Returns a sheet hyperlink to a Fandom page URL.
  *
- * @param {String} pageName The name of the wiki page
- * @param {String} String The name of the wiki
- * @returns {String} Returns the formatted hyperlink
+ * @param {String} pageName The name of the wiki page.
+ * @param {String} String The name of the wiki.
+ * @returns {String} Returns the formatted hyperlink.
  */
-function getFandomHyperlink(pageName, wikiName) {
-  var wikiUrl = "https://" + wikiName + ".fandom.com/wiki/";
+function formatFandomHyperlink(pageName, wikiName) {
+  const wikiUrl = "https://" + wikiName + ".fandom.com/wiki/";
   pageName = pageName.replace(/Reupload: /g, "").replace(/Reup: /g, "");
-  var simplePageName = pageName.replace(/"/g, '""').replace(/ \(GiIvaSunner\)/g, "");
-  var encodedPageName = encodeFandomPageName(pageName);
+  const simplePageName = pageName.replace(/"/g, '""').replace(/ \(GiIvaSunner\)/g, "");
+  const encodedPageName = encodeFandomPageName(pageName);
   return '=HYPERLINK("' + wikiUrl + encodedPageName + '", "' + simplePageName + '")';
 }
 
 /**
- * Gets an encoded page name for a Fandom page URL.
+ * Returns an encoded page name for a Fandom page URL.
  *
- * @param {String} pageName The name of the wiki page
- * @returns {String} Returns the encoded page name
+ * @param {String} pageName The name of the wiki page.
+ * @returns {String} Returns the encoded page name.
  */
 function encodeFandomPageName(pageName) {
+  pageName = pageName.replace(/#/g, '');
+  pageName = pageName.replace(/\|/g, '');
   pageName = pageName.replace(/\[/g, '(');
   pageName = pageName.replace(/\]/g, ')');
   pageName = pageName.replace(/\{/g, '(');
   pageName = pageName.replace(/\}/g, ')');
-  pageName = pageName.replace(/#/g, '');
   pageName = pageName.replace(/\​\|\​_/g, 'L');
-  pageName = pageName.replace(/\|/g, '');
   pageName = pageName.replace(/Nigga/g, 'N----');
   return encodeURIComponent(pageName);
 }
@@ -114,74 +109,104 @@ function encodeFandomPageName(pageName) {
 /**
  * Gets the JSON data from a YouTube video.
  *
- * @param {String} videoId The YouTube video ID
- * @returns {Object} Returns the video object
+ * @param {String} videoId The YouTube video ID.
+ * @returns {Object} Returns the video object.
  */
 function getVideo(videoId) {
-  return YouTube.Videos.list('snippet,contentDetails,statistics',{id: videoId}).items[0];
+  try {
+    return YouTube.Videos.list("snippet, contentDetails, statistics", {id: videoId}).items[0];
+  } catch(e) {
+    Logger.log(e);
+    return null;
+  }
 }
 
 /**
  * Gets the JSON data from a YouTube channel.
  *
- * @param {String} channelId The YouTube channel ID
- * @returns {Object} Returns the channel object
+ * @param {String} channelId The YouTube channel ID.
+ * @returns {Object} Returns the channel object.
  */
 function getChannel(channelId) {
-  return YouTube.Channels.list('snippet,statistics', {id: channelId}).items[0];
+  try {
+    return YouTube.Channels.list("snippet, statistics", {id: channelId}).items[0];
+  } catch(e) {
+    Logger.log(e);
+    return null;
+  }
 }
 
 /**
  * Gets the JSON data from a YouTube channel's uploads.
  *
- * @param {String} channelId The YouTube channel ID
- * @returns {Array[Object]} Returns the video objects
+ * @param {String} channelId The YouTube channel ID.
+ * @returns {Array[Object]} Returns the video objects.
  */
 function getChannelUploads(channelId) {
-  var channel = YouTube.Channels.list('contentDetails', {id: channelId}).items[0];
-  var uploadsPlaylistId = channel.contentDetails.relatedPlaylists.uploads;
-  return getPlaylistItems(uploadsPlaylistId);
+  try {
+    const channel = YouTube.Channels.list("contentDetails", {id: channelId}).items[0];
+    const uploadsPlaylistId = channel.contentDetails.relatedPlaylists.uploads;
+    return getPlaylistItems(uploadsPlaylistId);
+  } catch(e) {
+    Logger.log(e);
+    return null;
+  }
 }
 
 /**
  * Gets the JSON data from videos in a YouTube playlist.
  *
- * @param {String} playlistId The YouTube playlist ID
- * @returns {Array[Object]} Returns the video objects
+ * @param {String} playlistId The YouTube playlist ID.
+ * @returns {Array[Object]} Returns the video objects.
  */
 function getPlaylistItems(playlistId) {
-  var playlistItems = [];
-  var nextPageToken = "";
+  try {
+    let playlistItems = [];
+    let nextPageToken = "";
 
-  while (nextPageToken != null) {
-    var playlist = YouTube.PlaylistItems.list('snippet', {playlistId: playlistId, maxResults: 50, pageToken: nextPageToken});
-    playlist.items.forEach(function(item) {playlistItems.push(getVideo(item.snippet.resourceId))});
-    nextPageToken = playlist.nextPageToken;
+    while (nextPageToken != null) {
+      const playlist = YouTube.PlaylistItems.list("snippet", {playlistId: playlistId, maxResults: 50, pageToken: nextPageToken});
+      playlist.items.forEach(function(item) {playlistItems.push(getVideo(item.snippet.resourceId))});
+      nextPageToken = playlist.nextPageToken;
+    }
+
+    return playlistItems;
+  } catch(e) {
+    Logger.log(e);
+    return null;
   }
-
-  return playlistItems;
 }
 
 /**
  * Removes a video from a YouTube playlist.
  *
- * @param {String} videoId The YouTube video ID
- * @param {String} playlistId The YouTube playlist ID
+ * @param {String} playlistId The YouTube playlist ID.
+ * @param {String} videoId The YouTube video ID.
  */
-function removeFromPlaylist(videoId, playlistId) {
-  var playlist = YouTube.PlaylistItems.list('snippet', {playlistId: playlistId, videoId: videoId});
-  var deletionId = playlist.items[0].id;
-  YouTube.PlaylistItems.remove(deletionId);
+function removeFromPlaylist(playlistId, videoId) {
+  try {
+    const playlist = YouTube.PlaylistItems.list("snippet", {playlistId: playlistId, videoId: videoId});
+    const deletionId = playlist.items[0].id;
+    YouTube.PlaylistItems.remove(deletionId);
+  } catch(e) {
+    Logger.log(e);
+    return null;
+  }
 }
 
 /**
  * Adds a video to a YouTube playlist.
  *
- * @param {String} videoId The YouTube video ID
- * @param {String} playlistId The YouTube playlist ID
+ * @param {String} playlistId The YouTube playlist ID.
+ * @param {String} videoId The YouTube video ID.
  */
-function addToPlaylist(videoId, playlistId) {
-  YouTube.PlaylistItems.insert({snippet: {playlistId: playlistId, resourceId: {kind: "youtube#video", videoId: videoId}}}, "snippet");
+function addToPlaylist(playlistId, videoId) {
+  try {
+    YouTube.PlaylistItems.insert({snippet: {playlistId: playlistId, resourceId: {kind: "youtube#video", videoId: videoId}}}, "snippet");
+  } catch(e) {
+    Logger.log(e);
+    return null;
+  }
 }
 
 
@@ -192,42 +217,53 @@ function addToPlaylist(videoId, playlistId) {
 //////////////////////
 
 /**
- * Inserts a range of data into a spreadsheet.
+ * Gets all data values from a spreadsheet, ignoring the header row.
  *
- * @param {Sheet} sheet The spreadsheet object
- * @param {Array[Object] | Object} data The data to insert
+ * @param {Sheet} sheet The spreadsheet object.
+ * @returns {Array[Array[Object]]} Returns the values.
  */
-function insertRow(sheet, data) {
-  sheet.insertRowAfter(sheet.getLastRow());
-  var values = [];
-
-  for (var index in data) {
-    values.push(data[index]);
-  }
-
-  sheet.getRange(sheet.getLastRow(), 1, 1, sheet.getLastColumn()).setValues([values]);
-}
-
-/**
- * Gets the full range of data from a spreadsheet, ignoring the header row.
- *
- * @param {Sheet} sheet The spreadsheet object
- * @returns {Array[Array[Object]]} Returns the values
- */
-function getRange(sheet) {
-  var data = sheet.getDataRange().getValues();
+function getSheetValues(sheet) {
+  let data = sheet.getDataRange().getValues();
   data.shift(); // Ignore the header row
   return data;
 }
 
 /**
+ * Inserts a range of data into a spreadsheet.
+ *
+ * @param {Sheet} sheet The spreadsheet object.
+ * @param {Array[Object] | Object} data The data to insert.
+ */
+function addToSheet(sheet, data) {
+  sheet.insertRowAfter(sheet.getLastRow());
+  updateInSheet(sheet, data, sheet.getLastRow());
+}
+
+/**
+ * Updates a range of data in a spreadsheet.
+ *
+ * @param {Sheet} sheet The spreadsheet object.
+ * @param {Array[Object] | Object} data The data to insert.
+ * @param {Integer} row The row to update.
+ */
+function updateInSheet(sheet, data, row) {
+  let values = [];
+
+  for (let index in data) {
+    values.push(data[index]);
+  }
+
+  sheet.getRange(row, 1, 1, sheet.getLastColumn()).setValues([values]);
+}
+
+/**
  * Sorts the given spreadsheet, ignoring the header row.
  *
- * @param {Sheet} sheet The spreadsheet object
- * @param {Integer} column The column number
- * @param {Boolean} ascending True if ascending, defaults to false
+ * @param {Sheet} sheet The spreadsheet object.
+ * @param {Integer} column The column number.
+ * @param {Boolean} [ascending] True if ascending, defaults to false.
  */
-function sortRange(sheet, column, ascending) {
+function sortSheet(sheet, column, ascending) {
   ascending = ascending ? true : false;
   // Sort everything but the header row
   sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).sort({column: column, ascending: ascending});
@@ -243,17 +279,16 @@ function sortRange(sheet, column, ascending) {
 /**
  * Gets the JSON data from members of a fandom wiki category .
  *
- * @param {String} wikiName The name of the wiki
- * @param {String} categoryName The name of the wiki category
- * @returns {Array[Object]} Returns the category member objects
+ * @param {String} wikiName The name of the wiki.
+ * @param {String} categoryName The name of the wiki category.
+ * @returns {Array[Object]} Returns the category member objects.
  */
 function getCategoryMembers(wikiName, categoryName) {
-  var categoryMembers = [];
-  var cmcontinue = "";
+  let categoryMembers = [];
+  let cmcontinue = "";
 
   while (cmcontinue != null) {
-    var url = "https://" + wikiName + ".fandom.com/api.php?"; 
-    var params = {
+    const params = {
       action: "query",
       list: "categorymembers",
       cmtitle: "Category:" + encodeURIComponent(categoryName),
@@ -262,16 +297,19 @@ function getCategoryMembers(wikiName, categoryName) {
       format: "json"
     };
 
-    Object.keys(params).forEach(function(key) {url += "&" + key + "=" + params[key]});
+    let url = "https://" + wikiName + ".fandom.com/api.php?"; 
+
+    Object.keys(params).forEach((key) => {
+      url += "&" + key + "=" + params[key];
+    });
 
     try {
-      var request = UrlFetchApp.fetch(url);
-      var json = JSON.parse(request.getContentText());
+      const request = UrlFetchApp.fetch(url);
+      const json = JSON.parse(request.getContentText());
       categoryMembers = categoryMembers.concat(json.query.categorymembers);
       cmcontinue = json.continue ? json.continue.cmcontinue : null;
-    }
-    catch (error) {
-      Logger.log(error);
+    } catch (e) {
+      Logger.log(e);
     }
   }
 

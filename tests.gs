@@ -1,58 +1,43 @@
+/**
+ * Runs all function tests.
+ */
 function runTests() {
-  var date = new Date();
-  var length = "PT1H1M1S";
-  var videoId = "NzoneDE0A2o";
-  var wikiName = "siivagunner";
-  var pageName = "The Inn - Fire Emblem";
-  var channelId = "UCYGz7FZImRL8oI68pD7NoKg";
-  var playlistId = "PLn8P5M1uNQk7hJWh8jPlpbhvvxex_QfI5";
-  var sheet = SpreadsheetApp.openById("11XxOGk3IVJdiOs3nFzcdFxhedXep4_JLRSXTs8E-2v8").getSheetByName("Testing");
-  var video = ["aaa", "aaa", "aaa", "aaa", "aaa", "aaa", "aaa", "aaa", "aaa", "aaa"];
-  var column = 3;
-  var categoryName = "Rips with sentence mixing";
 
-  var formattedDate = getFormattedDate(date);
-  Logger.log(formattedDate);
+  const date = new Date();
+  const length = "PT1H1M1S";
+  const videoId = "NzoneDE0A2o"; // https://www.youtube.com/watch?v=NzoneDE0A2o
+  const wikiName = "siivagunner"; // https://siivagunner.fandom.com/wiki/SiIvaGunner_Wiki
+  const pageName = "The Inn - Fire Emblem"; // https://siivagunner.fandom.com/wiki/The_Inn_-_Fire_Emblem
+  const channelId = "UCYGz7FZImRL8oI68pD7NoKg"; // https://www.youtube.com/c/SiIvaGunner2
+  const playlistId = "PLn8P5M1uNQk5_q_y1BVxgP68xhKQ2eM3F"; // https://www.youtube.com/playlist?list=PLn8P5M1uNQk5_q_y1BVxgP68xhKQ2eM3F
+  const sheet = SpreadsheetApp.openById("11XxOGk3IVJdiOs3nFzcdFxhedXep4_JLRSXTs8E-2v8").getSheetByName("Tests"); // https://docs.google.com/spreadsheets/d/11XxOGk3IVJdiOs3nFzcdFxhedXep4_JLRSXTs8E-2v8
+  const video = new Video("id", "title", "wiki status", "yt status", "upload date", "leng", "desc", "views", "likes", "dislikes", "comments");
+  const column = 3;
+  const row = 9;
+  const categoryName = "Rips with sentence mixing"; // https://siivagunner.fandom.com/wiki/Category:Rips_with_sentence_mixing
 
-  var formattedLength = getFormattedLength(length);
-  Logger.log(formattedLength);
+  Logger.log( "Testing general utilities" );
+  Logger.log( formatDate(date) );
+  Logger.log( formatLength(length) );
+  Logger.log( formatYouTubeHyperlink(videoId) );
+  Logger.log( formatFandomHyperlink(pageName, wikiName) );
+  Logger.log( encodeFandomPageName(pageName) );
 
-  var youtubeHyperlink = getYouTubeHyperlink(videoId);
-  Logger.log(youtubeHyperlink);
+  Logger.log( "Testing YouTube utilities" );
+  Logger.log( getVideo(videoId) );
+  Logger.log( getChannel(channelId) );
+  Logger.log( getChannelUploads(channelId) );
+  Logger.log( getPlaylistItems(playlistId) );
+  Logger.log( addToPlaylist(playlistId, videoId) );
+  Logger.log( removeFromPlaylist(playlistId, videoId) );
 
-  var fandomHyperlink = getFandomHyperlink(pageName, wikiName);
-  Logger.log(fandomHyperlink);
+  Logger.log( "Testing sheets utilities" );
+  Logger.log( getSheetValues(sheet) );
+  Logger.log( addToSheet(sheet, video) );
+  Logger.log( updateInSheet(sheet, video, row) );
+  Logger.log( sortSheet(sheet, column) );
 
-  var pageName = encodeFandomPageName(pageName);
-  Logger.log(pageName);
+  Logger.log( "Testing fetch utilities" );
+  Logger.log( getCategoryMembers(wikiName, categoryName) );
 
-  var video = getVideo(videoId);
-  Logger.log(video);
-
-  var channel = getChannel(channelId);
-  Logger.log(channel);
-
-  var channelUploads = getChannelUploads(channelId);
-  Logger.log(channelUploads);
-
-  var playlistItems = getPlaylistItems(playlistId);
-  Logger.log(playlistItems);
-
-  var remove = removeFromPlaylist(videoId, playlistId);
-  Logger.log(remove);
-
-  var add = addToPlaylist(videoId, playlistId);
-  Logger.log(add);
-
-  var insert = insertRow(sheet, video);
-  Logger.log(insert);
-
-  var range = getRange(sheet);
-  Logger.log(range);
-
-  var sort = sortRange(sheet, column);
-  Logger.log(sort);
-
-  var categoryMembers = getCategoryMembers(wikiName, categoryName);
-  Logger.log(categoryMembers);
 }
