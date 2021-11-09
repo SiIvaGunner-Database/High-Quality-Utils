@@ -67,9 +67,9 @@ function formatYouTubeHyperlink(youtubeId) {
 
   if (youtubeId.length == 11) {
     hyperlink = '=HYPERLINK("https://www.youtube.com/watch?v=' + youtubeId + '", "' + youtubeId + '")';
-  } else if (youtubeId.includes("UC")) {
-    hyperlink = '=HYPERLINK("https://www.youtube.com/playlist?list=' + youtubeId + '", "' + youtubeId + '")';
   } else if (youtubeId.includes("PL")) {
+    hyperlink = '=HYPERLINK("https://www.youtube.com/playlist?list=' + youtubeId + '", "' + youtubeId + '")';
+  } else if (youtubeId.includes("UC")) {
     hyperlink = '=HYPERLINK("https://www.youtube.com/channel/' + youtubeId + '", "' + youtubeId + '")';
   }
 
@@ -293,6 +293,21 @@ function getPlaylistItems(playlistId) {
 }
 
 /**
+ * Adds a video to a YouTube playlist.
+ *
+ * @param {String} playlistId The YouTube playlist ID.
+ * @param {String} videoId The YouTube video ID.
+ */
+function addToPlaylist(playlistId, videoId) {
+  try {
+    YouTube.PlaylistItems.insert({snippet: {playlistId: playlistId, resourceId: {kind: "youtube#video", videoId: videoId}}}, "snippet");
+  } catch(e) {
+    Logger.log(e);
+    return null;
+  }
+}
+
+/**
  * Removes a video from a YouTube playlist.
  *
  * @param {String} playlistId The YouTube playlist ID.
@@ -303,21 +318,6 @@ function removeFromPlaylist(playlistId, videoId) {
     const playlist = YouTube.PlaylistItems.list("snippet", {playlistId: playlistId, videoId: videoId});
     const deletionId = playlist.items[0].id;
     YouTube.PlaylistItems.remove(deletionId);
-  } catch(e) {
-    Logger.log(e);
-    return null;
-  }
-}
-
-/**
- * Adds a video to a YouTube playlist.
- *
- * @param {String} playlistId The YouTube playlist ID.
- * @param {String} videoId The YouTube video ID.
- */
-function addToPlaylist(playlistId, videoId) {
-  try {
-    YouTube.PlaylistItems.insert({snippet: {playlistId: playlistId, resourceId: {kind: "youtube#video", videoId: videoId}}}, "snippet");
   } catch(e) {
     Logger.log(e);
     return null;
@@ -428,13 +428,37 @@ function sortSheet(sheet, column, ascending) {
 /////////////////////
 
 /**
- * Gets the response content from a URL.
+ * Gets a response from a URL.
  *
  * @param {String} url The URL to fetch.
- * @returns {Object} Returns the response content.
+ * @param {Boolean} [allowFailureCodes] Whether or not to allow failure response codes, defaults to false.
+ * @returns {Object} Returns the response.
  */
-function getUrlResponse(url) {
-  // TODO - GET RESPONSE
+function getUrlResponse(url, allowFailureCodes) {
+  allowFailureCodes = allowFailureCodes || false;
+  const start = new Date();
+  let response;
+
+  while (!response) {
+    try {
+      response = UrlFetchApp.fetch(url, {muteHttpExceptions: allowFailureCodes});
+    } catch (e) {
+      if (e.toString().includes("429")) {
+        Logger.log("HTTP 429: too many requests; waiting 30 seconds");
+        Utilities.sleep(30000);
+      } else {
+        Logger.log(e);
+        Utilities.sleep(1000);
+      }
+
+      if (new Date().getTime() - start.getTime() > 120000) {
+        Logger.log("2 minutes exceeded; timing out");
+        break;
+      }
+    }
+  }
+
+  return response;
 }
 
 /**
@@ -444,7 +468,34 @@ function getUrlResponse(url) {
  * @returns {String} Returns the status: "Public", "Unlisted", "Unavailable", or "Deleted".
  */
 function getYouTubeStatus(youtubeId) {
-  // TODO - CHECK YOUTUBE STATUS
+  let url;
+
+  if (youtubeId.length == 11) {
+    url = 'https://www.youtube.com/watch?v=' + youtubeId;
+  } else if (youtubeId.includes("PL")) {
+    url = 'https://www.youtube.com/playlist?list=' + youtubeId;
+  } else if (youtubeId.includes("UC")) {
+    url = 'https://www.youtube.com/channel/' + youtubeId;
+  } else {
+    return null;
+  }
+
+  const contentText = getUrlResponse(url).getContentText();
+  let youtubeStatus;
+
+  if (contentText.includes('"isUnlisted":true')) {
+    youtubeStatus = "Unlisted";
+  } else if (contentText.includes('"status":"OK"')) {
+    youtubeStatus = "Public";
+  } else if (contentText.includes('"This video is private."')) {
+    youtubeStatus = "Private";
+  } else if (contentText.includes('"status":"ERROR"')) {
+    youtubeStatus = "Deleted";
+  } else if (contentText.includes('"status":"UNPLAYABLE"')) {
+    youtubeStatus = "Unavailable";
+  }
+
+  return youtubeStatus;
 }
 
 /**
@@ -455,7 +506,17 @@ function getYouTubeStatus(youtubeId) {
  * @returns {String} Returns the status: "Documented" or "Undocumented".
  */
 function getWikiStatus(wikiName, pageName) {
-  // TODO - CHECK WIKI STATUS
+  const url = "https://" + wikiName + ".fandom.com/wiki/" + encodeFandomPageName(pageName);
+  const statusCode = getUrlResponse(url, true).getResponseCode();
+  let wikiStatus;
+
+  if (statusCode == 200) {
+    wikiStatus = "Documented";
+  } else if (statusCode == 404) {
+    wikiStatus = "Undocumented";
+  }
+
+  return wikiStatus;
 }
 
 /**
@@ -486,8 +547,8 @@ function getCategoryMembers(wikiName, categoryName) {
     });
 
     try {
-      const request = UrlFetchApp.fetch(url);
-      const json = JSON.parse(request.getContentText());
+      const contentText = getUrlResponse(url).getContentText();
+      const json = JSON.parse(contentText);
       categoryMembers = categoryMembers.concat(json.query.categorymembers);
       cmcontinue = json.continue ? json.continue.cmcontinue : null;
     } catch (e) {
