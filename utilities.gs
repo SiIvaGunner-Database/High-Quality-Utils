@@ -57,13 +57,23 @@ function formatLength(length) {
 }
 
 /**
- * Returns a sheet hyperlink to a YouTube video URL.
+ * Returns a sheet hyperlink to a YouTube video, playlist, or channel URL.
  *
- * @param {String} videoId The YouTube video ID.
+ * @param {String} youtubeId The YouTube video, playlist, or channel ID.
  * @returns {String} Returns the formatted hyperlink.
  */
-function formatYouTubeHyperlink(videoId) {
-  return '=HYPERLINK("https://www.youtube.com/watch?v=' + videoId + '", "' + videoId + '")';
+function formatYouTubeHyperlink(youtubeId) {
+  let hyperlink;
+
+  if (youtubeId.length == 11) {
+    hyperlink = '=HYPERLINK("https://www.youtube.com/watch?v=' + youtubeId + '", "' + youtubeId + '")';
+  } else if (youtubeId.includes("UC")) {
+    hyperlink = '=HYPERLINK("https://www.youtube.com/playlist?list=' + youtubeId + '", "' + youtubeId + '")';
+  } else if (youtubeId.includes("PL")) {
+    hyperlink = '=HYPERLINK("https://www.youtube.com/channel/' + youtubeId + '", "' + youtubeId + '")';
+  }
+
+  return hyperlink;
 }
 
 /**
@@ -107,14 +117,46 @@ function encodeFandomPageName(pageName) {
 ///////////////////////
 
 /**
- * Gets the JSON data from a YouTube video.
+ * Gets JSON data from a YouTube video.
  *
  * @param {String} videoId The YouTube video ID.
  * @returns {Object} Returns the video object.
  */
 function getVideo(videoId) {
+  return getVideos([videoId]).join("");
+}
+
+/**
+ * Gets JSON data from multiple YouTube videos.
+ *
+ * @param {Array[String]} videoIds The YouTube video IDs.
+ * @returns {Object} Returns the video objects.
+ */
+function getVideos(videoIds) {
   try {
-    return YouTube.Videos.list("snippet, contentDetails, statistics", {id: videoId}).items[0];
+    let videos = [];
+    let arrayOfIds = videoIds.slice();
+    let stringOfIds = "";
+
+    while ( (stringOfIds = arrayOfIds.splice(-50).join(",")) && stringOfIds ) {
+      YouTube.Videos.list("snippet,contentDetails,statistics", {id: stringOfIds}).items.forEach((item) => {
+        videos.push(new Video(
+          item.snippet.resourceId,
+          item.snippet.title,
+          "Undocumented",
+          "Public",
+          formatDate(item.snippet.publishedAt),
+          item.contentDetails.duration,
+          item.snippet.description,
+          item.statistics.videoCount,
+          item.statistics.likeCount,
+          item.statistics.dislikeCount,
+          item.statistics.commentCount
+        ));
+      });
+    }
+
+    return videos;
   } catch(e) {
     Logger.log(e);
     return null;
@@ -122,14 +164,87 @@ function getVideo(videoId) {
 }
 
 /**
- * Gets the JSON data from a YouTube channel.
+ * Gets JSON data from a YouTube playlist.
+ *
+ * @param {String} playlistId The YouTube video ID.
+ * @returns {Object} Returns the playlist object.
+ */
+function getPlaylist(playlistId) {
+  return getPlaylists([playlistId]).join("");
+}
+
+/**
+ * Gets JSON data from multiple YouTube playlists.
+ *
+ * @param {Array[String]} playlistIds The YouTube playlist IDs.
+ * @returns {Object} Returns the playlist objects.
+ */
+function getPlaylists(playlistIds) {
+  try {
+    let playlists = [];
+    let arrayOfIds = playlistIds.slice();
+    let stringOfIds = "";
+
+    while ( (stringOfIds = arrayOfIds.splice(-50).join(",")) && stringOfIds ) {
+      YouTube.Playlists.list("snippet,contentDetails", {id: stringOfIds}).items.forEach((item) => {
+        playlists.push(new Playlist(
+          item.id,
+          item.snippet.title,
+          "",
+          item.snippet.description,
+          item.contentDetails.itemCount,
+          "",
+          "Public"
+        ));
+      });
+    }
+
+    return playlists;
+  } catch(e) {
+    Logger.log(e);
+    return null;
+  }
+}
+
+/**
+ * Gets JSON data from a YouTube channel.
  *
  * @param {String} channelId The YouTube channel ID.
  * @returns {Object} Returns the channel object.
  */
 function getChannel(channelId) {
+  return getChannels([channelId]).join("");
+}
+
+/**
+ * Gets JSON data from multiple YouTube channels.
+ *
+ * @param {Array[String]} channelIds The YouTube channel IDs.
+ * @returns {Object} Returns the channel objects.
+ */
+function getChannels(channelIds) {
   try {
-    return YouTube.Channels.list("snippet, statistics", {id: channelId}).items[0];
+    let channels = [];
+    let arrayOfIds = channelIds.slice();
+    let stringOfIds = "";
+
+    while ( (stringOfIds = arrayOfIds.splice(-50).join(",")) && stringOfIds ) {
+      YouTube.Channels.list("snippet,statistics", {id: stringOfIds}).items.forEach((item) => {
+        channels.push(new Channel(
+          item.id,
+          item.snippet.title,
+          "None",
+          "Public",
+          formatDate(item.snippet.publishedAt),
+          item.snippet.description,
+          item.statistics.videoCount,
+          item.statistics.subscriberCount,
+          item.statistics.viewCount
+        ));
+      });
+    }
+
+    return channels;
   } catch(e) {
     Logger.log(e);
     return null;
@@ -137,7 +252,7 @@ function getChannel(channelId) {
 }
 
 /**
- * Gets the JSON data from a YouTube channel's uploads.
+ * Gets JSON data from a YouTube channel's uploads.
  *
  * @param {String} channelId The YouTube channel ID.
  * @returns {Array[Object]} Returns the video objects.
@@ -154,23 +269,23 @@ function getChannelUploads(channelId) {
 }
 
 /**
- * Gets the JSON data from videos in a YouTube playlist.
+ * Gets JSON data from videos in a YouTube playlist.
  *
  * @param {String} playlistId The YouTube playlist ID.
  * @returns {Array[Object]} Returns the video objects.
  */
 function getPlaylistItems(playlistId) {
   try {
-    let playlistItems = [];
+    let itemIds = [];
     let nextPageToken = "";
 
     while (nextPageToken != null) {
       const playlist = YouTube.PlaylistItems.list("snippet", {playlistId: playlistId, maxResults: 50, pageToken: nextPageToken});
-      playlist.items.forEach(function(item) {playlistItems.push(getVideo(item.snippet.resourceId))});
+      playlist.items.forEach(function(item) {itemIds.push(item.snippet.resourceId)});
       nextPageToken = playlist.nextPageToken;
     }
 
-    return playlistItems;
+    return getVideos(itemIds);
   } catch(e) {
     Logger.log(e);
     return null;
@@ -220,11 +335,38 @@ function addToPlaylist(playlistId, videoId) {
  * Gets all data values from a spreadsheet, ignoring the header row.
  *
  * @param {Sheet} sheet The spreadsheet object.
+ * @param {String} [dataType] The type of object to return from the values.
  * @returns {Array[Array[Object]]} Returns the values.
  */
-function getSheetValues(sheet) {
+function getSheetValues(sheet, dataType) {
   let data = sheet.getDataRange().getValues();
   data.shift(); // Ignore the header row
+
+  if (dataType) {
+    switch (dataType.toLowerCase()) {
+      case "video":
+        data.forEach((row, index) => {
+          data[index] = new Video(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10]);
+        });
+        break;
+      case "playlist":
+        data.forEach((row, index) => {
+          data[index] = new Playlist(row[0], row[1], row[2], row[3], row[4], row[5], row[6]);
+        });
+        break;
+      case "channel":
+        data.forEach((row, index) => {
+          data[index] = new Channel(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]);
+        });
+        break;
+      case "change":
+        data.forEach((row, index) => {
+          data[index] = new Change(row[0], row[1], row[2], row[3]);
+        });
+        break;
+    }
+  }
+
   return data;
 }
 
@@ -232,28 +374,37 @@ function getSheetValues(sheet) {
  * Inserts a range of data into a spreadsheet.
  *
  * @param {Sheet} sheet The spreadsheet object.
- * @param {Array[Object] | Object} data The data to insert.
+ * @param {Object} data The data to insert.
  */
 function addToSheet(sheet, data) {
-  sheet.insertRowAfter(sheet.getLastRow());
-  updateInSheet(sheet, data, sheet.getLastRow());
+  // Convert to Array[]
+  if (!Array.isArray(data)) {
+    data = [data];
+  }
+
+  sheet.insertRowsBefore(2, data.length);
+  updateInSheet(sheet, data, 2);
 }
 
 /**
  * Updates a range of data in a spreadsheet.
  *
  * @param {Sheet} sheet The spreadsheet object.
- * @param {Array[Object] | Object} data The data to insert.
+ * @param {Array[Object]} data The data to insert.
  * @param {Integer} row The row to update.
  */
 function updateInSheet(sheet, data, row) {
-  let values = [];
-
-  for (let index in data) {
-    values.push(data[index]);
+  // Convert to Array[]
+  if (!Array.isArray(data)) {
+    data = [data];
   }
 
-  sheet.getRange(row, 1, 1, sheet.getLastColumn()).setValues([values]);
+  // Convert to Array[Array[]]
+  for (let i in data) {
+    data[i] = Object.values(data[i]);
+  }
+
+  sheet.getRange(row, 1, data.length, sheet.getLastColumn()).setValues(data);
 }
 
 /**
@@ -277,11 +428,42 @@ function sortSheet(sheet, column, ascending) {
 /////////////////////
 
 /**
- * Gets the JSON data from members of a fandom wiki category .
+ * Gets the response content from a URL.
+ *
+ * @param {String} url The URL to fetch.
+ * @returns {Object} Returns the response content.
+ */
+function getUrlResponse(url) {
+  // TODO - GET RESPONSE
+}
+
+/**
+ * Gets the status of a YouTube video, playlist, or channel.
+ *
+ * @param {String} youtubeId The YouTube video, playlist, or channel ID.
+ * @returns {String} Returns the status: "Public", "Unlisted", "Unavailable", or "Deleted".
+ */
+function getYouTubeStatus(youtubeId) {
+  // TODO - CHECK YOUTUBE STATUS
+}
+
+/**
+ * Gets the status of a Fandom wiki page.
+ *
+ * @param {String} wikiName The name of the wiki.
+ * @param {String} pageName The name of the wiki page.
+ * @returns {String} Returns the status: "Documented" or "Undocumented".
+ */
+function getWikiStatus(wikiName, pageName) {
+  // TODO - CHECK WIKI STATUS
+}
+
+/**
+ * Gets the names of all members of a Fandom wiki category.
  *
  * @param {String} wikiName The name of the wiki.
  * @param {String} categoryName The name of the wiki category.
- * @returns {Array[Object]} Returns the category member objects.
+ * @returns {Array[String]} Returns all category member names.
  */
 function getCategoryMembers(wikiName, categoryName) {
   let categoryMembers = [];
@@ -313,5 +495,7 @@ function getCategoryMembers(wikiName, categoryName) {
     }
   }
 
-  return categoryMembers;
+  return categoryMembers.map((categoryMember) => {
+    return categoryMember.title;
+  });
 }
