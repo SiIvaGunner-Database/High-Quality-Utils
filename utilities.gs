@@ -420,6 +420,20 @@ function sortSheet(sheet, column, ascending) {
   sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).sort({column: column, ascending: ascending});
 }
 
+/**
+ * Logs a message to the event log spreadsheet.
+ *
+ * @param {String} message The message to log.
+ */
+async function logEvent(message) {
+  const projectId = ScriptApp.getScriptId();
+  const projectName = DriveApp.getFileById(projectId).getName();
+  const date = new Date();
+  const event = new Event(projectName, message, date);
+  const eventSpreadsheet = SpreadsheetApp.openById("1_78uNwS1kcxru3PIstADhjvR3hn6rlc-yc4v4PkLoMU").getActiveSheet();
+  addToSheet(eventSpreadsheet, event);
+}
+
 
 
 
@@ -428,7 +442,7 @@ function sortSheet(sheet, column, ascending) {
 /////////////////////
 
 /**
- * Gets a response from a URL.
+ * Gets a response from a get request to a URL.
  *
  * @param {String} url The URL to fetch.
  * @param {Boolean} [allowFailureCodes] Whether or not to allow failure response codes, defaults to false.
@@ -459,6 +473,23 @@ function getUrlResponse(url, allowFailureCodes) {
   }
 
   return response;
+}
+
+/**
+ * Gets a response from a post request to a URL.
+ *
+ * @param {String} url The URL to post to.
+ * @param {String} data The data to post.
+ * @returns {String} Returns the response.
+ */
+function postUrlResponse(url, data) {
+  var options = {
+    "method" : "post",
+    "contentType": "application/json",
+    "payload": JSON.stringify(data)
+  };
+
+  return UrlFetchApp.fetch(url, options);
 }
 
 /**

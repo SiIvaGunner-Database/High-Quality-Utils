@@ -50,7 +50,18 @@ class Playlist {
 }
 
 /**
- * The class object for changelog entries.
+ * The class object for event log entries.
+ */
+class Event {
+  constructor(projectName, message, logDate) {
+    this.projectName = projectName;
+    this.message = message;
+    this.logDate = logDate;
+  }
+}
+
+/**
+ * The class object for change log entries.
  */
 class Change {
   constructor(id, oldValue, newValue, logDate) {
