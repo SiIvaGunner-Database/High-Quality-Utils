@@ -374,7 +374,7 @@ function getSheetValues(sheet, dataType) {
  * Inserts a range of data into a spreadsheet.
  *
  * @param {Sheet} sheet The spreadsheet object.
- * @param {Object} data The data to insert.
+ * @param {Object | Array[Object]} data The data to insert.
  */
 function addToSheet(sheet, data) {
   // Convert to Array[]
@@ -390,7 +390,7 @@ function addToSheet(sheet, data) {
  * Updates a range of data in a spreadsheet.
  *
  * @param {Sheet} sheet The spreadsheet object.
- * @param {Array[Object]} data The data to insert.
+ * @param {Object | Array[Object] | } data The data to insert.
  * @param {Integer} row The row to update.
  */
 function updateInSheet(sheet, data, row) {
@@ -511,19 +511,34 @@ function getYouTubeStatus(youtubeId) {
     return null;
   }
 
-  const contentText = getUrlResponse(url).getContentText();
   let youtubeStatus;
 
-  if (contentText.includes('"isUnlisted":true')) {
-    youtubeStatus = "Unlisted";
-  } else if (contentText.includes('"status":"OK"')) {
-    youtubeStatus = "Public";
-  } else if (contentText.includes('"This video is private."')) {
-    youtubeStatus = "Private";
-  } else if (contentText.includes('"status":"ERROR"')) {
-    youtubeStatus = "Deleted";
-  } else if (contentText.includes('"status":"UNPLAYABLE"')) {
-    youtubeStatus = "Unavailable";
+  if (youtubeId.length == 11) {
+    const contentText = getUrlResponse(url).getContentText();
+
+    if (contentText.includes('"isUnlisted":true')) {
+      youtubeStatus = "Unlisted";
+    } else if (contentText.includes('"status":"OK"')) {
+      youtubeStatus = "Public";
+    } else if (contentText.includes('"This video is private."')) {
+      youtubeStatus = "Private";
+    } else if (contentText.includes('"status":"ERROR"')) {
+      youtubeStatus = "Deleted";
+    } else if (contentText.includes('"status":"UNPLAYABLE"')) {
+      youtubeStatus = "Unavailable";
+    }
+  } else {
+    const responseCode = getUrlResponse(url, true).getResponseCode();
+
+    if (responseCode == 200) {
+      youtubeStatus = "Public";
+    } else if (responseCode == 403) {
+      youtubeStatus = "Private";
+    } else if (responseCode == 404) {
+      youtubeStatus = "Deleted";
+    } else {
+      logEvent("HTTP " + responseCode + ": " + url);
+    }
   }
 
   return youtubeStatus;
