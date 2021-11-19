@@ -21,10 +21,10 @@ class Video {
  * The class object for YouTube channels.
  */
 class Channel {
-  constructor(id, name, wikiStatus, youtubeStatus, joinDate, description, videoCount, subscriberCount, viewCount) {
+  constructor(id, name, wiki, youtubeStatus, joinDate, description, videoCount, subscriberCount, viewCount) {
     this.id = id;
     this.name = name;
-    this.wikiStatus = wikiStatus;
+    this.wiki = wiki;
     this.youtubeStatus = youtubeStatus;
     this.joinDate = joinDate;
     this.description = description;

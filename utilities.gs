@@ -1,8 +1,15 @@
 // Table of Contents
-// 1. General
-// 2. YouTube
-// 3. Sheets
-// 4. Fetch
+// 1. Global Variables
+// 2. General Utilities
+// 3. YouTube Utilities
+// 4. Sheets Utilities
+// 5. Fetch Utilities
+
+//////////////////////
+// Global Variables //
+//////////////////////
+
+const authToken = "Token " + getAuthToken();
 
 ///////////////////////
 // General Utilities //
@@ -108,9 +115,6 @@ function encodeFandomPageName(pageName) {
   pageName = pageName.replace(/Nigga/g, 'N----');
   return encodeURIComponent(pageName);
 }
-
-
-
 
 ///////////////////////
 // YouTube Utilities //
@@ -324,9 +328,6 @@ function removeFromPlaylist(playlistId, videoId) {
   }
 }
 
-
-
-
 //////////////////////
 // Sheets Utilities //
 //////////////////////
@@ -421,6 +422,17 @@ function sortSheet(sheet, column, ascending) {
 }
 
 /**
+ * Gets an siivagunnerdatabase.net admin authentication token stored in a spreadsheet.
+ * This will fail if the user doesn't have permission.
+ *
+ * @returns {String} Returns the authentication token.
+ */
+function getAuthToken() {
+  const secretSpreadsheet = SpreadsheetApp.openById("1mP5lB6QQQxn0TF_l2sGsrvYDZZ39L-rk_EJrJhif-sI").getActiveSheet();
+  return secretSpreadsheet.getActiveRange().getValue();
+}
+
+/**
  * Logs a message to the event log spreadsheet.
  *
  * @param {String} message The message to log.
@@ -433,9 +445,6 @@ async function logEvent(message) {
   const eventSpreadsheet = SpreadsheetApp.openById("1_78uNwS1kcxru3PIstADhjvR3hn6rlc-yc4v4PkLoMU").getActiveSheet();
   addToSheet(eventSpreadsheet, event);
 }
-
-
-
 
 /////////////////////
 // Fetch Utilities //
@@ -477,19 +486,47 @@ function getUrlResponse(url, allowFailureCodes) {
 
 /**
  * Gets a response from a post request to a URL.
+ * Sends the default siivagunnerdatabase.net authentication token in header.
  *
  * @param {String} url The URL to post to.
- * @param {String} data The data to post.
- * @returns {String} Returns the response.
+ * @param {Object} data The data to post.
+ * @returns {Object} Returns the response.
  */
 function postUrlResponse(url, data) {
-  var options = {
-    "method" : "post",
-    "contentType": "application/json",
-    "payload": JSON.stringify(data)
+  const options = {
+    method: "post",
+    contentType: "application/json",
+    headers: { Authorization: authToken },
+    payload: JSON.stringify(data)
   };
 
   return UrlFetchApp.fetch(url, options);
+}
+
+/**
+ * Posts a video / rip object to siivagunnerdatabase.net.
+ * This will fail if the user doesn't have permission.
+ *
+ * @param {Object} video The video object to post.
+ * @returns {Object} Returns the response.
+ */
+function postToVideoDb(video) {
+  const url = "https://siivagunnerdatabase.net/api/rips/";
+  // TODO - set required fields
+  return postUrlResponse(url, video);
+}
+
+/**
+ * Posts a channel object to siivagunnerdatabase.net.
+ * This will fail if the user doesn't have permission.
+ *
+ * @param {Object} channel The channel object to post.
+ * @returns {Object} Returns the response.
+ */
+function postToChannelDb(channel) {
+  const url = "https://siivagunnerdatabase.net/api/channels/";
+  // TODO - set required fields
+  return postUrlResponse(url, channel);
 }
 
 /**

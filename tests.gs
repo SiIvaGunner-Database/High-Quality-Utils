@@ -15,8 +15,9 @@ function runTests() {
   const column = 3;
   const row = 9;
   const message = "This is a test!";
-  const url = "https://siivagunnerdatabase.net/rips/";
+  const url = "https://siivagunnerdatabase.net/api/";
   const data = { key: "value" };
+  const channel = new Channel("id", "name", "wiki", "yt status", "join date", "desc", "videos", "subs", "views");
   const categoryName = "Rips with sentence mixing";
 
   Logger.log( "Testing general utilities" );
@@ -38,16 +39,19 @@ function runTests() {
   Logger.log( addToPlaylist(playlistId, videoId) );
   Logger.log( removeFromPlaylist(playlistId, videoId) );
 
-  Logger.log( "Testing spreadsheet utilities" );
+  Logger.log( "Testing Sheets utilities" );
   Logger.log( getSheetValues(sheet) );
   Logger.log( addToSheet(sheet, video) );
   Logger.log( updateInSheet(sheet, video, row) );
   Logger.log( sortSheet(sheet, column) );
+  Logger.log( getApiKey() );
   Logger.log( logEvent(message) );
 
   Logger.log( "Testing fetch utilities" );
   Logger.log( getUrlResponse(url) );
-  // Logger.log( postUrlResponse(url, data) );
+  Logger.log( postUrlResponse(url, data) );
+  Logger.log( postToVideoDb(video) );
+  Logger.log( postToChannelDb(channel) );
   Logger.log( getYouTubeStatus(videoId) );
   Logger.log( getWikiStatus(wikiName, pageName) );
   Logger.log( getCategoryMembers(wikiName, categoryName) );
