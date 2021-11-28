@@ -163,7 +163,6 @@ function getVideos(videoIds) {
     return videos;
   } catch(e) {
     Logger.log(e);
-    return null;
   }
 }
 
@@ -206,7 +205,6 @@ function getPlaylists(playlistIds) {
     return playlists;
   } catch(e) {
     Logger.log(e);
-    return null;
   }
 }
 
@@ -251,7 +249,6 @@ function getChannels(channelIds) {
     return channels;
   } catch(e) {
     Logger.log(e);
-    return null;
   }
 }
 
@@ -268,7 +265,6 @@ function getChannelUploads(channelId) {
     return getPlaylistItems(uploadsPlaylistId);
   } catch(e) {
     Logger.log(e);
-    return null;
   }
 }
 
@@ -292,7 +288,6 @@ function getPlaylistItems(playlistId) {
     return getVideos(itemIds);
   } catch(e) {
     Logger.log(e);
-    return null;
   }
 }
 
@@ -307,7 +302,6 @@ function addToPlaylist(playlistId, videoId) {
     YouTube.PlaylistItems.insert({snippet: {playlistId: playlistId, resourceId: {kind: "youtube#video", videoId: videoId}}}, "snippet");
   } catch(e) {
     Logger.log(e);
-    return null;
   }
 }
 
@@ -324,7 +318,6 @@ function removeFromPlaylist(playlistId, videoId) {
     YouTube.PlaylistItems.remove(deletionId);
   } catch(e) {
     Logger.log(e);
-    return null;
   }
 }
 
@@ -335,7 +328,7 @@ function removeFromPlaylist(playlistId, videoId) {
 /**
  * Gets all data values from a spreadsheet, ignoring the header row.
  *
- * @param {Sheet} sheet The spreadsheet object.
+ * @param {Sheet} sheet The sheet object.
  * @param {String} [dataType] The type of object to return from the values.
  * @returns {Array[Array[Object]]} Returns the values.
  */
@@ -374,7 +367,7 @@ function getSheetValues(sheet, dataType) {
 /**
  * Inserts a range of data into a spreadsheet.
  *
- * @param {Sheet} sheet The spreadsheet object.
+ * @param {Sheet} sheet The sheet object.
  * @param {Object | Array[Object]} data The data to insert.
  */
 function addToSheet(sheet, data) {
@@ -390,8 +383,8 @@ function addToSheet(sheet, data) {
 /**
  * Updates a range of data in a spreadsheet.
  *
- * @param {Sheet} sheet The spreadsheet object.
- * @param {Object | Array[Object] | } data The data to insert.
+ * @param {Sheet} sheet The sheet object.
+ * @param {Object | Array[Object]} data The data to insert.
  * @param {Integer} row The row to update.
  */
 function updateInSheet(sheet, data, row) {
@@ -411,9 +404,9 @@ function updateInSheet(sheet, data, row) {
 /**
  * Sorts the given spreadsheet, ignoring the header row.
  *
- * @param {Sheet} sheet The spreadsheet object.
+ * @param {Sheet} sheet The sheet object.
  * @param {Integer} column The column number.
- * @param {Boolean} [ascending] True if ascending, defaults to false.
+ * @param {Boolean} [ascending] Whether or not to sort in ascending order, defaults to false.
  */
 function sortSheet(sheet, column, ascending) {
   ascending = ascending ? true : false;
@@ -442,8 +435,24 @@ async function logEvent(message) {
   const projectName = DriveApp.getFileById(projectId).getName();
   const date = new Date();
   const event = new Event(projectName, message, date);
-  const eventSpreadsheet = SpreadsheetApp.openById("1_78uNwS1kcxru3PIstADhjvR3hn6rlc-yc4v4PkLoMU").getActiveSheet();
-  addToSheet(eventSpreadsheet, event);
+  const eventSheet = SpreadsheetApp.openById("1_78uNwS1kcxru3PIstADhjvR3hn6rlc-yc4v4PkLoMU").getSheetByName("Events");
+  addToSheet(eventSheet, event);
+}
+
+/**
+ * Logs a change to the changelog spreadsheets.
+ *
+ * @param {Sheet} sheet The sheet object.
+ * @param {String} id The YouTube ID.
+ * @param {String} type The type of change.
+ * @param {String} oldValue The old value.
+ * @param {String} newValue The new value.
+ */
+async function logChange(sheet, id, type, oldValue, newValue) {
+  const change = new Change(formatYouTubeHyperlink(id), type, oldValue, newValue, new Date());
+  addToSheet(sheet, change);
+  const changelogSheet = SpreadsheetApp.openById("1_78uNwS1kcxru3PIstADhjvR3hn6rlc-yc4v4PkLoMU").getSheetByName("Changelog");
+  addToSheet(changelogSheet, change);
 }
 
 /////////////////////
@@ -490,11 +499,12 @@ function getUrlResponse(url, allowFailureCodes) {
  *
  * @param {String} url The URL to post to.
  * @param {Object} data The data to post.
+ * @param {Boolean} [usePutMethod] Whether or not to use the PUT method, defaults to false.
  * @returns {Object} Returns the response.
  */
-function postUrlResponse(url, data) {
+function postUrlResponse(url, data, usePutMethod) {
   const options = {
-    method: "post",
+    method: usePutMethod ? "put" : "post",
     contentType: "application/json",
     headers: { Authorization: authToken },
     payload: JSON.stringify(data)
@@ -507,33 +517,59 @@ function postUrlResponse(url, data) {
  * Posts a video / rip object to siivagunnerdatabase.net.
  * This will fail if the user doesn't have permission.
  *
- * @param {Object} video The video object to post.
+ * @param {Object | Array[Object]} videos The video objects to post.
+ * @param {Boolean} [updateExisting] Whether or not to update existing records, defaults to false.
  * @returns {Object} Returns the response.
  */
-function postToVideoDb(video) {
+function postToVideoDb(videos, updateExisting) {
+  // Convert to Array[]
+  if (!Array.isArray(videos)) {
+    videos = [videos];
+  }
+
   const url = "https://siivagunnerdatabase.net/api/rips/";
-  // TODO - set required fields
-  return postUrlResponse(url, video);
+  const channelId = getVideo(videos[0].id);
+
+  // Set the required fields
+  videos.forEach((video) => {
+    video.channel = channelId;
+    video.author = 2; // spreadsheet-bot
+    video.visible = true;
+  });
+
+  return postUrlResponse(url, videos, updateExisting);
 }
 
 /**
  * Posts a channel object to siivagunnerdatabase.net.
  * This will fail if the user doesn't have permission.
  *
- * @param {Object} channel The channel object to post.
+ * @param {Object | Array[Object]} channels The channel objects to post.
+ * @param {Boolean} [updateExisting] Whether or not to update existing records, defaults to false.
  * @returns {Object} Returns the response.
  */
-function postToChannelDb(channel) {
+function postToChannelDb(channels, updateExisting) {
+  // Convert to Array[]
+  if (!Array.isArray(channels)) {
+    channels = [channels];
+  }
+
   const url = "https://siivagunnerdatabase.net/api/channels/";
-  // TODO - set required fields
-  return postUrlResponse(url, channel);
+
+  // Set the required fields
+  channels.forEach((channel) => {
+    channel.author = 2; // spreadsheet-bot
+    channel.visible = true;
+  });
+
+  return postUrlResponse(url, channels, updateExisting);
 }
 
 /**
  * Gets the status of a YouTube video, playlist, or channel.
  *
  * @param {String} youtubeId The YouTube video, playlist, or channel ID.
- * @returns {String} Returns the status: "Public", "Unlisted", "Unavailable", or "Deleted".
+ * @returns {String} Returns the status: "Public", "Unlisted", "Unavailable", "Private", or "Deleted".
  */
 function getYouTubeStatus(youtubeId) {
   let url;
