@@ -256,13 +256,14 @@ function getChannels(channelIds) {
  * Gets JSON data from a YouTube channel's uploads.
  *
  * @param {String} channelId The YouTube channel ID.
+ * @param {Integer} [limit] The video count limit.
  * @returns {Array[Object]} Returns the video objects.
  */
-function getChannelUploads(channelId) {
+function getChannelUploads(channelId, limit) {
   try {
     const channel = YouTube.Channels.list("contentDetails", {id: channelId}).items[0];
     const uploadsPlaylistId = channel.contentDetails.relatedPlaylists.uploads;
-    return getPlaylistItems(uploadsPlaylistId);
+    return getPlaylistItems(uploadsPlaylistId, limit);
   } catch(e) {
     Logger.log(e);
   }
@@ -272,9 +273,10 @@ function getChannelUploads(channelId) {
  * Gets JSON data from videos in a YouTube playlist.
  *
  * @param {String} playlistId The YouTube playlist ID.
+ * @param {Integer} [limit] The video count limit.
  * @returns {Array[Object]} Returns the video objects.
  */
-function getPlaylistItems(playlistId) {
+function getPlaylistItems(playlistId, limit) {
   try {
     let itemIds = [];
     let nextPageToken = "";
@@ -282,7 +284,7 @@ function getPlaylistItems(playlistId) {
     while (nextPageToken != null) {
       const playlist = YouTube.PlaylistItems.list("snippet", {playlistId: playlistId, maxResults: 50, pageToken: nextPageToken});
       playlist.items.forEach(function(item) {itemIds.push(item.snippet.resourceId)});
-      nextPageToken = playlist.nextPageToken;
+      nextPageToken = limit && itemIds.length >= limit ? null : playlist.nextPageToken;
     }
 
     return getVideos(itemIds);
@@ -514,7 +516,7 @@ function postUrlResponse(url, data, usePutMethod) {
 }
 
 /**
- * Posts a video / rip object to siivagunnerdatabase.net.
+ * Posts video / rip objects to siivagunnerdatabase.net.
  * This will fail if the user doesn't have permission.
  *
  * @param {Object | Array[Object]} videos The video objects to post.
@@ -541,7 +543,7 @@ function postToVideoDb(videos, updateExisting) {
 }
 
 /**
- * Posts a channel object to siivagunnerdatabase.net.
+ * Posts channel objects to siivagunnerdatabase.net.
  * This will fail if the user doesn't have permission.
  *
  * @param {Object | Array[Object]} channels The channel objects to post.
