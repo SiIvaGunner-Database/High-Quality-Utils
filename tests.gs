@@ -44,13 +44,15 @@ function runTests() {
   Logger.log( addToSheet(sheet, video) );
   Logger.log( updateInSheet(sheet, video, row) );
   Logger.log( sortSheet(sheet, column) );
-  Logger.log( getApiKey() );
+  Logger.log( getAuthToken() );
   Logger.log( logEvent(message) );
 
   Logger.log( "Testing fetch utilities" );
   Logger.log( getUrlResponse(url) );
   Logger.log( postUrlResponse(url, data) );
+  Logger.log( getFromVideoDb(video) );
   Logger.log( postToVideoDb(video) );
+  Logger.log( getFromChannelDb() );
   Logger.log( postToChannelDb(channel) );
   Logger.log( getYouTubeStatus(videoId) );
   Logger.log( getWikiStatus(wikiName, pageName) );

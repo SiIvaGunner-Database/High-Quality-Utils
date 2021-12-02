@@ -516,6 +516,19 @@ function postUrlResponse(url, data, usePutMethod) {
 }
 
 /**
+ * Gets all video / rip objects from siivagunnerdatabase.net.
+ * This will fail if the user doesn't have permission.
+ *
+ * @returns {Array[Object]} Returns the response.
+ */
+function getFromVideoDb() {
+  const url = "https://siivagunnerdatabase.net/api/rips/";
+  const options = { headers: { Authorization: authToken } };
+  const response = UrlFetchApp.fetch(url, options);
+  return JSON.parse(response.getContentText());
+}
+
+/**
  * Posts video / rip objects to siivagunnerdatabase.net.
  * This will fail if the user doesn't have permission.
  *
@@ -540,6 +553,19 @@ function postToVideoDb(videos, updateExisting) {
   });
 
   return postUrlResponse(url, videos, updateExisting);
+}
+
+/**
+ * Gets all channel objects from siivagunnerdatabase.net.
+ * This will fail if the user doesn't have permission.
+ *
+ * @returns {Array[Object]} Returns the response.
+ */
+function getFromChannelDb() {
+  const url = "https://siivagunnerdatabase.net/api/channels/";
+  const options = { headers: { Authorization: authToken } };
+  const response = UrlFetchApp.fetch(url, options);
+  return JSON.parse(response.getContentText());
 }
 
 /**
