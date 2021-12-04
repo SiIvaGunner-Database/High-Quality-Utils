@@ -2,7 +2,6 @@
  * Runs all function tests.
  */
 function runTests() {
-
   const date = new Date();
   const length = "PT1H1M1S";
   const videoId = "NzoneDE0A2o";
@@ -25,7 +24,7 @@ function runTests() {
   Logger.log( formatLength(length) );
   Logger.log( formatYouTubeHyperlink(videoId) );
   Logger.log( formatFandomHyperlink(pageName, wikiName) );
-  Logger.log( encodeFandomPageName(pageName) );
+  Logger.log( formatFandomPageName(pageName) );
 
   Logger.log( "Testing YouTube utilities" );
   Logger.log( getVideo(videoId) );
@@ -50,12 +49,11 @@ function runTests() {
   Logger.log( "Testing fetch utilities" );
   Logger.log( getUrlResponse(url) );
   Logger.log( postUrlResponse(url, data) );
-  Logger.log( getFromVideoDb(video) );
+  Logger.log( getFromVideoDb() );
   Logger.log( postToVideoDb(video) );
   Logger.log( getFromChannelDb() );
   Logger.log( postToChannelDb(channel) );
   Logger.log( getYouTubeStatus(videoId) );
   Logger.log( getWikiStatus(wikiName, pageName) );
   Logger.log( getCategoryMembers(wikiName, categoryName) );
-
 }

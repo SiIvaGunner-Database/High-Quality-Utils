@@ -70,7 +70,7 @@ function formatLength(length) {
  * @returns {String} Returns the formatted hyperlink.
  */
 function formatYouTubeHyperlink(youtubeId) {
-  let hyperlink;
+  let hyperlink = "";
 
   if (youtubeId.length == 11) {
     hyperlink = '=HYPERLINK("https://www.youtube.com/watch?v=' + youtubeId + '", "' + youtubeId + '")';
@@ -94,17 +94,18 @@ function formatFandomHyperlink(pageName, wikiName) {
   const wikiUrl = "https://" + wikiName + ".fandom.com/wiki/";
   pageName = pageName.replace(/Reupload: /g, "").replace(/Reup: /g, "");
   const simplePageName = pageName.replace(/"/g, '""').replace(/ \(GiIvaSunner\)/g, "");
-  const encodedPageName = encodeFandomPageName(pageName);
+  const encodedPageName = encodeURIComponent(formatFandomPageName(pageName));
   return '=HYPERLINK("' + wikiUrl + encodedPageName + '", "' + simplePageName + '")';
 }
 
 /**
- * Returns an encoded page name for a Fandom page URL.
+ * Returns an formatted page name for a Fandom page URL.
+ * Removes characters and slurs restricted by Fandom article names.
  *
  * @param {String} pageName The name of the wiki page.
- * @returns {String} Returns the encoded page name.
+ * @returns {String} Returns the formatted page name.
  */
-function encodeFandomPageName(pageName) {
+function formatFandomPageName(pageName) {
   pageName = pageName.replace(/#/g, '');
   pageName = pageName.replace(/\|/g, '');
   pageName = pageName.replace(/\[/g, '(');
@@ -113,7 +114,7 @@ function encodeFandomPageName(pageName) {
   pageName = pageName.replace(/\}/g, ')');
   pageName = pageName.replace(/\​\|\​_/g, 'L');
   pageName = pageName.replace(/Nigga/g, 'N----');
-  return encodeURIComponent(pageName);
+  return pageName;
 }
 
 ///////////////////////
@@ -138,8 +139,8 @@ function getVideo(videoId) {
  */
 function getVideos(videoIds) {
   try {
-    let videos = [];
-    let arrayOfIds = videoIds.slice();
+    const videos = [];
+    const arrayOfIds = videoIds.slice();
     let stringOfIds = "";
 
     while ( (stringOfIds = arrayOfIds.splice(-50).join(",")) && stringOfIds ) {
@@ -184,8 +185,8 @@ function getPlaylist(playlistId) {
  */
 function getPlaylists(playlistIds) {
   try {
-    let playlists = [];
-    let arrayOfIds = playlistIds.slice();
+    const playlists = [];
+    const arrayOfIds = playlistIds.slice();
     let stringOfIds = "";
 
     while ( (stringOfIds = arrayOfIds.splice(-50).join(",")) && stringOfIds ) {
@@ -226,8 +227,8 @@ function getChannel(channelId) {
  */
 function getChannels(channelIds) {
   try {
-    let channels = [];
-    let arrayOfIds = channelIds.slice();
+    const channels = [];
+    const arrayOfIds = channelIds.slice();
     let stringOfIds = "";
 
     while ( (stringOfIds = arrayOfIds.splice(-50).join(",")) && stringOfIds ) {
@@ -278,7 +279,7 @@ function getChannelUploads(channelId, limit) {
  */
 function getPlaylistItems(playlistId, limit) {
   try {
-    let itemIds = [];
+    const itemIds = [];
     let nextPageToken = "";
 
     while (nextPageToken != null) {
@@ -335,7 +336,7 @@ function removeFromPlaylist(playlistId, videoId) {
  * @returns {Array[Array[Object]]} Returns the values.
  */
 function getSheetValues(sheet, dataType) {
-  let data = sheet.getDataRange().getValues();
+  const data = sheet.getDataRange().getValues();
   data.shift(); // Ignore the header row
 
   if (dataType) {
@@ -600,7 +601,7 @@ function postToChannelDb(channels, updateExisting) {
  * @returns {String} Returns the status: "Public", "Unlisted", "Unavailable", "Private", or "Deleted".
  */
 function getYouTubeStatus(youtubeId) {
-  let url;
+  let url = "";
 
   if (youtubeId.length == 11) {
     url = 'https://www.youtube.com/watch?v=' + youtubeId;
@@ -612,7 +613,7 @@ function getYouTubeStatus(youtubeId) {
     return null;
   }
 
-  let youtubeStatus;
+  let youtubeStatus = "";
 
   if (youtubeId.length == 11) {
     const contentText = getUrlResponse(url).getContentText();
@@ -653,9 +654,10 @@ function getYouTubeStatus(youtubeId) {
  * @returns {String} Returns the status: "Documented" or "Undocumented".
  */
 function getWikiStatus(wikiName, pageName) {
-  const url = "https://" + wikiName + ".fandom.com/wiki/" + encodeFandomPageName(pageName);
+  const encodedPageName = encodeURIComponent(formatFandomPageName(pageName));
+  const url = "https://" + wikiName + ".fandom.com/wiki/" + encodedPageName;
   const statusCode = getUrlResponse(url, true).getResponseCode();
-  let wikiStatus;
+  let wikiStatus = "";
 
   if (statusCode == 200) {
     wikiStatus = "Documented";
@@ -674,7 +676,7 @@ function getWikiStatus(wikiName, pageName) {
  * @returns {Array[String]} Returns all category member names.
  */
 function getCategoryMembers(wikiName, categoryName) {
-  let categoryMembers = [];
+  const categoryMembers = [];
   let cmcontinue = "";
 
   while (cmcontinue != null) {
@@ -688,10 +690,7 @@ function getCategoryMembers(wikiName, categoryName) {
     };
 
     let url = "https://" + wikiName + ".fandom.com/api.php?"; 
-
-    Object.keys(params).forEach((key) => {
-      url += "&" + key + "=" + params[key];
-    });
+    Object.keys(params).forEach(key => url += "&" + key + "=" + params[key]);
 
     try {
       const contentText = getUrlResponse(url).getContentText();
@@ -703,7 +702,5 @@ function getCategoryMembers(wikiName, categoryName) {
     }
   }
 
-  return categoryMembers.map((categoryMember) => {
-    return categoryMember.title;
-  });
+  return categoryMembers.map(categoryMember => categoryMember.title);
 }
