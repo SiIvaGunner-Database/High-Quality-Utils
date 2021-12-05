@@ -15,8 +15,6 @@ function runTests() {
   const row = 9;
   const message = "This is a test!";
   const url = "https://siivagunnerdatabase.net/api/";
-  const data = { key: "value" };
-  const channel = new Channel("id", "name", "wiki", "yt status", "join date", "desc", "videos", "subs", "views");
   const categoryName = "Rips with sentence mixing";
 
   Logger.log( "Testing general utilities" );
@@ -48,11 +46,7 @@ function runTests() {
 
   Logger.log( "Testing fetch utilities" );
   Logger.log( getUrlResponse(url) );
-  Logger.log( postUrlResponse(url, data) );
-  Logger.log( getFromVideoDb() );
-  Logger.log( postToVideoDb(video) );
-  Logger.log( getFromChannelDb() );
-  Logger.log( postToChannelDb(channel) );
+  Logger.log( getDatabaseResponse() );
   Logger.log( getYouTubeStatus(videoId) );
   Logger.log( getWikiStatus(wikiName, pageName) );
   Logger.log( getCategoryMembers(wikiName, categoryName) );

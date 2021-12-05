@@ -497,101 +497,49 @@ function getUrlResponse(url, allowFailureCodes) {
 }
 
 /**
- * Gets a response from a post request to a URL.
- * Sends the default siivagunnerdatabase.net authentication token in header.
+ * Gets data from the siivagunnerdatabase.net API.
+ * This will fail if the user doesn't have permission.
  *
- * @param {String} url The URL to post to.
- * @param {Object} data The data to post.
- * @param {Boolean} [usePutMethod] Whether or not to use the PUT method, defaults to false.
- * @returns {Object} Returns the response.
+ * @param {String} [apiPath] The path to append to /api/.
+ * @param {String} [method] The method to use, defaults to get.
+ * @param {Object | Array[Object]} [data] The data to send.
+ * @returns {Object} Returns the JSON response object.
  */
-function postUrlResponse(url, data, usePutMethod) {
+function getDatabaseResponse(apiPath, method, data) {
+  if (data) {
+    // Convert to Array[]
+    if (!Array.isArray(data)) {
+      data = [data];
+    }
+
+    // Set any required fields
+    if (apiPath == "rips") {
+      const channelId = YouTube.Videos.list("snippet", {id: data[0].id}).items[0].snippet.channelId;
+
+      data.forEach((video, index) => {
+        video.channel = channelId;
+        video.author = 2; // spreadsheet-bot
+        video.visible = true;
+        data[index] = video;
+      });
+    } else if (apiPath == "channels") {
+      data.forEach((channel, index) => {
+        channel.author = 2; // spreadsheet-bot
+        channel.visible = true;
+        data[index] = channel;
+      });
+    }
+  }
+
+  const url = "https://siivagunnerdatabase.net/api/" + apiPath || "";
   const options = {
-    method: usePutMethod ? "put" : "post",
+    method: method || "GET",
     contentType: "application/json",
     headers: { Authorization: authToken },
-    payload: JSON.stringify(data)
+    payload: JSON.stringify(data || {})
   };
-
-  return UrlFetchApp.fetch(url, options);
-}
-
-/**
- * Gets all video / rip objects from siivagunnerdatabase.net.
- * This will fail if the user doesn't have permission.
- *
- * @returns {Array[Object]} Returns the response.
- */
-function getFromVideoDb() {
-  const url = "https://siivagunnerdatabase.net/api/rips/";
-  const options = { headers: { Authorization: authToken } };
   const response = UrlFetchApp.fetch(url, options);
   return JSON.parse(response.getContentText());
-}
-
-/**
- * Posts video / rip objects to siivagunnerdatabase.net.
- * This will fail if the user doesn't have permission.
- *
- * @param {Object | Array[Object]} videos The video objects to post.
- * @param {Boolean} [updateExisting] Whether or not to update existing records, defaults to false.
- * @returns {Object} Returns the response.
- */
-function postToVideoDb(videos, updateExisting) {
-  // Convert to Array[]
-  if (!Array.isArray(videos)) {
-    videos = [videos];
-  }
-
-  const url = "https://siivagunnerdatabase.net/api/rips/";
-  const channelId = getVideo(videos[0].id);
-
-  // Set the required fields
-  videos.forEach((video) => {
-    video.channel = channelId;
-    video.author = 2; // spreadsheet-bot
-    video.visible = true;
-  });
-
-  return postUrlResponse(url, videos, updateExisting);
-}
-
-/**
- * Gets all channel objects from siivagunnerdatabase.net.
- * This will fail if the user doesn't have permission.
- *
- * @returns {Array[Object]} Returns the response.
- */
-function getFromChannelDb() {
-  const url = "https://siivagunnerdatabase.net/api/channels/";
-  const options = { headers: { Authorization: authToken } };
-  const response = UrlFetchApp.fetch(url, options);
-  return JSON.parse(response.getContentText());
-}
-
-/**
- * Posts channel objects to siivagunnerdatabase.net.
- * This will fail if the user doesn't have permission.
- *
- * @param {Object | Array[Object]} channels The channel objects to post.
- * @param {Boolean} [updateExisting] Whether or not to update existing records, defaults to false.
- * @returns {Object} Returns the response.
- */
-function postToChannelDb(channels, updateExisting) {
-  // Convert to Array[]
-  if (!Array.isArray(channels)) {
-    channels = [channels];
-  }
-
-  const url = "https://siivagunnerdatabase.net/api/channels/";
-
-  // Set the required fields
-  channels.forEach((channel) => {
-    channel.author = 2; // spreadsheet-bot
-    channel.visible = true;
-  });
-
-  return postUrlResponse(url, channels, updateExisting);
 }
 
 /**
