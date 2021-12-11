@@ -138,33 +138,37 @@ function getVideo(videoId) {
  * @returns {Object} Returns the video objects.
  */
 function getVideos(videoIds) {
-  try {
-    const videos = [];
-    const arrayOfIds = videoIds.slice();
-    let stringOfIds = "";
+  const videos = [];
+  const arrayOfIds = videoIds.slice();
+  let stringOfIds = "";
 
+  try {
     while ( (stringOfIds = arrayOfIds.splice(-50).join(",")) && stringOfIds ) {
       YouTube.Videos.list("snippet,contentDetails,statistics", {id: stringOfIds}).items.forEach((item) => {
         videos.push(new Video(
-          item.snippet.resourceId,
+          item.id,
           item.snippet.title,
           "Undocumented",
           "Public",
           formatDate(item.snippet.publishedAt),
           item.contentDetails.duration,
           item.snippet.description,
-          item.statistics.videoCount,
+          item.statistics.viewCount,
           item.statistics.likeCount,
           item.statistics.dislikeCount,
           item.statistics.commentCount
         ));
       });
-    }
 
-    return videos;
+      if (videos.length % 1000 < 50 && videos.length > 50) {
+        Logger.log("Found " + videos.length + " videos...");
+      }
+    }
   } catch(e) {
     Logger.log(e);
   }
+
+  return videos;
 }
 
 /**
@@ -342,21 +346,27 @@ function getSheetValues(sheet, dataType) {
   if (dataType) {
     switch (dataType.toLowerCase()) {
       case "video":
+      case "videos":
         data.forEach((row, index) => {
+          row[6] = row[6].toString().replace(/NEWLINE/g, "\n"); // video.description
           data[index] = new Video(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10]);
         });
         break;
       case "playlist":
+      case "playlists":
         data.forEach((row, index) => {
           data[index] = new Playlist(row[0], row[1], row[2], row[3], row[4], row[5], row[6]);
         });
         break;
       case "channel":
+      case "channels":
         data.forEach((row, index) => {
+          row[5] = row[5].toString().replace(/NEWLINE/g, "\n"); // channel.description
           data[index] = new Channel(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]);
         });
         break;
       case "change":
+      case "changes":
         data.forEach((row, index) => {
           data[index] = new Change(row[0], row[1], row[2], row[3]);
         });
@@ -397,9 +407,19 @@ function updateInSheet(sheet, data, row) {
   }
 
   // Convert to Array[Array[]]
-  for (let i in data) {
-    data[i] = Object.values(data[i]);
-  }
+  data.forEach((object, index) => {
+    switch(object.constructor.name) {
+      case "Video":
+      case "Playlist":
+      case "Channel":
+        object.id = formatYouTubeHyperlink(object.id);
+        object.description = object.description.toString().replace(/\n/g, "NEWLINE");
+        break;
+    }
+
+    // Convert to array of object values
+    data[index] = Object.values(object);
+  });
 
   sheet.getRange(row, 1, data.length, sheet.getLastColumn()).setValues(data);
 }
