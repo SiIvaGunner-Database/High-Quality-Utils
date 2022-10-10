@@ -60,6 +60,8 @@ const playlistService = new PlaylistService();
 
 /**
  * Returns a new playlist service instance.
+ * 
+ * @returns {PlaylistService} Returns the playlist service.
  */
 function getPlaylistService() {
   return playlistService;

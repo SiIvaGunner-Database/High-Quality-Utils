@@ -61,3 +61,16 @@ class VideoService {
 
 }
 
+/**
+ * Constant video service variable.
+ */
+const videoService = new VideoService();
+
+/**
+ * Returns a new video service instance.
+ * 
+ * @returns {VideoService} Returns the video service.
+ */
+function getVideoService() {
+  return videoService;
+}
