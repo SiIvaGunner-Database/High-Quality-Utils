@@ -4,7 +4,7 @@
  * @param {String | Date} date The date to be formatted.
  * @returns {Date} Returns the formatted date.
  */
-function formatDate(date) {
+function formatDate_(date) {
   return Utilities.formatDate(new Date(date), "UTC", "yyyy-MM-dd   HH:mm:ss");
 }
 
@@ -14,7 +14,7 @@ function formatDate(date) {
  * @param {String} length The length to be formatted.
  * @returns {String} Returns the formatted length.
  */
-function formatLength(length) {
+function formatLength_(length) {
   let date = new Date();
 
   if (length.includes("H")) {
@@ -53,7 +53,7 @@ function formatLength(length) {
  * @param {String} youtubeId The YouTube video, playlist, or channel ID.
  * @returns {String} Returns the formatted hyperlink.
  */
-function formatYouTubeHyperlink(youtubeId) {
+function formatYouTubeHyperlink_(youtubeId) {
   let hyperlink = "";
 
   if (youtubeId.length == 11) {
@@ -74,7 +74,7 @@ function formatYouTubeHyperlink(youtubeId) {
  * @param {String} String The name of the wiki.
  * @returns {String} Returns the formatted hyperlink.
  */
-function formatFandomHyperlink(pageName, wikiName) {
+function formatFandomHyperlink_(pageName, wikiName) {
   const wikiUrl = "https://" + wikiName + ".fandom.com/wiki/";
   pageName = pageName.replace(/Reupload: /g, "").replace(/Reup: /g, "");
   const simplePageName = pageName.replace(/"/g, '""').replace(/ \(GiIvaSunner\)/g, "");
@@ -89,7 +89,7 @@ function formatFandomHyperlink(pageName, wikiName) {
  * @param {String} pageName The name of the wiki page.
  * @returns {String} Returns the formatted page name.
  */
-function formatFandomPageName(pageName) {
+function formatFandomPageName_(pageName) {
   pageName = pageName.replace(/#/g, '');
   pageName = pageName.replace(/\|/g, '');
   pageName = pageName.replace(/\[/g, '(');
@@ -108,7 +108,7 @@ function formatFandomPageName(pageName) {
  * @returns {String} Returns the authentication token.
  * @throws {MissingPropertyError} Thrown if no script property with the key 'authToken' exists.
  */
-function getAuthToken(scriptProperties) {
+function getAuthToken_(scriptProperties) {
   if (!scriptProperties.getProperty("authToken")) {
     throw new MissingPropertyError("authToken");
   }
@@ -124,7 +124,7 @@ function getAuthToken(scriptProperties) {
  * @returns {String} Returns the authentication token.
  * @throws {MissingPropertyError} Thrown if no script property with the key 'authToken' exists.
  */
-function getAuthToken(value) {
+function getAuthToken_(value) {
   scriptProperties().setProperty("authToken", value);
 }
 
@@ -136,7 +136,7 @@ function getAuthToken(value) {
  * @param {Boolean} [allowFailureCodes] Whether or not to allow failure response codes, defaults to false.
  * @returns {Object} Returns the response.
  */
-function getUrlResponse(url, allowFailureCodes) {
+function getUrlResponse_(url, allowFailureCodes) {
   allowFailureCodes = allowFailureCodes || false;
   const start = new Date();
   let response;
@@ -172,7 +172,7 @@ function getUrlResponse(url, allowFailureCodes) {
  * @param {Object | Array[Object]} [data] The data to send.
  * @returns {Object} Returns the JSON response object.
  */
-function getDatabaseResponse(apiPath, method, data) {
+function getDatabaseResponse_(apiPath, method, data) {
   if (data) {
     // Convert to Array[]
     if (!Array.isArray(data)) {
@@ -216,7 +216,7 @@ function getDatabaseResponse(apiPath, method, data) {
  * @param {String} youtubeId The YouTube video, playlist, or channel ID.
  * @returns {String} Returns the status: "Public", "Unlisted", "Unavailable", "Private", or "Deleted".
  */
-function getYouTubeStatus(youtubeId) {
+function getYouTubeStatus_(youtubeId) {
   let url = "";
 
   if (youtubeId.length == 11) {
