@@ -1,5 +1,6 @@
 /**
  * Error class for missing script or user properties.
+ * @extends Error
  */
 class MissingPropertyError extends Error {
 
@@ -9,13 +10,14 @@ class MissingPropertyError extends Error {
    * @param {String} propertyKey The script property key.
    */
   constructor(propertyKey) {
-    super(`You must create a property with the key '${propertyKey}' in order to use this method`);
+    super(`You must create a property with the key '${propertyKey}' in order to use this method`)
   }
 
 }
 
 /**
  * Error class for invalid parameter types.
+ * @extends TypeError
  */
 class InvalidParameterTypeError extends TypeError {
 
@@ -26,7 +28,7 @@ class InvalidParameterTypeError extends TypeError {
    * @param {String} expectedType The expected parameter type.
    */
   constructor(givenType, expectedType) {
-    super(`Invalid parameter of type '${givenType}' when expecting '${expectedType}'' type`);
+    super(`Invalid parameter of type '${givenType}' when expecting '${expectedType}' type`)
   }
 
 }

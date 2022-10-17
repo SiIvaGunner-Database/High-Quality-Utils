@@ -1,35 +1,46 @@
 /**
- * Service class for YouTube playlists.
+ * Service class for playlists.
  */
 class PlaylistService {
 
   /**
-   * Creates a new playlist service.
+   * Create a playlist service.
    */
   constructor() {
+    this._cache = []
+  }
+
+  getById(playlistId) {
+
+  }
+
+  getAll() {
+
+  }
+
+  updateAll() {
+    
   }
 
   /**
    * Gets JSON data from a YouTube playlist.
-   *
-   * @param {String} playlistId The YouTube video ID.
-   * @returns {Object} Returns the playlist object.
+   * @param {String} playlistId - The YouTube video ID.
+   * @return {Object} The playlist object.
    */
-  getPlaylist(playlistId) {
-    return getPlaylists([playlistId]).join("");
+  getYoutubePlaylist_(playlistId) {
+    return getYoutubePlaylists([playlistId]).join("")
   }
 
   /**
    * Gets JSON data from multiple YouTube playlists.
-   *
-   * @param {Array[String]} playlistIds The YouTube playlist IDs.
-   * @returns {Object} Returns the playlist objects.
+   * @param {Array[String]} playlistIds - The YouTube playlist IDs.
+   * @return {Object} The playlist objects.
    */
-  getPlaylists(playlistIds) {
+  getYoutubePlaylists_(playlistIds) {
     try {
-      const playlists = [];
-      const arrayOfIds = playlistIds.slice();
-      let stringOfIds = "";
+      const playlists = []
+      const arrayOfIds = playlistIds.slice()
+      let stringOfIds = ""
 
       while ( (stringOfIds = arrayOfIds.splice(-50).join(",")) && stringOfIds ) {
         YouTube.Playlists.list("snippet,contentDetails", {id: stringOfIds}).items.forEach((item) => {
@@ -41,28 +52,35 @@ class PlaylistService {
             item.contentDetails.itemCount,
             "",
             "Public"
-          ));
-        });
+          ))
+        })
       }
 
-      return playlists;
+      return playlists
     } catch(e) {
-      Logger.log(e);
+      Logger.log(e)
     }
+  }
+
+  getDatabasePlaylist_(playlistId) {
+    
+  }
+
+  getDatabasePlaylists_(playlistIds) {
+    
   }
 
 }
 
 /**
- * Constant playlist service variable.
+ * The constant playlist service.
  */
-const playlistService = new PlaylistService();
+const playlistService = new PlaylistService()
 
 /**
- * Returns a new playlist service instance.
- * 
- * @returns {PlaylistService} Returns the playlist service.
+ * Get the playlist service instance.
+ * @return {PlaylistService} The playlist service.
  */
 function getPlaylistService() {
-  return playlistService;
+  return playlistService
 }

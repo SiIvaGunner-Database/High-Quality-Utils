@@ -1,35 +1,46 @@
 /**
- * Service class for YouTube channels.
+ * Service class for channels.
  */
 class ChannelService {
 
   /**
-   * Creates a new channel service.
+   * Create a channel service.
    */
   constructor() {
+    this._cache = []
+  }
+
+  getById(channelId) {
+
+  }
+
+  getAll() {
+
+  }
+
+  updateAll() {
+    
   }
 
   /**
    * Gets JSON data from a YouTube channel.
-   *
-   * @param {String} channelId The YouTube channel ID.
-   * @returns {Object} Returns the channel object.
+   * @param {String} channelId - The YouTube channel ID.
+   * @return {Object} The channel object.
    */
-  getChannel(channelId) {
-    return getChannels([channelId]).join("");
+  getYoutubeChannel_(channelId) {
+    return getYoutubeChannels([channelId]).join("")
   }
 
   /**
    * Gets JSON data from multiple YouTube channels.
-   *
-   * @param {Array[String]} channelIds The YouTube channel IDs.
-   * @returns {Object} Returns the channel objects.
+   * @param {Array[String]} channelIds - The YouTube channel IDs.
+   * @return {Object} The channel objects.
    */
-  getChannels(channelIds) {
+  getYoutubeChannels_(channelIds) {
     try {
-      const channels = [];
-      const arrayOfIds = channelIds.slice();
-      let stringOfIds = "";
+      const channels = []
+      const arrayOfIds = channelIds.slice()
+      let stringOfIds = ""
 
       while ( (stringOfIds = arrayOfIds.splice(-50).join(",")) && stringOfIds ) {
         YouTube.Channels.list("snippet,statistics", {id: stringOfIds}).items.forEach((item) => {
@@ -43,28 +54,39 @@ class ChannelService {
             item.statistics.videoCount,
             item.statistics.subscriberCount,
             item.statistics.viewCount
-          ));
-        });
+          ))
+        })
       }
 
-      return channels;
+      return channels
     } catch(e) {
-      Logger.log(e);
+      Logger.log(e)
     }
+  }
+
+  getDatabaseChannel_(channelId) {
+    
+  }
+
+  getDatabaseChannels_(channelIds) {
+    
+  }
+
+  updateDatabaseChannels_(channels) {
+    
   }
 
 }
 
 /**
- * Constant channel service variable.
+ * The constant channel service.
  */
-const channelService = new ChannelService();
+const channelService = new ChannelService()
 
 /**
- * Returns a new channel service instance.
- * 
- * @returns {ChannelService} Returns the channel service.
+ * Get the channel service instance.
+ * @return {ChannelService} The channel service.
  */
 function getChannelService() {
-  return channelService;
+  return channelService
 }

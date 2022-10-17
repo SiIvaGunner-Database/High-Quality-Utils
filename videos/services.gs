@@ -1,34 +1,45 @@
 /**
- * Service class for YouTube videos.
+ * Service class for videos.
  */
 class VideoService {
 
   /**
-   * Creates a new video service.
+   * Create a video service.
    */
   constructor() {
+    this._cache = []
+  }
+
+  getById(videoId) {
+
+  }
+
+  getAll() {
+
+  }
+
+  updateAll() {
+    
   }
 
   /**
    * Gets JSON data from a YouTube video.
-   *
-   * @param {String} videoId The YouTube video ID.
-   * @returns {Object} Returns the video object.
+   * @param {String} videoId - The YouTube video ID.
+   * @return {Object} The video object.
    */
-  getVideo(videoId) {
-    return getVideos([videoId]).join("");
+  getYoutubeVideo_(videoId) {
+    return getYoutubeVideos([videoId]).join("")
   }
 
   /**
    * Gets JSON data from multiple YouTube videos.
-   *
-   * @param {Array[String]} videoIds The YouTube video IDs.
-   * @returns {Object} Returns the video objects.
+   * @param {Array[String]} videoIds - The YouTube video IDs.
+   * @return {Object} The video objects.
    */
-  getVideos(videoIds) {
-    const videos = [];
-    const arrayOfIds = videoIds.slice();
-    let stringOfIds = "";
+  getYotubeVideos_(videoIds) {
+    const videos = []
+    const arrayOfIds = videoIds.slice()
+    let stringOfIds = ""
 
     try {
       while ( (stringOfIds = arrayOfIds.splice(-50).join(",")) && stringOfIds ) {
@@ -45,32 +56,50 @@ class VideoService {
             item.statistics.likeCount,
             item.statistics.dislikeCount,
             item.statistics.commentCount
-          ));
-        });
+          ))
+        })
 
         if (videos.length % 1000 < 50 && videos.length > 50) {
-          Logger.log("Found " + videos.length + " videos...");
+          Logger.log("Found " + videos.length + " videos...")
         }
       }
     } catch(e) {
-      Logger.log(e);
+      Logger.log(e)
     }
 
-    return videos;
+    return videos
+  }
+
+  /**
+   * Gets JSON data from a YouTube video.
+   * @param {String} videoId - The YouTube video ID.
+   * @return {Object} The video object.
+   */
+  getDatabaseVideo_(videoId) {
+    return getYoutubeVideos([videoId]).join("")
+  }
+
+  /**
+   * Gets JSON data from multiple YouTube videos.
+   * @param {Array[String]} videoIds - The YouTube video IDs.
+   * @return {Object} The video objects.
+   */
+  getDatabaseVideos_(videoIds) {
+    const videos = []
+    return videos
   }
 
 }
 
 /**
- * Constant video service variable.
+ * The constant video service.
  */
-const videoService = new VideoService();
+const videoService = new VideoService()
 
 /**
- * Returns a new video service instance.
- * 
- * @returns {VideoService} Returns the video service.
+ * Get the video service instance.
+ * @return {VideoService} The video service.
  */
 function getVideoService() {
-  return videoService;
+  return videoService
 }
