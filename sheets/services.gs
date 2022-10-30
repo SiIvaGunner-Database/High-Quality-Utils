@@ -1,38 +1,42 @@
+let SpreadsheetService
+
 /**
  * Service class for spreadsheets.
+ * @return {Class} The service class.
  */
-class SpreadsheetService {
+function SpreadsheetService_() {
+  if (SpreadsheetService == undefined) SpreadsheetService = class SpreadsheetService {
+    /**
+     * Create a sheet service.
+     */
+    constructor() {
+      this._cache = []
+    }
 
-  /**
-   * Create a sheet service.
-   */
-  constructor() {
-    this._cache = []
+    getById(spreadsheetId) {
+      
+    }
+
+    getAll() {
+
+    }
+
+    updateAll() {
+      
+    }
   }
 
-  getById(spreadsheetId) {
-    
-  }
-
-  getAll() {
-
-  }
-
-  updateAll() {
-    
-  }
-
+  return SpreadsheetService
 }
 
-/**
- * The constant playlist service.
- */
-const spreadsheetService = new SpreadsheetService()
+let theSpreadsheetService
 
 /**
- * get the spreadsheet service instance.
- * @return {SpreadsheetService} The spreadsheet service.
+ * Get the spreadsheet service.
+ * return {SpreadsheetService} The service object.
  */
-function getSpreadsheetService() {
-  return spreadsheetService
+function spreadsheetService() {
+  if (theSpreadsheetService == undefined) theSpreadsheetService = new SpreadsheetService_()
+
+  return theSpreadsheetService
 }

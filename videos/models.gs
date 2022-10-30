@@ -1,61 +1,65 @@
-/** 
+let Video
+
+/**
  * Model class representing a video.
+ * @return {Class} The model class.
  */
-class Video {
+function Video_() {
+  if (Video == undefined) Video = class Video {
+    /**
+     * Creates a video object.
+     * @param {Object} youtubeObject - The YouTube metadata.
+     * @param {Object} databaseObject - The database metadata.
+     */
+    constructor(youtubeObject, databaseObject) {
+      this._ytObject = youtubeObject
+      this._dbObject = databaseObject
+    }
 
-  /**
-   * Creates a video object.
-   *
-   * @param {Object} youtubeObject - The YouTube metadata object.
-   * @param {Object} databaseObject - The database metadata object.
-   */
-  constructor(youtubeObject, databaseObject) {
-    this._ytObject = youtubeObject
-    this._dbObject = databaseObject
+    getSpreadsheet() {
+      
+    }
+
+    getChannel() {
+      
+    }
+
+    getPlaylists() {
+
+    }
+
+    getYoutubeObject() {
+      
+    }
+
+    getDatabaseObject() {
+      
+    }
+
+    getYoutubeStatus() {
+
+    }
+
+    getWikiStatus() {
+
+    }
+
+    getChanges() {
+
+    }
+
+    hasChanges() {
+
+    }
+
+    update() {
+
+    }
+
+    logChanges_() {
+
+    }
   }
 
-  getSpreadsheet() {
-    
-  }
-
-  getChannel() {
-    
-  }
-
-  getPlaylists() {
-
-  }
-
-  getYoutubeObject() {
-    
-  }
-
-  getDatabaseObject() {
-    
-  }
-
-  getYoutubeStatus() {
-
-  }
-
-  getWikiStatus() {
-
-  }
-
-  getChanges() {
-
-  }
-
-  hasChanges() {
-
-  }
-
-  updateDatabaseObject() {
-
-  }
-
-  logChanges_() {
-
-  }
-
+  return Video
 }

@@ -1,119 +1,111 @@
+let Playlist
+
 /**
  * Model class representing a playlist.
+ * @return {Class} The model class.
  */
-class Playlist {
+function Playlist_() {
+  if (Playlist == undefined) Playlist = class Playlist {
+    /**
+     * Create a playlist object.
+     * @param {Object} youtubeObject - The YouTube metadata.
+     * @param {Object} databaseObject - The database metadata.
+     */
+    constructor(youtubeObject, databaseObject) {
+      this._ytObject = youtubeObject
+      this._dbObject = databaseObject
+    }
 
-  /**
-   * Creates a playlist object.
-   * @param {Object} youtubeObject - The YouTube metadata object.
-   * @param {Object} databaseObject - The database metadata object.
-   */
-  constructor(youtubeObject, databaseObject) {
-    this._ytObject = youtubeObject
-    this._dbObject = databaseObject
-  }
+    /**
+     * Get the parent spreadsheet object.
+     */
+    getSpreadsheet() {
+      return {}
+    }
 
-  /**
-   * The parent spreadsheet object.
-   */
-  getSpreadsheet() {
-    
-  }
+    /**
+     * Get the parent channel object.
+     */
+    getChannel() {
+      return {}
+    }
 
-  /**
-   * The parent channel object.
-   */
-  getChannel() {
-    
-  }
+    /**
+     * Get the YouTube playlist metadata.
+     * See https://developers.google.com/youtube/v3/docs/playlists
+     * @return {Object} The playlist metadata.
+     */
+    getYoutubeObject() {
+      return {}
+    }
 
-  /**
-   * Get the YouTube playlist metadata object.
-   * See https://developers.google.com/youtube/v3/docs/playlists
-   * @return {Object} the playlist metadata
-   */
-  getYoutubeObject() {
-    return {}
-  }
+    /**
+     * Get the database playlist metadata.
+     * See https://siivagunnerdatabase.net/api/playlists/
+     * @return {Object} The playlist metadata.
+     */
+    getDatabaseObject() {
+      return {}
+    }
 
-  /**
-   * Get the database playlist metadata object.
-   * See https://siivagunnerdatabase.net/api/playlists/
-   * @return {Object} the playlist metadata
-   */
-  getDatabaseObject() {
-    return {}
-  }
+    getYoutubeStatus() {
+      this.getDatabaseObject()
+    }
 
-  getYoutubeStatus() {
-    this.getDatabaseObject()
-  }
+    getChanges() {
 
-  getChanges() {
+    }
 
-  }
+    hasChanges() {
 
-  hasChanges() {
+    }
 
-  }
+    updateDatabaseObject() {
 
-  updateDatabaseObject() {
+    }
 
-  }
+    logChanges_() {
 
-  logChanges_() {
+    }
 
-  }
+    /**
+     * Get the appropriate metadata from videos in a YouTube playlist.
+     * @param {String} playlistId - The YouTube playlist ID.
+     * @param {Integer} [limit] - The video count limit.
+     * @return {Array[Object]} The video objects.
+     */
+    getVideos(limit) {
+      return youtubeService().getPlaylistItems(limit)
+    }
 
-  /**
-   * Gets JSON data from videos in a YouTube playlist.
-   * @param {String} playlistId - The YouTube playlist ID.
-   * @param {Integer} [limit] - The video count limit.
-   * @return {Array[Object]} The video objects.
-   */
-  getVideos(limit) {
-    try {
-      const itemIds = []
-      let nextPageToken = ""
-
-      while (nextPageToken != null) {
-        const playlist = YouTube.PlaylistItems.list("snippet", {playlistId: playlistId, maxResults: 50, pageToken: nextPageToken})
-        playlist.items.forEach(function(item) {itemIds.push(item.snippet.resourceId)})
-        nextPageToken = limit && itemIds.length >= limit ? null : playlist.nextPageToken
+    /**
+     * Add a video to a YouTube playlist.
+     * @param {String} playlistId - The playlist ID.
+     * @param {String} videoId - The video ID.
+     */
+    addVideo(videoId) {
+      try {
+        YouTube.PlaylistItems.insert({snippet: {playlistId: playlistId, resourceId: {kind: "youtube#video", videoId: videoId}}}, "snippet")
+      } catch(e) {
+        Logger.log(e)
       }
+    }
 
-      return getVideos(itemIds)
-    } catch(e) {
-      Logger.log(e)
+    /**
+     * Remove a video from a YouTube playlist.
+     * @param {String} playlistId - The playlist ID.
+     * @param {String} videoId - The video ID.
+     */
+    removeVideo(videoId) {
+      try {
+        const playlist = YouTube.PlaylistItems.list("snippet", {playlistId: playlistId, videoId: videoId})
+        const deletionId = playlist.items[0].id
+        YouTube.PlaylistItems.remove(deletionId)
+      } catch(e) {
+        Logger.log(e)
+      }
     }
   }
 
-  /**
-   * Add a video to a YouTube playlist.
-   * @param {String} playlistId - The playlist ID.
-   * @param {String} videoId - The video ID.
-   */
-  addVideo(videoId) {
-    try {
-      YouTube.PlaylistItems.insert({snippet: {playlistId: playlistId, resourceId: {kind: "youtube#video", videoId: videoId}}}, "snippet")
-    } catch(e) {
-      Logger.log(e)
-    }
-  }
-
-  /**
-   * Remove a video from a YouTube playlist.
-   * @param {String} playlistId - The playlist ID.
-   * @param {String} videoId - The video ID.
-   */
-  removeVideo(videoId) {
-    try {
-      const playlist = YouTube.PlaylistItems.list("snippet", {playlistId: playlistId, videoId: videoId})
-      const deletionId = playlist.items[0].id
-      YouTube.PlaylistItems.remove(deletionId)
-    } catch(e) {
-      Logger.log(e)
-    }
-  }
-
+  return Playlist
 }
