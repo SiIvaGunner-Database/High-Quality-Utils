@@ -2,15 +2,16 @@ let SpreadsheetService
 
 /**
  * Service class for spreadsheets.
+ * @extends CachedService
  * @return {Class} The service class.
  */
 function SpreadsheetService_() {
-  if (SpreadsheetService == undefined) SpreadsheetService = class SpreadsheetService {
+  if (SpreadsheetService === undefined) SpreadsheetService = class SpreadsheetService extends CachedService_() {
     /**
      * Create a sheet service.
      */
     constructor() {
-      this._cache = []
+      super()
     }
 
     getById(spreadsheetId) {
@@ -35,8 +36,10 @@ let theSpreadsheetService
  * Get the spreadsheet service.
  * return {SpreadsheetService} The service object.
  */
-function spreadsheetService() {
-  if (theSpreadsheetService == undefined) theSpreadsheetService = new SpreadsheetService_()
+function spreadsheets() {
+  if (theSpreadsheetService === undefined) {
+    theSpreadsheetService = new (SpreadsheetService_())()
+  }
 
   return theSpreadsheetService
 }

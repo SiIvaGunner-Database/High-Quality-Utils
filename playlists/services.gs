@@ -2,15 +2,16 @@ let PlaylistService
 
 /**
  * Service class for playlists.
+ * @extends CachedService
  * @return {Class} The service class.
  */
 function PlaylistService_() {
-  if (PlaylistService == undefined) PlaylistService = class PlaylistService {
+  if (PlaylistService === undefined) PlaylistService = class PlaylistService extends CachedService_() {
     /**
      * Create a playlist service.
      */
     constructor() {
-      this._cache = []
+      super()
     }
 
     getById(playlistId) {
@@ -35,8 +36,10 @@ let thePlaylistService
  * Get the playlist service.
  * return {PlaylistService} The service object.
  */
-function playlistService() {
-  if (thePlaylistService == undefined) thePlaylistService = new PlaylistService_()
+function playlists() {
+  if (thePlaylistService === undefined) {
+    thePlaylistService = new (PlaylistService_())()
+  }
 
   return thePlaylistService
 }

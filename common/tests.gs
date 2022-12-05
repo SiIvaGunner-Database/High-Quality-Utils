@@ -5,7 +5,7 @@ let Tests
  * @return {Class} The tests class.
  */
 function Tests_() {
-  if (Tests == undefined) Tests = class Tests {
+  if (Tests === undefined) Tests = class Tests {
   }
 
   return Tests

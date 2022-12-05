@@ -6,7 +6,7 @@ let MissingPropertyError;
  * @return {Class} The error class.
  */
 function MissingPropertyError_() {
-  if (MissingPropertyError == undefined) MissingPropertyError = class MissingPropertyError extends Error {
+  if (MissingPropertyError === undefined) MissingPropertyError = class MissingPropertyError extends Error {
     /**
      * Create a missing property error object.
      * @param {String} propertyKey The property key.
@@ -19,15 +19,36 @@ function MissingPropertyError_() {
   return MissingPropertyError;
 }
 
+let RequiredParameterError;
+
+/**
+ * Error class for required parameters.
+ * @extends Error
+ * @return {Class} The error class.
+ */
+function RequiredParameterError_() {
+  if (RequiredParameterError === undefined) RequiredParameterError = class RequiredParameterError extends Error {
+    /**
+     * Create a required paramter error object.
+     * @param {String} propertyKey The property key.
+     */
+    constructor(parameterName) {
+      super(`'${parameterName}' can not be null or undefined`)
+    }
+  }
+
+  return RequiredParameterError;
+}
+
 let InvalidParameterTypeError;
 
 /**
  * Error class for invalid parameter types.
- * @extends TypeError
+ * @extends Error
  * @return {Class} The error class.
  */
 function InvalidParameterTypeError_() {
-  if (InvalidParameterTypeError == undefined) InvalidParameterTypeError = class InvalidParameterTypeError extends Error {
+  if (InvalidParameterTypeError === undefined) InvalidParameterTypeError = class InvalidParameterTypeError extends Error {
     /**
      * Create an invalid parameter type error object.
      * @param {String} givenType The given parameter type.

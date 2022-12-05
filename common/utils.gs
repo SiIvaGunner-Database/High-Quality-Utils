@@ -5,14 +5,13 @@ let Utils;
  * @return {Class} The utility class.
  */
 function Utils_() {
-  if (Utils == undefined) Utils = class Utils {
+  if (Utils === undefined) Utils = class Utils {
     /**
      * Get a date in the format "yyyy-MM-dd   HH:mm:ss".
      * @param {String | Date} date - The date to be formatted.
      * @return {Date} The formatted date.
      */
     formatDate(date) {
-      SpreadsheetApp.getActive().getActiveCell().getSheet().date
       return Utilities.formatDate(new Date(date), "UTC", "yyyy-MM-dd   HH:mm:ss")
     }
 
@@ -61,7 +60,7 @@ function Utils_() {
     getYoutubeHyperlink(youtubeId) {
       let hyperlink = ""
 
-      if (youtubeId.length == 11) {
+      if (youtubeId.length === 11) {
         hyperlink = '=HYPERLINK("https://www.youtube.com/watch?v=' + youtubeId + '", "' + youtubeId + '")'
       } else if (youtubeId.includes("PL")) {
         hyperlink = '=HYPERLINK("https://www.youtube.com/playlist?list=' + youtubeId + '", "' + youtubeId + '")'
@@ -155,15 +154,15 @@ function Utils_() {
           response = UrlFetchApp.fetch(url, { muteHttpExceptions: allowFailureCodes })
         } catch (e) {
           if (e.toString().includes("429")) {
-            Logger.log("HTTP 429: too many requests waiting 30 seconds")
+            console.log("HTTP 429: too many requests waiting 30 seconds")
             Utilities.sleep(30000)
           } else {
-            Logger.log(e)
+            console.error(e)
             Utilities.sleep(1000)
           }
 
           if (new Date().getTime() - start.getTime() > 120000) {
-            Logger.log("2 minutes exceeded timing out")
+            console.log("2 minutes exceeded timing out")
             break
           }
         }
@@ -180,7 +179,7 @@ function Utils_() {
     getYouTubeStatus(youtubeId) {
       let url = ""
 
-      if (youtubeId.length == 11) {
+      if (youtubeId.length === 11) {
         url = "https://www.youtube.com/watch?v=" + youtubeId
       } else if (youtubeId.includes("PL")) {
         url = "https://www.youtube.com/playlist?list=" + youtubeId
@@ -192,7 +191,7 @@ function Utils_() {
 
       let youtubeStatus = ""
 
-      if (youtubeId.length == 11) {
+      if (youtubeId.length === 11) {
         const contentText = getUrlResponse(url).getContentText()
 
         if (contentText.includes('"isUnlisted":true')) {
@@ -209,11 +208,11 @@ function Utils_() {
       } else {
         const responseCode = getUrlResponse(url, true).getResponseCode()
 
-        if (responseCode == 200) {
+        if (responseCode === 200) {
           youtubeStatus = "Public"
-        } else if (responseCode == 403) {
+        } else if (responseCode === 403) {
           youtubeStatus = "Private"
-        } else if (responseCode == 404) {
+        } else if (responseCode === 404) {
           youtubeStatus = "Deleted"
         } else {
           logEvent("HTTP " + responseCode + ": " + url)
@@ -234,7 +233,7 @@ let theUtils
  * return {Utils} The utility object.
  */
 function utils() {
-  if (theUtils == undefined) theUtils = new Utils_()
+  if (theUtils === undefined) theUtils = new Utils_()
 
   return theUtils
 }

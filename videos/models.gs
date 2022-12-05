@@ -5,7 +5,7 @@ let Video
  * @return {Class} The model class.
  */
 function Video_() {
-  if (Video == undefined) Video = class Video {
+  if (Video === undefined) Video = class Video {
     /**
      * Creates a video object.
      * @param {Object} youtubeObject - The YouTube metadata.

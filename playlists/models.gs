@@ -5,7 +5,7 @@ let Playlist
  * @return {Class} The model class.
  */
 function Playlist_() {
-  if (Playlist == undefined) Playlist = class Playlist {
+  if (Playlist === undefined) Playlist = class Playlist {
     /**
      * Create a playlist object.
      * @param {Object} youtubeObject - The YouTube metadata.
@@ -36,7 +36,7 @@ function Playlist_() {
      * @return {Object} The playlist metadata.
      */
     getYoutubeObject() {
-      return {}
+      return this._ytObject
     }
 
     /**
@@ -45,7 +45,7 @@ function Playlist_() {
      * @return {Object} The playlist metadata.
      */
     getDatabaseObject() {
-      return {}
+      return this._dbObject
     }
 
     getYoutubeStatus() {
@@ -80,14 +80,13 @@ function Playlist_() {
 
     /**
      * Add a video to a YouTube playlist.
-     * @param {String} playlistId - The playlist ID.
      * @param {String} videoId - The video ID.
      */
     addVideo(videoId) {
       try {
         YouTube.PlaylistItems.insert({snippet: {playlistId: playlistId, resourceId: {kind: "youtube#video", videoId: videoId}}}, "snippet")
       } catch(e) {
-        Logger.log(e)
+        console.error(e)
       }
     }
 
@@ -102,7 +101,7 @@ function Playlist_() {
         const deletionId = playlist.items[0].id
         YouTube.PlaylistItems.remove(deletionId)
       } catch(e) {
-        Logger.log(e)
+        console.error(e)
       }
     }
   }

@@ -5,7 +5,7 @@ let SiivaSpreadsheet
  * @return {Class} The model class.
  */
 function SiivaSpreadsheet_() {
-  if (SiivaSpreadsheet == undefined) SiivaSpreadsheet = class SiivaSpreadsheet {
+  if (SiivaSpreadsheet === undefined) SiivaSpreadsheet = class SiivaSpreadsheet {
     /**
      * Create a spreadsheet object.
      * @param {Spreadsheet} spreadsheetObject - The Google Sheets object.
@@ -40,7 +40,7 @@ let SiivaSheet
  * @return {Class} The model class.
  */
 function SiivaSheet_() {
-  if (SiivaSheet == undefined) SiivaSheet = class SiivaSheet {
+  if (SiivaSheet === undefined) SiivaSheet = class SiivaSheet {
     /**
      * Creates a sheet object.
      * @param {SiivaSpreadsheet} parentSpreadsheet - The parent object.

@@ -5,7 +5,7 @@ let Channel;
  * @return {Class} The model class.
  */
 function Channel_() {
-  if (Channel == undefined) Channel = class Channel {
+  if (Channel === undefined) Channel = class Channel {
     /**
      * Create a channel object.
      * @param {Object} youtubeObject - The YouTube metadata.
@@ -17,7 +17,7 @@ function Channel_() {
     }
 
     getSpreadsheet() {
-      
+      return spreadsheets().getById(this.getDatabaseObject().productionSheet)
     }
 
     getPlaylists() {
@@ -60,7 +60,7 @@ function Channel_() {
         const uploadsPlaylistId = channel.contentDetails.relatedPlaylists.uploads
         return getPlaylistItems(uploadsPlaylistId, limit)
       } catch(e) {
-        Logger.log(e)
+        console.error(e)
       }
     }
 
@@ -80,9 +80,9 @@ function Channel_() {
       const statusCode = getUrlResponse(url, true).getResponseCode()
       let wikiStatus = ""
 
-      if (statusCode == 200) {
+      if (statusCode === 200) {
         wikiStatus = "Documented"
-      } else if (statusCode == 404) {
+      } else if (statusCode === 404) {
         wikiStatus = "Undocumented"
       }
 
