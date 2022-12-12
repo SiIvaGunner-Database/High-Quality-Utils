@@ -6,24 +6,12 @@ let PlaylistService
  * @return {Class} The service class.
  */
 function PlaylistService_() {
-  if (PlaylistService === undefined) PlaylistService = class PlaylistService extends CachedService_() {
+  if (PlaylistService === undefined) PlaylistService = class PlaylistService extends CommonService_() {
     /**
      * Create a playlist service.
      */
     constructor() {
-      super()
-    }
-
-    getById(playlistId) {
-
-    }
-
-    getAll() {
-
-    }
-
-    updateAll() {
-      
+      super(Playlist_(), "playlists")
     }
   }
 

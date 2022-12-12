@@ -5,67 +5,32 @@ let Playlist
  * @return {Class} The model class.
  */
 function Playlist_() {
-  if (Playlist === undefined) Playlist = class Playlist {
+  if (Playlist === undefined) Playlist = class Playlist extends CommonModel_() {
     /**
      * Create a playlist object.
      * @param {Object} youtubeObject - The YouTube metadata.
      * @param {Object} databaseObject - The database metadata.
      */
     constructor(youtubeObject, databaseObject) {
-      this._ytObject = youtubeObject
-      this._dbObject = databaseObject
+      super(youtubeObject, databaseObject, playlists())
     }
 
     /**
      * Get the parent spreadsheet object.
+     * @return {WrapperSpreadsheet} The spreadsheet object.
      */
     getSpreadsheet() {
+      // TODO
       return {}
     }
 
     /**
      * Get the parent channel object.
+     * @return {Channel} The channel object.
      */
     getChannel() {
+      // TODO
       return {}
-    }
-
-    /**
-     * Get the YouTube playlist metadata.
-     * See https://developers.google.com/youtube/v3/docs/playlists
-     * @return {Object} The playlist metadata.
-     */
-    getYoutubeObject() {
-      return this._ytObject
-    }
-
-    /**
-     * Get the database playlist metadata.
-     * See https://siivagunnerdatabase.net/api/playlists/
-     * @return {Object} The playlist metadata.
-     */
-    getDatabaseObject() {
-      return this._dbObject
-    }
-
-    getYoutubeStatus() {
-      this.getDatabaseObject()
-    }
-
-    getChanges() {
-
-    }
-
-    hasChanges() {
-
-    }
-
-    updateDatabaseObject() {
-
-    }
-
-    logChanges_() {
-
     }
 
     /**
@@ -103,6 +68,16 @@ function Playlist_() {
       } catch(e) {
         console.error(e)
       }
+    }
+
+    /**
+     * Get the status of the YouTube playlist.
+     * @return {String} The current status.
+     */
+    getYoutubeStatus() {
+      const statuses = youtube().getStatuses()
+      // TODO fetch YouTube URL
+      return statuses.public
     }
   }
 

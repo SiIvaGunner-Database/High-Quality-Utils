@@ -5,47 +5,39 @@ let Channel;
  * @return {Class} The model class.
  */
 function Channel_() {
-  if (Channel === undefined) Channel = class Channel {
+  if (Channel === undefined) Channel = class Channel extends CommonModel_() {
     /**
      * Create a channel object.
      * @param {Object} youtubeObject - The YouTube metadata.
      * @param {Object} databaseObject - The database metadata.
      */
     constructor(youtubeObject, databaseObject) {
-      this._ytObject = youtubeObject
-      this._dbObject = databaseObject
+      super(youtubeObject, databaseObject, channels())
     }
 
+    /**
+     * Get the associated spreadsheet object.
+     * @return {WrapperSpreadsheet} The spreadsheet object.
+     */
     getSpreadsheet() {
       return spreadsheets().getById(this.getDatabaseObject().productionSheet)
     }
 
+    /**
+     * Get the associated sheet object.
+     * @return {WrapperSheet} The sheet object.
+     */
+    getSheet() {
+      return this.getSpreadsheet().getSheet(this.getDatabaseObject().title)
+    }
+
+    /**
+     * Get all public playlists on the channel.
+     * @return {Array[Playlist]} An array of playlists.
+     */
     getPlaylists() {
-
-    }
-
-    getYoutubeObject() {
-      
-    }
-
-    getDatabaseObject() {
-      
-    }
-
-    getChanges() {
-
-    }
-
-    hasChanges() {
-
-    }
-
-    updateDatabaseObject() {
-
-    }
-
-    logChanges_() {
-
+      // TODO
+      return []
     }
 
     /**
@@ -64,29 +56,14 @@ function Channel_() {
       }
     }
 
-    getYoutubeStatus() {
-
-    }
-
     /**
-     * Get the status of a Fandom wiki page.
-     * @param {String} wikiName - The name of the wiki.
-     * @param {String} pageName - The name of the wiki page.
-     * @return {String} Either "Documented" or "Undocumented".
+     * Get the status of the YouTube channel.
+     * @return {String} The current status.
      */
-    getWikiStatus(wikiName, pageName) {
-      const encodedPageName = encodeURIComponent(formatFandomPageName(pageName))
-      const url = "https://" + wikiName + ".fandom.com/wiki/" + encodedPageName
-      const statusCode = getUrlResponse(url, true).getResponseCode()
-      let wikiStatus = ""
-
-      if (statusCode === 200) {
-        wikiStatus = "Documented"
-      } else if (statusCode === 404) {
-        wikiStatus = "Undocumented"
-      }
-
-      return wikiStatus
+    getYoutubeStatus() {
+      const statuses = youtube().getStatuses()
+      // TODO fetch YouTube URL
+      return statuses.public
     }
   }
 

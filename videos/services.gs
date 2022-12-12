@@ -6,24 +6,12 @@ let VideoService
  * @return {Class} The service class.
  */
 function VideoService_() {
-  if (VideoService === undefined) VideoService = class VideoService extends CachedService_() {
+  if (VideoService === undefined) VideoService = class VideoService extends CommonService_() {
     /**
      * Create a video service.
      */
     constructor() {
-      super()
-    }
-
-    getById(videoId) {
-
-    }
-
-    getAll() {
-
-    }
-
-    updateAll() {
-      
+      super(Video_(), "videos")
     }
   }
 

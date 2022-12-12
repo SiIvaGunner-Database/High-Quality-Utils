@@ -6,24 +6,12 @@ let SpreadsheetService
  * @return {Class} The service class.
  */
 function SpreadsheetService_() {
-  if (SpreadsheetService === undefined) SpreadsheetService = class SpreadsheetService extends CachedService_() {
+  if (SpreadsheetService === undefined) SpreadsheetService = class SpreadsheetService extends CommonService_() {
     /**
-     * Create a sheet service.
+     * Create a spreadsheet service.
      */
     constructor() {
-      super()
-    }
-
-    getById(spreadsheetId) {
-      
-    }
-
-    getAll() {
-
-    }
-
-    updateAll() {
-      
+      super(WrapperSpreadsheet_(), "sheets")
     }
   }
 

@@ -1,64 +1,78 @@
-let SiivaSpreadsheet
+let WrapperSpreadsheet
 
 /**
  * Model class representing a spreadsheet.
  * @return {Class} The model class.
  */
-function SiivaSpreadsheet_() {
-  if (SiivaSpreadsheet === undefined) SiivaSpreadsheet = class SiivaSpreadsheet {
+function WrapperSpreadsheet_() {
+  if (WrapperSpreadsheet === undefined) WrapperSpreadsheet = class WrapperSpreadsheet extends CommonModel_() {
     /**
      * Create a spreadsheet object.
      * @param {Spreadsheet} spreadsheetObject - The Google Sheets object.
      * @param {Object} databaseObject - The database metadata.
      */
     constructor(spreadsheetObject, databaseObject) {
-      this._ssObject = spreadsheetObject
-      this._dbObject = databaseObject
+      super(spreadsheetObject, databaseObject, spreadsheets())
     }
 
-    getSpreadsheetObject() {
-      
-    }
-
-    getDatabaseobject() {
-      
-    }
-
+    /**
+     * Get a child sheet from the spreadsheet.
+     * @return {WrapperSheet} The sheet object.
+     */
     getSheet(sheetName) {
-      
+      const sheet = this.getSpreadsheetObject().getSheetByName(sheetName)
+      return new (WrapperSheet_())(this, sheet)
     }
   }
 
-  return SiivaSpreadsheet
+  return WrapperSpreadsheet
 }
 
 
-let SiivaSheet
+let WrapperSheet
 
 /**
  * Model class representing a sheet inside a spreadsheet.
+ * This is just a wrapper class for the Sheet class provided in Apps Script.
+ * There is no matching object in the web application database.
  * @return {Class} The model class.
  */
-function SiivaSheet_() {
-  if (SiivaSheet === undefined) SiivaSheet = class SiivaSheet {
+function WrapperSheet_() {
+  if (WrapperSheet === undefined) WrapperSheet = class WrapperSheet {
     /**
      * Creates a sheet object.
-     * @param {SiivaSpreadsheet} parentSpreadsheet - The parent object.
+     * @param {WrapperSpreadsheet} parentSpreadsheet - The parent object.
      * @param {Sheet} sheetObject - The Google Sheets object.
      */
     constructor(parentSpreadsheet, sheetObject) {
-      this._ssObject = parentSpreadsheet
-      this._shObject = sheetObject
+      this._parentSpreadsheet = parentSpreadsheet
+      this._sheetObject = sheetObject
+    }
+
+    /**
+     * Get the base sheet object.
+     * @return {Sheet} The base object.
+     */
+    getBaseObject() {
+      return this._sheetObject
+    }
+
+    /**
+     * Get the parent spreadsheet.
+     * @return {WrapperSpreadsheet} The parent object.
+     */
+    getSpreadsheet() {
+      return this._parentSpreadsheet
     }
 
     /**
      * Get all data values from a spreadsheet, ignoring the header row.
-     * @param {Sheet} sheet - The sheet object.
      * @param {String} [dataType] - The type of object to return from the values.
      * @return {Array[Array[Object]]} The values.
      */
-    getValues(sheet, dataType) {
-      const data = sheet.getDataRange().getValues()
+    getValues(dataType) {
+      // TODO rewrite this
+      const data = this.getBaseSheet().getDataRange().getValues()
       data.shift() // Ignore the header row
 
       if (dataType) {
@@ -97,26 +111,27 @@ function SiivaSheet_() {
 
     /**
      * Insert a range of data into a spreadsheet.
-     * @param {Sheet} sheet - The sheet object.
      * @param {Object | Array[Object]} data - The data to insert.
      */
-    addValues(sheet, data) {
+    addValues(data) {
+      // TODO rewrite this
       // Convert to Array[]
       if (!Array.isArray(data)) {
         data = [data]
       }
 
+      const sheet = this.getBaseSheet()
       sheet.insertRowsBefore(2, data.length)
-      updateInSheet(sheet, data, 2)
+      this.updateInSheet(data, 2)
     }
 
     /**
      * Update a range of data in a spreadsheet.
-     * @param {Sheet} sheet - The sheet object.
      * @param {Object | Array[Object]} data - The data to insert.
      * @param {Integer} row - The row to update.
      */
-    updateValues(sheet, data, row) {
+    updateValues(data, row) {
+      // TODO rewrite this
       // Convert to Array[]
       if (!Array.isArray(data)) {
         data = [data]
@@ -137,36 +152,39 @@ function SiivaSheet_() {
         data[index] = Object.values(object)
       })
 
+      const sheet = this.getBaseSheet()
       sheet.getRange(row, 1, data.length, sheet.getLastColumn()).setValues(data)
     }
 
     /**
      * Sort the given spreadsheet, ignoring the header row.
-     * @param {Sheet} sheet - The sheet object.
      * @param {Integer} column - The column number.
      * @param {Boolean} [ascending] - Whether or not to sort in ascending order, defaults to false.
      */
-    sort(sheet, column, ascending) {
-      ascending = ascending ? true : false
+    sort(column, ascending) {
+      // TODO rewrite this
+      const sheet = this.getBaseSheet()
+      ascending = (ascending === true ? true : false)
       // Sort everything but the header row
       sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).sort({column: column, ascending: ascending})
     }
 
     /**
      * Log a change to the changelog spreadsheets.
-     * @param {Sheet} sheet - The sheet object.
      * @param {String} id - The YouTube ID.
      * @param {String} type - The type of change.
      * @param {String} oldValue - The old value.
      * @param {String} newValue - The new value.
      */
-    logChange_(sheet, id, type, oldValue, newValue) {
+    logChange_(id, type, oldValue, newValue) {
+      // TODO rewrite this
+      const sheet = this.getBaseSheet()
       const change = new Change(formatYouTubeHyperlink(id), type, oldValue, newValue, new Date())
-      addToSheet(sheet, change)
+      this.addToSheet(change)
       const changelogSheet = SpreadsheetApp.openById("1_78uNwS1kcxru3PIstADhjvR3hn6rlc-yc4v4PkLoMU").getSheetByName("Changelog")
-      addToSheet(changelogSheet, change)
+      changelogSheet.addToSheet(changelogSheet, change)
     }
   }
 
-  return SiivaSheet
+  return WrapperSheet
 }

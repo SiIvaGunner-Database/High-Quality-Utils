@@ -1,19 +1,48 @@
-let CachedService
+let CommonService
 
 /**
- * Common service class for cached operations.
- * Cached objects must have an ID property for this to work.
+ * Common service class for database and caching service operations.
+ * Objects must have an ID property for this service to work.
  * @return {Class} The service class.
  */
-function CachedService_() {
-  if (CachedService === undefined) CachedService = class CachedService {
+function CommonService_() {
+  if (CommonService === undefined) CommonService = class CommonService {
     /**
-     * Create a cache service.
+     * Create a common service.
+     * @param {Class} modelClass - The service's associated model class.
+     * @param {String} apiPath - The web application API path.
      */
-    constructor() {
+    constructor(modelClass, apiPath) {
+      this._modelClass = modelClass
+      this._apiPath = apiPath
       this._cache = []
       this._lastCachedObject = {}
       this._useCache = true
+    }
+
+    /**
+     * Enable data caching.
+     */
+    enableCache() {
+      this._useCache = true
+    }
+
+    /**
+     * Disable data caching.
+     */
+    disableCache() {
+      this._useCache = true
+    }
+
+    /**
+     * Add an object to the cache.
+     * @param {Object} object - The object.
+     */
+    addToCache(object) {
+      if (this._useCache === true) {
+        this._lastCachedObject = object
+        this._cache.push(object)
+      }
     }
 
     /**
@@ -22,7 +51,7 @@ function CachedService_() {
      * @return {Boolean} True if the object is cached, else false.
      */
     isCached(objectId) {
-      return this.getCachedObject(objectId) !== undefined
+      return this._useCache === true && this.getCachedObject(objectId) !== undefined
     }
 
     /**
@@ -45,21 +74,82 @@ function CachedService_() {
     }
 
     /**
-     * Enable data caching.
+     * Get the web application API path.
+     * @param {String} [objectId] - An optional object ID.
+     * @return {String} The API path.
      */
-    enableCache() {
-      this._useCache = true
+    getApiPath(objectId) {
+      if (objectId !== undefined) {
+        return this._apiPath + "/" + objectId
+      } else {
+        return this._apiPath 
+      }
     }
 
     /**
-     * Disable data caching.
+     * Get an object by its ID.
+     * @param {String} objectId - The object ID.
+     * @return {Object} The object.
      */
-    disableCache() {
-      this._useCache = true
+    getById(objectId) {
+      if (super.isCached(objectId)) {
+        return super.getCachedObject(objectId)
+      }
+
+      let baseObject
+
+      switch(this._modelClass) {
+        case Channel_():
+          baseObject = youtube().getChannels(objectId)
+          break;
+        case Playlist_():
+          baseObject = youtube().getPlaylists(objectId)
+          break;
+        case WrapperSpreadsheet_():
+          baseObject = SpreadsheetApp.openById(objectId)
+          break;
+        case Video_():
+          baseObject = youtube().getVideos(objectId)
+          break;
+        default:
+          throw "No matching model class found"
+      }
+
+      const dbObject = database().getData(this.getApiPath(objectId))
+
+      if (baseObject !== undefined && dbObject === undefined) {
+        dbObject = {id: baseObject.id}
+        database().postData(this.getApiPath(), dbObject)
+      }
+
+      const wrapperObject = new (this._modelClass)(baseObject, dbObject)
+      super.addToCache(wrapperObject)
+      return wrapperObject
+    }
+
+    /**
+     * Get all objects.
+     * @return {Array[Object]} The objects.
+     */
+    getAll() {
+      return database().getData(this.getApiPath())
+    }
+
+    /**
+     * Update all objects.
+     */
+    updateAll() {
+      const objects = this.getAll()
+
+      objects.forEach(object => {
+        // TODO apply any changes to DB objects
+      })
+
+      database().putData(this.getApiPath(), object)
     }
   }
 
-  return CachedService
+  return CommonService
 }
 
 let YoutubeService
@@ -74,6 +164,20 @@ function YoutubeService_() {
      * Create a YouTube service.
      */
     constructor() {
+    }
+
+    /**
+     * Get a simple key value object map of possible YouTube statuses.
+     * @return {Object} A key value map.
+     */
+    getStatuses() {
+      return {
+        public: "Public",
+        unlisted: "Unlisted",
+        private: "Private",
+        unavailable: "Unavailable",
+        deleted: "Deleted"
+      }
     }
 
     /**
