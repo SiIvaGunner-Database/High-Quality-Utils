@@ -21,7 +21,29 @@ function Settings_() {
      * @param {String} value - The authentication token.
      */
     setAuthToken(scriptProperties, value) {
-      scriptProperties.setProperty(utils().getAuthTokenKey(), value)
+      scriptProperties.setProperty(this.getAuthTokenKey(), value)
+    }
+
+    /**
+     * Get a siivagunnerdatabase.net admin authentication token stored in a script property.
+     * @param {ScriptProperties} scriptProperties - The script properties object.
+     * @return {String} The authentication token.
+     * @throws {MissingPropertyError} Thrown if no script property with the key "authToken" exists.
+     */
+    getAuthToken(scriptProperties) {
+      if (!scriptProperties.getProperty(this.getAuthTokenKey())) {
+        throw new MissingPropertyError(this.getAuthTokenKey())
+      }
+
+      return `Token ${scriptProperties.getProperty(this.getAuthTokenKey())}`
+    }
+
+    /**
+     * Get the constant authentication token key.
+     * @return {String} The authentication token key.
+     */
+    getAuthTokenKey() {
+      return "authToken"
     }
 
     /**
@@ -79,7 +101,9 @@ let theSettings
  * return {Settings} The settings object.
  */
 function settings() {
-  if (theSettings === undefined) theSettings = new Settings_()
+  if (theSettings === undefined) {
+    theSettings = new (Settings_())()
+  }
 
   return theSettings
 }

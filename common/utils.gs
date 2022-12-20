@@ -57,7 +57,7 @@ function Utils_() {
      * @param {String} youtubeId - The video, playlist, or channel ID.
      * @return {String} The formatted hyperlink.
      */
-    getYoutubeHyperlink(youtubeId) {
+    formatYoutubeHyperlink(youtubeId) {
       let hyperlink = ""
 
       if (youtubeId.length === 11) {
@@ -78,7 +78,7 @@ function Utils_() {
      * @return {String} The formatted hyperlink.
      */
     formatFandomHyperlink(pageName, wikiName) {
-      const wikiUrl = "https://" + wikiName + ".fandom.com/wiki/"
+      const wikiUrl = `https://${wikiName}.fandom.com/wiki/`
       pageName = pageName.replace(/Reupload: /g, "").replace(/Reup: /g, "")
       const simplePageName = pageName.replace(/"/g, '""').replace(/ \(GiIvaSunner\)/g, "")
       const encodedPageName = encodeURIComponent(formatFandomPageName(pageName))
@@ -104,122 +104,17 @@ function Utils_() {
     }
 
     /**
-     * Get a siivagunnerdatabase.net admin authentication token stored in a script property.
-     * @param {ScriptProperties} scriptProperties - The script properties object.
-     * @return {String} The authentication token.
-     * @throws {MissingPropertyError} Thrown if no script property with the key "authToken" exists.
-     */
-    getAuthToken(scriptProperties) {
-      if (!scriptProperties.getProperty(this.getAuthTokenKey())) {
-        throw new MissingPropertyError(this.getAuthTokenKey())
-      }
-
-      return "Token " + scriptProperties.getProperty(this.getAuthTokenKey())
-    }
-
-    /**
-     * Get the constant authentication token key.
-     * @return {String} The authentication token key.
-     */
-    getAuthTokenKey() {
-      return "authToken"
-    }
-
-    /**
      * Log a message to the event log spreadsheet.
      * @param {String} message - The message to log.
      */
     logEvent(message) {
+      // TODO rewrite or remove this method
       const projectId = ScriptApp.getScriptId()
       const projectName = DriveApp.getFileById(projectId).getName()
       const date = new Date()
       const event = new Event(projectName, message, date)
       const eventSheet = SpreadsheetApp.openById("1_78uNwS1kcxru3PIstADhjvR3hn6rlc-yc4v4PkLoMU").getSheetByName("Events")
       addToSheet(eventSheet, event)
-    }
-
-    /**
-     * Gets a response from a get request to a URL.
-     * @param {String} url - The URL to fetch.
-     * @param {Boolean} [allowFailureCodes] - Whether or not to allow failure response codes, defaults to false.
-     * @return {Object} The response object.
-     */
-    getUrlResponse(url, allowFailureCodes) {
-      allowFailureCodes = allowFailureCodes || false
-      const start = new Date()
-      let response
-
-      while (!response) {
-        try {
-          response = UrlFetchApp.fetch(url, { muteHttpExceptions: allowFailureCodes })
-        } catch (e) {
-          if (e.toString().includes("429")) {
-            console.log("HTTP 429: too many requests waiting 30 seconds")
-            Utilities.sleep(30000)
-          } else {
-            console.error(e)
-            Utilities.sleep(1000)
-          }
-
-          if (new Date().getTime() - start.getTime() > 120000) {
-            console.log("2 minutes exceeded timing out")
-            break
-          }
-        }
-      }
-
-      return response
-    }
-
-    /**
-     * Get the status of a YouTube video, playlist, or channel.
-     * @param {String} youtubeId - The YouTube video, playlist, or channel ID.
-     * @return {String} One of the following: "Public", "Unlisted", "Unavailable", "Private", or "Deleted".
-     */
-    getYouTubeStatus(youtubeId) {
-      let url = ""
-
-      if (youtubeId.length === 11) {
-        url = "https://www.youtube.com/watch?v=" + youtubeId
-      } else if (youtubeId.includes("PL")) {
-        url = "https://www.youtube.com/playlist?list=" + youtubeId
-      } else if (youtubeId.includes("UC")) {
-        url = "https://www.youtube.com/channel/" + youtubeId
-      } else {
-        return null
-      }
-
-      let youtubeStatus = ""
-
-      if (youtubeId.length === 11) {
-        const contentText = getUrlResponse(url).getContentText()
-
-        if (contentText.includes('"isUnlisted":true')) {
-          youtubeStatus = "Unlisted"
-        } else if (contentText.includes('"status":"OK"')) {
-          youtubeStatus = "Public"
-        } else if (contentText.includes('"This video is private."')) {
-          youtubeStatus = "Private"
-        } else if (contentText.includes('"status":"ERROR"')) {
-          youtubeStatus = "Deleted"
-        } else if (contentText.includes('"status":"UNPLAYABLE"')) {
-          youtubeStatus = "Unavailable"
-        }
-      } else {
-        const responseCode = getUrlResponse(url, true).getResponseCode()
-
-        if (responseCode === 200) {
-          youtubeStatus = "Public"
-        } else if (responseCode === 403) {
-          youtubeStatus = "Private"
-        } else if (responseCode === 404) {
-          youtubeStatus = "Deleted"
-        } else {
-          logEvent("HTTP " + responseCode + ": " + url)
-        }
-      }
-
-      return youtubeStatus
     }
   }
 
@@ -233,7 +128,9 @@ let theUtils
  * return {Utils} The utility object.
  */
 function utils() {
-  if (theUtils === undefined) theUtils = new Utils_()
+  if (theUtils === undefined) {
+    theUtils = new (Utils_())()
+  }
 
   return theUtils
 }

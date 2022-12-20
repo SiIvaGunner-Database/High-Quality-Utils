@@ -36,8 +36,21 @@ function Channel_() {
      * @return {Array[Playlist]} An array of playlists.
      */
     getPlaylists() {
-      // TODO
-      return []
+      const playlists = []
+      let nextPageToken = ""
+
+      while (nextPageToken !== null) {
+        const parameters = {
+          channelId: super.getId(),
+          maxResults: 50,
+          pageToken: nextPageToken
+        }
+        const playlist = YouTube.Playlists.list("snippet,contentDetails", parameters)
+        playlists.push(...playlist.items)
+        nextPageToken = playlist.nextPageToken
+      }
+
+      return playlists
     }
 
     /**
@@ -47,13 +60,9 @@ function Channel_() {
      * @return {Array[Object]} The video objects.
      */
     getVideos(channelId, limit) {
-      try {
-        const channel = YouTube.Channels.list("contentDetails", {id: channelId}).items[0]
-        const uploadsPlaylistId = channel.contentDetails.relatedPlaylists.uploads
-        return getPlaylistItems(uploadsPlaylistId, limit)
-      } catch(e) {
-        console.error(e)
-      }
+      const channel = YouTube.Channels.list("contentDetails", {id: channelId}).items[0]
+      const uploadsPlaylistId = channel.contentDetails.relatedPlaylists.uploads
+      return getPlaylistItems(uploadsPlaylistId, limit)
     }
 
     /**
@@ -62,8 +71,14 @@ function Channel_() {
      */
     getYoutubeStatus() {
       const statuses = youtube().getStatuses()
-      // TODO fetch YouTube URL
-      return statuses.public
+
+      try {
+        youtube().getChannel(super.getId())
+        return statuses.public
+      } catch (error) {
+        console.log(error)
+        return statuses.deleted
+      }
     }
   }
 

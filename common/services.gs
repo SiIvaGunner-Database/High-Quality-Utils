@@ -80,7 +80,7 @@ function CommonService_() {
      */
     getApiPath(objectId) {
       if (objectId !== undefined) {
-        return this._apiPath + "/" + objectId
+        return `${this._apiPath}/${objectId}`
       } else {
         return this._apiPath 
       }
@@ -302,7 +302,7 @@ function YoutubeService_() {
         videos.push(...YouTube.Videos.list("snippet,contentDetails,statistics", {id: stringOfIds}).items)
 
         if (videos.length % 1000 < 50 && videos.length > 50) {
-          console.log("Found " + videos.length + " videos...")
+          console.log(`Found ${videos.length} videos...`)
         }
       }
 
@@ -376,8 +376,8 @@ function DatabaseService_() {
     /**
      * Get metadata from the siivagunnerdatabase.net API.
      * This will fail if the user doesn't have permission.
-     * @param {String} [apiPath] - The path to append to "siivagunnerdatabase.net/api/".
-     * @param {String} [method] - The method to use, defaults to "GET".
+     * @param {String} [apiPath] - An optional path to append to "siivagunnerdatabase.net/api/".
+     * @param {String} [method] - An optional method to use, defaults to "GET".
      * @param {Object | Array[Object]} [data] - The metadata to send.
      * @return {Object} The response object.
      */
@@ -407,11 +407,11 @@ function DatabaseService_() {
         }
       }
 
-      const url = "https://siivagunnerdatabase.net/api/" + apiPath || ""
+      const url = `https://siivagunnerdatabase.net/api/${apiPath || ""}`
       const options = {
         method: method || "GET",
         contentType: "application/json",
-        headers: { Authorization: getAuthToken() },
+        headers: { Authorization: settings().getAuthToken() },
         payload: JSON.stringify(data || {})
       }
       const response = UrlFetchApp.fetch(url, options)

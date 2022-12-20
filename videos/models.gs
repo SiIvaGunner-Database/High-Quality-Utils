@@ -20,8 +20,7 @@ function Video_() {
      * @return {Channel} The channel object.
      */
     getChannel() {
-      // TODO
-      return {}
+      return videos().getById(this.getDatabaseObject().channel)
     }
 
     /**
@@ -30,8 +29,22 @@ function Video_() {
      */
     getYoutubeStatus() {
       const statuses = youtube().getStatuses()
-      // TODO fetch YouTube URL
-      return statuses.public
+      const url = `https://www.youtube.com/watch?v=${super.getId()}`
+      const contentText = UrlFetchApp.fetch(url).getContentText()
+
+      if (contentText.includes('"isUnlisted":true')) {
+        return statuses.unlisted
+      } else if (contentText.includes('"status":"OK"')) {
+        return statuses.public
+      } else if (contentText.includes('"This video is private."')) {
+        return statuses.private
+      } else if (contentText.includes('"status":"ERROR"')) {
+        return statuses.deleted
+      } else if (contentText.includes('"status":"UNPLAYABLE"')) {
+        return statuses.unavailable
+      } else {
+        throw `Unexpected response content: ${contentText}`
+      }
     }
 
     /**
@@ -39,20 +52,22 @@ function Video_() {
      * @return {String} Either "Documented" or "Undocumented".
      */
     getWikiStatus() {
-      // TODO rewrite this
+      // TODO? consider using the Fandom API instead; it's slower but more consistent
       const wiki = this.getChannel().getDatabaseObject().wiki
       const pageName = super.getDatabaseObject().title
-      const encodedPageName = encodeURIComponent(formatFandomPageName(pageName))
-      const url = "https://" + wiki + ".fandom.com/wiki/" + encodedPageName
-      const statusCode = getUrlResponse(url, true).getResponseCode()
+      const encodedPageName = encodeURIComponent(utils().formatFandomPageName(pageName))
+      const url = `https://${wiki}.fandom.com/wiki/${encodedPageName}`
+      const options = { muteHttpExceptions: true }
+      const responseCode = UrlFetchApp.fetch(url, options).getResponseCode()
 
-      if (statusCode === 200) {
-        return "Documented"
-      } else if (statusCode === 404) {
-        return "Undocumented"
+      switch(responseCode) {
+        case 200:
+          return "Documented"
+        case 404:
+          return "Undocumented"
+        default:
+          throw `Unexpected response code: ${responseCode}`
       }
-
-      throw "An unexpected URL status was encountered"
     }
   }
 

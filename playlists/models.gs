@@ -20,8 +20,7 @@ function Playlist_() {
      * @return {WrapperSpreadsheet} The spreadsheet object.
      */
     getSpreadsheet() {
-      // TODO
-      return {}
+      return spreadsheets().getById(this.getDatabaseObject().productionSheet)
     }
 
     /**
@@ -29,8 +28,7 @@ function Playlist_() {
      * @return {Channel} The channel object.
      */
     getChannel() {
-      // TODO
-      return {}
+      return channels().getById(this.getDatabaseObject().channel)
     }
 
     /**
@@ -48,11 +46,7 @@ function Playlist_() {
      * @param {String} videoId - The video ID.
      */
     addVideo(videoId) {
-      try {
-        YouTube.PlaylistItems.insert({snippet: {playlistId: playlistId, resourceId: {kind: "youtube#video", videoId: videoId}}}, "snippet")
-      } catch(e) {
-        console.error(e)
-      }
+      YouTube.PlaylistItems.insert({snippet: {playlistId: playlistId, resourceId: {kind: "youtube#video", videoId: videoId}}}, "snippet")
     }
 
     /**
@@ -61,13 +55,9 @@ function Playlist_() {
      * @param {String} videoId - The video ID.
      */
     removeVideo(videoId) {
-      try {
-        const playlist = YouTube.PlaylistItems.list("snippet", {playlistId: playlistId, videoId: videoId})
-        const deletionId = playlist.items[0].id
-        YouTube.PlaylistItems.remove(deletionId)
-      } catch(e) {
-        console.error(e)
-      }
+      const playlist = YouTube.PlaylistItems.list("snippet", {playlistId: playlistId, videoId: videoId})
+      const deletionId = playlist.items[0].id
+      YouTube.PlaylistItems.remove(deletionId)
     }
 
     /**
@@ -76,8 +66,21 @@ function Playlist_() {
      */
     getYoutubeStatus() {
       const statuses = youtube().getStatuses()
-      // TODO fetch YouTube URL
-      return statuses.public
+      const url = `https://www.youtube.com/oembed?url=https://www.youtube.com/playlist?list=${super.getId()}&format=json`
+      const options = { muteHttpExceptions: true }
+      const responseCode = UrlFetchApp.fetch(url, options).getResponseCode()
+
+      switch(responseCode) {
+        case 200:
+          // TODO differentiate between public and unlisted
+          return statuses.public
+        case 403:
+          return statuses.private
+        case 404:
+          return statuses.deleted
+        default:
+          throw `Unexpected response code: ${responseCode}`
+      }
     }
   }
 

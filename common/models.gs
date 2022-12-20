@@ -19,6 +19,14 @@ function CommonModel_() {
     }
 
     /**
+     * Get the base object ID.
+     * @return {ID} The base object ID.
+     */
+    getId() {
+      return this.getBaseObject().id
+    }
+
+    /**
      * Get the base object.
      * @return {Object} The base object.
      */
