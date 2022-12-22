@@ -32,7 +32,7 @@ function Settings_() {
      */
     getAuthToken(scriptProperties) {
       if (!scriptProperties.getProperty(this.getAuthTokenKey())) {
-        throw new MissingPropertyError(this.getAuthTokenKey())
+        throw new (MissingPropertyError_())(this.getAuthTokenKey())
       }
 
       return `Token ${scriptProperties.getProperty(this.getAuthTokenKey())}`

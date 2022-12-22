@@ -11,7 +11,7 @@ function SpreadsheetService_() {
      * Create a spreadsheet service.
      */
     constructor() {
-      super(WrapperSpreadsheet_(), "sheets")
+      super(WrapperSpreadsheet_(), "spreadsheets")
     }
   }
 

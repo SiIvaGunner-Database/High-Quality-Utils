@@ -78,12 +78,8 @@ function CommonService_() {
      * @param {String} [objectId] - An optional object ID.
      * @return {String} The API path.
      */
-    getApiPath(objectId) {
-      if (objectId !== undefined) {
-        return `${this._apiPath}/${objectId}`
-      } else {
-        return this._apiPath 
-      }
+    getApiPath(objectId = "") {
+      return `${this._apiPath}/${objectId}`
     }
 
     /**
@@ -100,16 +96,16 @@ function CommonService_() {
 
       switch(this._modelClass) {
         case Channel_():
-          baseObject = youtube().getChannels(objectId)
+          baseObject = youtube().getChannel(objectId)
           break;
         case Playlist_():
-          baseObject = youtube().getPlaylists(objectId)
+          baseObject = youtube().getPlaylist(objectId)
           break;
         case WrapperSpreadsheet_():
           baseObject = SpreadsheetApp.openById(objectId)
           break;
         case Video_():
-          baseObject = youtube().getVideos(objectId)
+          baseObject = youtube().getVideo(objectId)
           break;
         default:
           throw "No matching model class found"
@@ -142,7 +138,9 @@ function CommonService_() {
       const objects = this.getAll()
 
       objects.forEach(object => {
-        // TODO apply any changes to DB objects
+        if (object.hasChanges()) {
+          object.update()
+        }
       })
 
       database().putData(this.getApiPath(), object)
@@ -181,15 +179,20 @@ function YoutubeService_() {
     }
 
     /**
+     * Get the metadata from a YouTube channel.
+     * @param {String} channelId - The YouTube channel ID.
+     * @return {Object} The channel object.
+     */
+    getChannel(channelId) {
+      return this.getChannels([channelId])[0]
+    }
+
+    /**
      * Get the metadata from multiple YouTube channels.
-     * @param {String | Array[String]} channelIds - The YouTube channel IDs.
-     * @return {Object} The channel objects.
+     * @param {Array[String]} channelIds - The YouTube channel IDs.
+     * @return {Array[Object]} The channel objects.
      */
     getChannels(channelIds) {
-      if (!Array.isArray(channelIds)) {
-        channelIds = [channelIds]
-      }
-
       const channels = []
       const arrayOfIds = channelIds.slice()
       let stringOfIds = ""
@@ -202,15 +205,20 @@ function YoutubeService_() {
     }
 
     /**
+     * Get the metadata from a YouTube playlist.
+     * @param {String} playlistId - The YouTube playlist ID.
+     * @return {Object} The playlist object.
+     */
+    getPlaylist(playlistId) {
+      return this.getPlaylists([playlistId])[0]
+    }
+
+    /**
      * Get the metadata from multiple YouTube playlists.
-     * @param {String | Array[String]} playlistIds - The YouTube playlist IDs.
-     * @return {Object} The playlist objects.
+     * @param {Array[String]} playlistIds - The YouTube playlist IDs.
+     * @return {Array[Object]} The playlist objects.
      */
     getPlaylists(playlistIds) {
-      if (!Array.isArray(playlistIds)) {
-        playlistIds = [playlistIds]
-      }
-
       const playlists = []
       const arrayOfIds = playlistIds.slice()
       let stringOfIds = ""
@@ -285,15 +293,20 @@ function YoutubeService_() {
     }
 
     /**
+     * Get the metadata from a YouTube video.
+     * @param {String} videoId - The YouTube video ID.
+     * @return {Object} The video object.
+     */
+    getVideo(videoId) {
+      return this.getVideos([videoId])[0]
+    }
+
+    /**
      * Get the metadata from multiple YouTube videos.
-     * @param {String | Array[String]} videoIds - The YouTube video IDs.
+     * @param {Array[String]} videoIds - The YouTube video IDs.
      * @return {Array[Object]} The video objects.
      */
     getVideos(videoIds) {
-      if (!Array.isArray(videoIds)) {
-        videoIds = [videoIds]
-      }
-
       const videos = []
       const arrayOfIds = videoIds.slice()
       let stringOfIds = ""
@@ -342,13 +355,25 @@ function DatabaseService_() {
     }
 
     /**
+     * Get the web application development/production domain.
+     * @return {String} The web application domain, usually "siivagunnerdatabase.net".
+     */
+    getDomain() {
+      if (settings().isDevMode()) {
+        return "dev.siivagunnerdatabase.net"
+      } else {
+        return "siivagunnerdatabase.net"
+      }
+    }
+
+    /**
      * Get metadata from the siivagunnerdatabase.net API.
      * This will fail if the user doesn't have permission.
      * @param {String} [apiPath] - The path to append to "siivagunnerdatabase.net/api/".
      * @return {Object} The response object.
      */
     getData(apiPath) {
-      return this.fetchDatabaseResponse_(apiPath, "GET")
+      return this.fetchResponse_(apiPath, "GET")
     }
 
     /**
@@ -359,7 +384,7 @@ function DatabaseService_() {
      * @return {Object} The response object.
      */
     putData(apiPath, data) {
-      return this.fetchDatabaseResponse_(apiPath, "PUT", data)
+      return this.fetchResponse_(apiPath, "PUT", data)
     }
 
     /**
@@ -370,7 +395,7 @@ function DatabaseService_() {
      * @return {Object} The response object.
      */
     postData(apiPath, data) {
-      return this.fetchDatabaseResponse_(apiPath, "POST", data)
+      return this.fetchResponse_(apiPath, "POST", data)
     }
 
     /**
@@ -381,38 +406,13 @@ function DatabaseService_() {
      * @param {Object | Array[Object]} [data] - The metadata to send.
      * @return {Object} The response object.
      */
-    fetchDatabaseResponse_(apiPath, method, data) {
-      if (data) {
-        // Convert to Array[]
-        if (!Array.isArray(data)) {
-          data = [data]
-        }
-
-        // Set any required fields
-        if (apiPath === "rips") {
-          const channelId = YouTube.Videos.list("snippet", { id: data[0].id }).items[0].snippet.channelId
-
-          data.forEach((video, index) => {
-            video.channel = channelId
-            video.author = 2 // spreadsheet-bot
-            video.visible = true
-            data[index] = video
-          })
-        } else if (apiPath === "channels") {
-          data.forEach((channel, index) => {
-            channel.author = 2 // spreadsheet-bot
-            channel.visible = true
-            data[index] = channel
-          })
-        }
-      }
-
-      const url = `https://siivagunnerdatabase.net/api/${apiPath || ""}`
+    fetchResponse_(apiPath = "", method = "GET", data = {}) {
+      const url = `https://${this.getDomain()}/api/${apiPath}`
       const options = {
-        method: method || "GET",
+        method: method,
         contentType: "application/json",
         headers: { Authorization: settings().getAuthToken() },
-        payload: JSON.stringify(data || {})
+        payload: JSON.stringify(data)
       }
       const response = UrlFetchApp.fetch(url, options)
       return JSON.parse(response.getContentText())

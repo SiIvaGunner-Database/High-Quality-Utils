@@ -20,7 +20,7 @@ function Playlist_() {
      * @return {WrapperSpreadsheet} The spreadsheet object.
      */
     getSpreadsheet() {
-      return spreadsheets().getById(this.getDatabaseObject().productionSheet)
+      return spreadsheets().getById(this.getDatabaseObject().productionSpreadsheet)
     }
 
     /**
@@ -38,7 +38,7 @@ function Playlist_() {
      * @return {Array[Object]} The video objects.
      */
     getVideos(limit) {
-      return youtubeService().getPlaylistItems(limit)
+      return youtube().getPlaylistItems(limit)
     }
 
     /**

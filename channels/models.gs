@@ -20,7 +20,7 @@ function Channel_() {
      * @return {WrapperSpreadsheet} The spreadsheet object.
      */
     getSpreadsheet() {
-      return spreadsheets().getById(this.getDatabaseObject().productionSheet)
+      return spreadsheets().getById(this.getDatabaseObject().productionSpreadsheet)
     }
 
     /**

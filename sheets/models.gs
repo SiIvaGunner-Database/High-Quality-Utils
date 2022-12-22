@@ -161,10 +161,9 @@ function WrapperSheet_() {
      * @param {Integer} column - The column number.
      * @param {Boolean} [ascending] - Whether or not to sort in ascending order, defaults to false.
      */
-    sort(column, ascending) {
+    sort(column, ascending = false) {
       // TODO rewrite this
       const sheet = this.getBaseSheet()
-      ascending = (ascending === true ? true : false)
       // Sort everything but the header row
       sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).sort({column: column, ascending: ascending})
     }
