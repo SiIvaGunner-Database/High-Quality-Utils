@@ -12,7 +12,20 @@ function Playlist_() {
      * @param {Object} databaseObject - The database metadata.
      */
     constructor(youtubeObject, databaseObject) {
-      super(youtubeObject, databaseObject, playlists())
+      const columnConfig = {
+        sortColumn: 5,
+        columns: {
+          1: "id",
+          2: "title",
+          3: "channelTitle",
+          4: "itemCount",
+          5: "itemChannels",
+          6: "itemIds",
+          7: "playlistStatus",
+          8: "logDate",
+        }
+      }
+      super(youtubeObject, databaseObject, playlists(), columnConfig)
     }
 
     /**

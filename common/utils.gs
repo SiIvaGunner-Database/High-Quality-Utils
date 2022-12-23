@@ -1,4 +1,4 @@
-let Utils;
+let Utils
 
 /**
  * Utility class for static methods.
@@ -116,7 +116,7 @@ function Utils_() {
     }
   }
 
-  return Utils;
+  return Utils
 }
 
 let theUtils

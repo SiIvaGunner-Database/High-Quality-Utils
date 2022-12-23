@@ -1,4 +1,4 @@
-let MissingPropertyError;
+let MissingPropertyError
 
 /**
  * Error class for missing script or user properties.
@@ -16,10 +16,10 @@ function MissingPropertyError_() {
     }
   }
 
-  return MissingPropertyError;
+  return MissingPropertyError
 }
 
-let RequiredParameterError;
+let RequiredParameterError
 
 /**
  * Error class for required parameters.
@@ -37,10 +37,10 @@ function RequiredParameterError_() {
     }
   }
 
-  return RequiredParameterError;
+  return RequiredParameterError
 }
 
-let InvalidParameterTypeError;
+let InvalidParameterTypeError
 
 /**
  * Error class for invalid parameter types.
@@ -59,5 +59,5 @@ function InvalidParameterTypeError_() {
     }
   }
 
-  return InvalidParameterTypeError;
+  return InvalidParameterTypeError
 }

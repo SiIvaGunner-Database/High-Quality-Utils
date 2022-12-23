@@ -92,7 +92,16 @@ function WrapperSheet_() {
      */
     updateValues(data, row) {
       // Convert to Array[Array[]]
-      data = Object.values(data).map(object => Object.values(object))
+      data = Object.values(data).map(object => {
+        if (typeof object === CommonModel_()) {
+          // Get the values for keys listed in the column config
+          const columns = object.getColumnConfig().columns
+          return Object.values(columns).map(column => object.getDatabaseObject()[column])
+        } else {
+          return Object.values(object)
+        }
+      })
+
       // Update the data range
       this.getBaseObject().getRange(row, 1, data.length, sheet.getLastColumn()).setValues(data)
     }
@@ -100,7 +109,7 @@ function WrapperSheet_() {
     /**
      * Sort the given sheet, excluding the header row.
      * @param {Integer} column - The column number.
-     * @param {Boolean} [ascending] - Whether or not to sort in ascending order, defaults to true.
+     * @param {Boolean} [ascending] - Whether or not to sort in ascending order. Defaults to true.
      */
     sort(column, ascending = true) {
       const sheet = this.getBaseObject()

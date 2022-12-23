@@ -18,6 +18,7 @@ function CommonService_() {
       this._cache = []
       this._lastCachedObject = {}
       this._useCache = true
+      this._changes
     }
 
     /**
@@ -97,16 +98,16 @@ function CommonService_() {
       switch(this._modelClass) {
         case Channel_():
           baseObject = youtube().getChannel(objectId)
-          break;
+          break
         case Playlist_():
           baseObject = youtube().getPlaylist(objectId)
-          break;
+          break
         case WrapperSpreadsheet_():
           baseObject = SpreadsheetApp.openById(objectId)
-          break;
+          break
         case Video_():
           baseObject = youtube().getVideo(objectId)
-          break;
+          break
         default:
           throw "No matching model class found"
       }
@@ -132,18 +133,50 @@ function CommonService_() {
     }
 
     /**
-     * Update all objects.
+     * Get a list of differences between the base object and the database object.
+     * @return {Array[String]} An array of database object keys for any new values.
      */
-    updateAll() {
+    getAllChanges() {
+      if (this._changes === undefined) {
+        /** @type {{ object: this; key: string; value: any; message: string; }[]} */
+        this._changes = []
+
+        this.getAll().forEach(object => {
+          this._changes.push(...object.getChanges())
+        })
+      }
+
+      return this._changes
+    }
+
+    /**
+     * Get whether or not the base object has any differences from the database object.
+     * @return {Boolean} True if there are any differences, else false.
+     */
+    hasAnyChanges() {
+      return this.getAllChanges().length > 0
+    }
+
+    /**
+     * Update all objects.
+     * @param {Object} [applyChanges] - Whether or not to apply the update to the database. Defaults to true.
+     */
+    updateAll(applyChanges = true) {
       const objects = this.getAll()
+      let changes = []
 
       objects.forEach(object => {
         if (object.hasChanges()) {
-          object.update()
+          object.update(false)
+          changes.push(object.getChanges())
         }
       })
 
-      database().putData(this.getApiPath(), object)
+      if (applyChanges === true) {
+        database().putData(this.getApiPath(), objects)
+      }
+
+      this._changes = []
     }
   }
 
@@ -402,7 +435,7 @@ function DatabaseService_() {
      * Get metadata from the siivagunnerdatabase.net API.
      * This will fail if the user doesn't have permission.
      * @param {String} [apiPath] - An optional path to append to "siivagunnerdatabase.net/api/".
-     * @param {String} [method] - An optional method to use, defaults to "GET".
+     * @param {String} [method] - An optional method to use. Defaults to "GET".
      * @param {Object | Array[Object]} [data] - The metadata to send.
      * @return {Object} The response object.
      */

@@ -1,4 +1,4 @@
-let ChannelService;
+let ChannelService
 
 /**
  * Service class for channels.
@@ -15,7 +15,7 @@ function ChannelService_() {
     }
   }
 
-  return ChannelService;
+  return ChannelService
 }
 
 let theChannelService

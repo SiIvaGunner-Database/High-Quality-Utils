@@ -12,7 +12,23 @@ function Video_() {
      * @param {Object} databaseObject - The database metadata.
      */
     constructor(youtubeObject, databaseObject) {
-      super(youtubeObject, databaseObject, videos())
+      const columnConfig = {
+        sortColumn: 5,
+        columns: {
+          1: "id",
+          2: "title",
+          3: "wikiStatus",
+          4: "videoStatus",
+          5: "publishedAt",
+          6: "duration",
+          7: "description",
+          8: "viewCount",
+          9: "likeCount",
+          10: "dislikeCount",
+          11: "commentCount"
+        }
+      }
+      super(youtubeObject, databaseObject, videos(), columnConfig)
     }
 
     /**

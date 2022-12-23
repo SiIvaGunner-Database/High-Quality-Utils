@@ -1,4 +1,4 @@
-let Channel;
+let Channel
 
 /**
  * Model class representing a channel.
@@ -12,7 +12,21 @@ function Channel_() {
      * @param {Object} databaseObject - The database metadata.
      */
     constructor(youtubeObject, databaseObject) {
-      super(youtubeObject, databaseObject, channels())
+      const columnConfig = {
+        sortColumn: 5,
+        columns: {
+          1: "id",
+          2: "title",
+          3: "wiki",
+          4: "channelStatus",
+          5: "publishedAt",
+          6: "description",
+          7: "videoCount",
+          8: "subscriberCount",
+          9: "viewCount"
+        }
+      }
+      super(youtubeObject, databaseObject, channels(), columnConfig)
     }
 
     /**
@@ -62,7 +76,7 @@ function Channel_() {
     getVideos(channelId, limit) {
       const channel = YouTube.Channels.list("contentDetails", {id: channelId}).items[0]
       const uploadsPlaylistId = channel.contentDetails.relatedPlaylists.uploads
-      return getPlaylistItems(uploadsPlaylistId, limit)
+      return this.getPlaylistItems(uploadsPlaylistId, limit)
     }
 
     /**
@@ -82,5 +96,5 @@ function Channel_() {
     }
   }
 
-  return Channel;
+  return Channel
 }
