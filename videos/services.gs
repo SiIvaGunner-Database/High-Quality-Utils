@@ -2,7 +2,7 @@ let VideoService
 
 /**
  * Service class for videos.
- * @extends CachedService
+ * @extends CommonService
  * @return {Class} The service class.
  */
 function VideoService_() {

@@ -9,55 +9,35 @@ function MissingPropertyError_() {
   if (MissingPropertyError === undefined) MissingPropertyError = class MissingPropertyError extends Error {
     /**
      * Create a missing property error object.
-     * @param {String} propertyKey The property key.
+     * @param {String} propertyKey - The property key.
      */
     constructor(propertyKey) {
       super(`You must create a property with the key '${propertyKey}' in order to use this method`)
+      super.name = this.constructor.name
     }
   }
 
   return MissingPropertyError
 }
 
-let RequiredParameterError
+let InvalidResponseError
 
 /**
- * Error class for required parameters.
+ * Error class for invalid responses.
  * @extends Error
  * @return {Class} The error class.
  */
-function RequiredParameterError_() {
-  if (RequiredParameterError === undefined) RequiredParameterError = class RequiredParameterError extends Error {
+function InvalidResponseError_() {
+  if (InvalidResponseError === undefined) InvalidResponseError = class InvalidResponseError extends Error {
     /**
-     * Create a required paramter error object.
-     * @param {String} propertyKey The property key.
+     * Create an invalid response error object.
+     * @param {String} response - The response.
      */
-    constructor(parameterName) {
-      super(`'${parameterName}' can not be null or undefined`)
+    constructor(response) {
+      super(`Unexpected response : ${response}`)
+      super.name = this.constructor.name
     }
   }
 
-  return RequiredParameterError
-}
-
-let InvalidParameterTypeError
-
-/**
- * Error class for invalid parameter types.
- * @extends Error
- * @return {Class} The error class.
- */
-function InvalidParameterTypeError_() {
-  if (InvalidParameterTypeError === undefined) InvalidParameterTypeError = class InvalidParameterTypeError extends Error {
-    /**
-     * Create an invalid parameter type error object.
-     * @param {String} givenType The given parameter type.
-     * @param {String} expectedType The expected parameter type.
-     */
-    constructor(givenType, expectedType) {
-      super(`Invalid parameter of type '${givenType}' when expecting '${expectedType}' type`)
-    }
-  }
-
-  return InvalidParameterTypeError
+  return InvalidResponseError
 }

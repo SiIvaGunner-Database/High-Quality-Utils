@@ -2,7 +2,7 @@ let SpreadsheetService
 
 /**
  * Service class for spreadsheets.
- * @extends CachedService
+ * @extends CommonService
  * @return {Class} The service class.
  */
 function SpreadsheetService_() {

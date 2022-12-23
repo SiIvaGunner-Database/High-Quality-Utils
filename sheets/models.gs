@@ -2,6 +2,7 @@ let WrapperSpreadsheet
 
 /**
  * Model class representing a spreadsheet.
+ * @extends CommonModel
  * @return {Class} The model class.
  */
 function WrapperSpreadsheet_() {
@@ -76,7 +77,7 @@ function WrapperSheet_() {
 
     /**
      * Insert a range of data into a sheet.
-     * @param {Object | Array[Object]} data - The data to insert.
+     * @param {Object | Array[CommonModel | Object]} data - The data to insert.
      */
     insertValues(data) {
       // Convert to Array[]
@@ -87,8 +88,8 @@ function WrapperSheet_() {
 
     /**
      * Update a range of data in a sheet.
-     * @param {Object | Array[Object]} data - The data to insert.
-     * @param {Integer} row - The row to update.
+     * @param {Object | Array[CommonModel | Object]} data - The data to insert.
+     * @param {Number} row - The row to update.
      */
     updateValues(data, row) {
       // Convert to Array[Array[]]
@@ -108,7 +109,7 @@ function WrapperSheet_() {
 
     /**
      * Sort the given sheet, excluding the header row.
-     * @param {Integer} column - The column number.
+     * @param {Number} column - The column number.
      * @param {Boolean} [ascending] - Whether or not to sort in ascending order. Defaults to true.
      */
     sort(column, ascending = true) {

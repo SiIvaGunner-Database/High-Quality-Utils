@@ -2,7 +2,7 @@ let ChannelService
 
 /**
  * Service class for channels.
- * @extends CachedService
+ * @extends CommonService
  * @return {Class} The service class.
  */
 function ChannelService_() {

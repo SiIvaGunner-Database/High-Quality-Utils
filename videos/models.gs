@@ -2,6 +2,7 @@ let Video
 
 /**
  * Model class representing a video.
+ * @extends CommonModel
  * @return {Class} The model class.
  */
 function Video_() {
@@ -59,7 +60,7 @@ function Video_() {
       } else if (contentText.includes('"status":"UNPLAYABLE"')) {
         return statuses.unavailable
       } else {
-        throw `Unexpected response content: ${contentText}`
+        throw (InvalidResponseError_())(contentText)
       }
     }
 
@@ -82,7 +83,7 @@ function Video_() {
         case 404:
           return "Undocumented"
         default:
-          throw `Unexpected response code: ${responseCode}`
+          throw new (InvalidResponseError_())(responseCode)
       }
     }
   }

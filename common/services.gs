@@ -109,7 +109,7 @@ function CommonService_() {
           baseObject = youtube().getVideo(objectId)
           break
         default:
-          throw "No matching model class found"
+          throw new Error("No model class found for this service")
       }
 
       const dbObject = database().getData(this.getApiPath(objectId))
@@ -299,7 +299,7 @@ function YoutubeService_() {
     /**
      * Get the metadata from videos in a YouTube playlist.
      * @param {String} playlistId - The YouTube playlist ID.
-     * @param {Integer} [limit] - The video count limit.
+     * @param {Number} [limit] - The video count limit.
      * @return {Array[Object]} The video objects.
      */
     getPlaylistItems(playlistId, limit) {

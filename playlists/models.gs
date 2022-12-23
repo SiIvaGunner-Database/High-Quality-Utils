@@ -2,6 +2,7 @@ let Playlist
 
 /**
  * Model class representing a playlist.
+ * @extends CommonModel
  * @return {Class} The model class.
  */
 function Playlist_() {
@@ -47,7 +48,7 @@ function Playlist_() {
     /**
      * Get the appropriate metadata from videos in a YouTube playlist.
      * @param {String} playlistId - The YouTube playlist ID.
-     * @param {Integer} [limit] - The video count limit.
+     * @param {Number} [limit] - The video count limit.
      * @return {Array[Object]} The video objects.
      */
     getVideos(limit) {
@@ -92,7 +93,7 @@ function Playlist_() {
         case 404:
           return statuses.deleted
         default:
-          throw `Unexpected response code: ${responseCode}`
+          throw new (InvalidResponseError_())(responseCode)
       }
     }
   }

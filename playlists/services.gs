@@ -2,7 +2,7 @@ let PlaylistService
 
 /**
  * Service class for playlists.
- * @extends CachedService
+ * @extends CommonService
  * @return {Class} The service class.
  */
 function PlaylistService_() {

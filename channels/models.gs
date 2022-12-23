@@ -2,6 +2,7 @@ let Channel
 
 /**
  * Model class representing a channel.
+ * @extends CommonModel
  * @return {Class} The model class.
  */
 function Channel_() {
@@ -70,7 +71,7 @@ function Channel_() {
     /**
      * Get the metadata from a YouTube channel's uploads.
      * @param {String} channelId - The YouTube channel ID.
-     * @param {Integer} [limit] - The video count limit.
+     * @param {Number} [limit] - The video count limit.
      * @return {Array[Object]} The video objects.
      */
     getVideos(channelId, limit) {
