@@ -70,12 +70,11 @@ function Channel_() {
 
     /**
      * Get the metadata from a YouTube channel's uploads.
-     * @param {String} channelId - The YouTube channel ID.
      * @param {Number} [limit] - The video count limit.
      * @return {Array[Object]} The video objects.
      */
-    getVideos(channelId, limit) {
-      const channel = YouTube.Channels.list("contentDetails", {id: channelId}).items[0]
+    getVideos(limit) {
+      const channel = YouTube.Channels.list("contentDetails", { id: this.getId() }).items[0]
       const uploadsPlaylistId = channel.contentDetails.relatedPlaylists.uploads
       return this.getPlaylistItems(uploadsPlaylistId, limit)
     }

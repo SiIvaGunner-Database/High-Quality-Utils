@@ -107,7 +107,7 @@ function Utils_() {
      * Log a message to the event log spreadsheet.
      * @param {String} message - The message to log.
      */
-    logEvent(message) {
+    logAlert(message) {
       const data = {
         author: 2,
         message: message

@@ -39,7 +39,7 @@ function CommonService_() {
      * Add an object to the cache.
      * @param {Object} object - The object.
      */
-    addToCache(object) {
+    addToCache_(object) {
       if (this._useCache === true) {
         this._lastCachedObject = object
         this._cache.push(object)
@@ -51,8 +51,8 @@ function CommonService_() {
      * @param {String} objectId - The object ID.
      * @return {Boolean} True if the object is cached, else false.
      */
-    isCached(objectId) {
-      return this._useCache === true && this.getCachedObject(objectId) !== undefined
+    isCached_(objectId) {
+      return this._useCache === true && this.getCachedObject_(objectId) !== undefined
     }
 
     /**
@@ -60,7 +60,7 @@ function CommonService_() {
      * @param {String} objectId - The object ID.
      * @return {Object} The cached object.
      */
-    getCachedObject(objectId) {
+    getCachedObject_(objectId) {
       if (this._lastCachedObject.id === objectId) {
         return this._lastCachedObject
       }
@@ -89,8 +89,8 @@ function CommonService_() {
      * @return {Object} The object.
      */
     getById(objectId) {
-      if (super.isCached(objectId)) {
-        return super.getCachedObject(objectId)
+      if (super.isCached_(objectId)) {
+        return super.getCachedObject_(objectId)
       }
 
       let baseObject
@@ -120,7 +120,7 @@ function CommonService_() {
       }
 
       const wrapperObject = new (this._modelClass)(baseObject, dbObject)
-      super.addToCache(wrapperObject)
+      super.addToCache_(wrapperObject)
       return wrapperObject
     }
 
@@ -410,6 +410,17 @@ function DatabaseService_() {
     }
 
     /**
+     * Post metadata to the siivagunnerdatabase.net API.
+     * This will fail if the user doesn't have permission.
+     * @param {String} [apiPath] - The path to append to "siivagunnerdatabase.net/api/".
+     * @param {Object | Array[Object]} [data] - The metadata to send.
+     * @return {Object} The response object.
+     */
+    postData(apiPath, data) {
+      return this.fetchResponse_(apiPath, "POST", data)
+    }
+
+    /**
      * Put metadata to the siivagunnerdatabase.net API.
      * This will fail if the user doesn't have permission.
      * @param {String} [apiPath] - The path to append to "siivagunnerdatabase.net/api/".
@@ -421,14 +432,14 @@ function DatabaseService_() {
     }
 
     /**
-     * Post metadata to the siivagunnerdatabase.net API.
+     * Delete metadata to the siivagunnerdatabase.net API.
      * This will fail if the user doesn't have permission.
      * @param {String} [apiPath] - The path to append to "siivagunnerdatabase.net/api/".
      * @param {Object | Array[Object]} [data] - The metadata to send.
      * @return {Object} The response object.
      */
     postData(apiPath, data) {
-      return this.fetchResponse_(apiPath, "POST", data)
+      return this.fetchResponse_(apiPath, "DELETE", data)
     }
 
     /**
