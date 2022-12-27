@@ -11,31 +11,35 @@ function Settings_() {
      */
     constructor() {
       this._devMode = false
+      this._authToken = ""
     }
 
     /**
      * Set an admin authentication token for access to the siivagunnerdatabase.net API.
-     * The authentication token must be set before the service classes can be used.
-     * This can also be done manually by going to project settings and adding a script property with the key "authToken".
+     * The authentication token must be set before service classes can be used.
+     * The value can be set manually by going to project settings and adding a script property with the key "authToken".
      * @param {ScriptProperties} scriptProperties - The script properties object.
-     * @param {String} value - The authentication token.
+     * @param {String} [value] - The optional authentication token value. Overwrites any token value previously set.
      */
     setAuthToken(scriptProperties, value) {
-      scriptProperties.setProperty(this.getAuthTokenKey(), value)
+      if (value !== undefined) {
+        scriptProperties.setProperty(this.getAuthTokenKey(), value)
+      }
+
+      this._authToken = scriptProperties.getProperty(this.getAuthTokenKey())
     }
 
     /**
-     * Get a siivagunnerdatabase.net admin authentication token stored in a script property.
-     * @param {ScriptProperties} scriptProperties - The script properties object.
+     * Get a siivagunnerdatabase.net admin authentication token.
      * @return {String} The authentication token.
      * @throws {MissingPropertyError} Thrown if no script property with the key "authToken" exists.
      */
-    getAuthToken(scriptProperties) {
-      if (!scriptProperties.getProperty(this.getAuthTokenKey())) {
+    getAuthToken() {
+      if (this._authToken === undefined) {
         throw new (MissingPropertyError_())(this.getAuthTokenKey())
       }
 
-      return `Token ${scriptProperties.getProperty(this.getAuthTokenKey())}`
+      return `Token ${this._authToken}`
     }
 
     /**

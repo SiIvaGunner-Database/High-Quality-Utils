@@ -81,7 +81,7 @@ function Utils_() {
       const wikiUrl = `https://${wikiName}.fandom.com/wiki/`
       pageName = pageName.replace(/Reupload: /g, "").replace(/Reup: /g, "")
       const simplePageName = pageName.replace(/"/g, '""').replace(/ \(GiIvaSunner\)/g, "")
-      const encodedPageName = encodeURIComponent(formatFandomPageName(pageName))
+      const encodedPageName = encodeURIComponent(this.formatFandomPageName(pageName))
       return '=HYPERLINK("' + wikiUrl + encodedPageName + '", "' + simplePageName + '")'
     }
 

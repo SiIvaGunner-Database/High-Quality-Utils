@@ -89,8 +89,8 @@ function CommonService_() {
      * @return {Object} The object.
      */
     getById(objectId) {
-      if (super.isCached_(objectId)) {
-        return super.getCachedObject_(objectId)
+      if (this.isCached_(objectId)) {
+        return this.getCachedObject_(objectId)
       }
 
       let baseObject
@@ -212,7 +212,7 @@ function YoutubeService_() {
     }
 
     /**
-     * Get formatted metadata for YouTube objects modified to match corresponding database metadata.
+     * Get formatted metadata from YouTube objects modified to match corresponding database metadata.
      * @param {Array[Object]} data - The YouTube objects.
      * @return {Array[Object]} The formatted objects.
      */
@@ -261,7 +261,7 @@ function YoutubeService_() {
       const arrayOfIds = channelIds.slice()
       let stringOfIds = ""
 
-      while ((stringOfIds = arrayOfIds.splice(-50).join(",")) && stringOfIds ) {
+      while ((stringOfIds = arrayOfIds.splice(-50).join(",")) && stringOfIds !== undefined) {
         channels.push(...YouTube.Channels.list("snippet,statistics", {id: stringOfIds}).items)
       }
 
@@ -287,7 +287,7 @@ function YoutubeService_() {
       const arrayOfIds = playlistIds.slice()
       let stringOfIds = ""
 
-      while ((stringOfIds = arrayOfIds.splice(-50).join(",")) && stringOfIds.length() > 0) {
+      while ((stringOfIds = arrayOfIds.splice(-50).join(",")) && stringOfIds !== undefined) {
         playlists.push(...YouTube.Playlists.list("snippet,contentDetails", {id: stringOfIds}).items)
       }
 
@@ -344,7 +344,7 @@ function YoutubeService_() {
           pageToken: nextPageToken
         }
         const playlist = YouTube.PlaylistItems.list("snippet", parameters)
-        itemIds.push(...playlist.items.map(item => item.snippet.resourceId))
+        itemIds.push(...playlist.items.map(item => item.snippet.resourceId.videoId))
 
         if (limit !== undefined && itemIds.length >= limit) {
           nextPageToken = null
@@ -375,7 +375,8 @@ function YoutubeService_() {
       const arrayOfIds = videoIds.slice()
       let stringOfIds = ""
 
-      while ((stringOfIds = arrayOfIds.splice(-50).join(",")) && stringOfIds ) {
+      while ((stringOfIds = arrayOfIds.splice(-50).join(",")) && stringOfIds !== undefined) {
+        console.log(stringOfIds)
         videos.push(...YouTube.Videos.list("snippet,contentDetails,statistics", {id: stringOfIds}).items)
 
         if (videos.length % 1000 < 50 && videos.length > 50) {
@@ -469,7 +470,7 @@ function DatabaseService_() {
      * @param {Object | Array[Object]} [data] - The metadata to send.
      * @return {Object} The response object.
      */
-    postData(apiPath, data) {
+    deleteData(apiPath, data) {
       return this.fetchResponse_(apiPath, "DELETE", data)
     }
 

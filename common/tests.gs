@@ -43,28 +43,28 @@ function Tests_() {
     testCommonUtils() {
       console.log("TESTING COMMON UTILS")
       const pageName = "Test Name - { [ \" ' + ' \" ] }"
-      this.test_("formatDate", formatDate(new Date()))
-      this.test_("formatLength", formatLength("PT1H43M1S"))
-      this.test_("formatYoutubeHyperlink", formatYoutubeHyperlink(this._videoId))
-      this.test_("formatFandomHyperlink", formatFandomHyperlink(pageName, "siivagunner"))
-      this.test_("formatFandomPageName", formatFandomPageName(pageName))
-      this.test_("logAlert", logAlert("You can shut up now."))
+      this.test_("formatDate", utils().formatDate(new Date()))
+      this.test_("formatLength", utils().formatLength("PT1H43M1S"))
+      this.test_("formatYoutubeHyperlink", utils().formatYoutubeHyperlink(this._videoId))
+      this.test_("formatFandomHyperlink", utils().formatFandomHyperlink(pageName, "siivagunner"))
+      this.test_("formatFandomPageName", utils().formatFandomPageName(pageName))
+      this.test_("logAlert", utils().logAlert("You can shut up now."))
     }
 
     /** Run common YouTube API service tests. */
     testCommonYoutubeService() {
       console.log("TESTING COMMON YOUTUBE SERVICE")
       const testPlaylistId = "PLn8P5M1uNQk5_q_y1BVxgP68xhKQ2eM3F"
-      this.test_("getStatuses", getStatuses())
-      this.test_("getChannel", getChannel(this._channelId))
-      this.test_("getChannels", getChannels([this._channelId, "UC6ajqR7lEYf-33Gsj4lgVOA"]))
-      this.test_("getPlaylist", getPlaylist(this._playlistId))
-      this.test_("getPlaylists", getPlaylists([this._playlistId, "PLL0CQjrcN8D38CfZ2TuZUbb6lreHbSHSL"]))
-      this.test_("addToPlaylist", addToPlaylist(testPlaylistId, this._videoId))
-      this.test_("removeFromPlaylist", removeFromPlaylist(testPlaylistId, this._videoId))
-      this.test_("getPlaylistItems", getPlaylistItems(this._playlistId, 100))
-      this.test_("getVideo", getVideo(this._videoId))
-      this.test_("getVideos", getVideos([this._videoId, "TP4XBFo8GoQ"]))
+      this.test_("getStatuses", youtube().getStatuses())
+      this.test_("getChannel", youtube().getChannel(this._channelId))
+      this.test_("getChannels", youtube().getChannels([this._channelId, "UC6ajqR7lEYf-33Gsj4lgVOA"]))
+      this.test_("getPlaylist", youtube().getPlaylist(this._playlistId))
+      this.test_("getPlaylists", youtube().getPlaylists([this._playlistId, "PLL0CQjrcN8D38CfZ2TuZUbb6lreHbSHSL"]))
+      this.test_("addToPlaylist", youtube().addToPlaylist(testPlaylistId, this._videoId))
+      this.test_("removeFromPlaylist", youtube().removeFromPlaylist(testPlaylistId, this._videoId))
+      this.test_("getPlaylistItems", youtube().getPlaylistItems(this._playlistId, 100))
+      this.test_("getVideo", youtube().getVideo(this._videoId))
+      this.test_("getVideos", youtube().getVideos([this._videoId, "TP4XBFo8GoQ"]))
     }
 
     /** Run common database API service tests. */
@@ -269,7 +269,7 @@ function Tests_() {
       }
 
       this._testResults.push(pass)
-      console.log(`${testResult}: ${logMessage} (${actualValue.toString().substring(0, 50)})`)
+      console.log(`${testResult}: ${logMessage}\n`, actualValue)
     }
   }
 
@@ -295,6 +295,7 @@ function tests_() {
  */
 function runTests() {
   settings().enableDevMode()
+  settings().setAuthToken(ScriptProperties)
   tests_().testAll()
   tests_().logResult()
 }
