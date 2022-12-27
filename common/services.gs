@@ -212,6 +212,37 @@ function YoutubeService_() {
     }
 
     /**
+     * Get formatted metadata for YouTube objects modified to match corresponding database metadata.
+     * @param {Array[Object]} data - The YouTube objects.
+     * @return {Array[Object]} The formatted objects.
+     */
+    formatMetadata_(objects) {
+      const keysToRemove = ["etag", "snippet", "contentDetails", "statistics"]
+      const keysToReplace = [{ oldKey: "channelId", newKey: "channel" }]
+
+      return objects.map(object => {
+
+        // Remove keys that aren't in the database metadata
+        keysToRemove.forEach(key => {
+          if (object[key] !== undefined) {
+            object = { ...object, ...object[key] }
+            delete object[key]
+          }
+        })
+
+        // Replace keys that have different names in the database metadata
+        keysToReplace.forEach(keys => {
+          if (object[keys.oldKey] !== undefined) {
+            object[keys.newKey] = object[keys.oldKey]
+            delete object[keys.oldKey]
+          }
+        })
+
+        return object
+      })
+    }
+
+    /**
      * Get the metadata from a YouTube channel.
      * @param {String} channelId - The YouTube channel ID.
      * @return {Object} The channel object.
@@ -234,7 +265,7 @@ function YoutubeService_() {
         channels.push(...YouTube.Channels.list("snippet,statistics", {id: stringOfIds}).items)
       }
 
-      return channels
+      return this.formatMetadata_(channels)
     }
 
     /**
@@ -260,7 +291,7 @@ function YoutubeService_() {
         playlists.push(...YouTube.Playlists.list("snippet,contentDetails", {id: stringOfIds}).items)
       }
 
-      return playlists
+      return this.formatMetadata_(playlists)
     }
 
     /**
@@ -322,7 +353,7 @@ function YoutubeService_() {
         }
       }
 
-      return getVideos(itemIds)
+      return this.getVideos(itemIds)
     }
 
     /**
@@ -352,7 +383,7 @@ function YoutubeService_() {
         }
       }
 
-      return videos
+      return this.formatMetadata_(videos)
     }
   }
 
