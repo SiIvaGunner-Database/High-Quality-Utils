@@ -53,26 +53,23 @@ function Playlist_() {
      * @return {Array[Object]} The video objects.
      */
     getVideos(limit) {
-      return youtube().getPlaylistItems(limit)
+      return youtube().getPlaylistItems(super.getId(), limit)
     }
 
     /**
-     * Add a video to a YouTube playlist.
+     * Add a video to the YouTube playlist.
      * @param {String} videoId - The video ID.
      */
     addVideo(videoId) {
-      YouTube.PlaylistItems.insert({snippet: {playlistId: playlistId, resourceId: {kind: "youtube#video", videoId: videoId}}}, "snippet")
+      youtube().addToPlaylist(super.getId(), videoId)
     }
 
     /**
-     * Remove a video from a YouTube playlist.
-     * @param {String} playlistId - The playlist ID.
+     * Remove a video from the YouTube playlist.
      * @param {String} videoId - The video ID.
      */
     removeVideo(videoId) {
-      const playlist = YouTube.PlaylistItems.list("snippet", {playlistId: playlistId, videoId: videoId})
-      const deletionId = playlist.items[0].id
-      YouTube.PlaylistItems.remove(deletionId)
+      youtube().removeFromPlaylist(super.getId(), videoId)
     }
 
     /**
