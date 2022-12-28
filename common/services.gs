@@ -120,7 +120,7 @@ function CommonService_() {
       }
 
       const wrapperObject = new (this._modelClass)(baseObject, dbObject)
-      super.addToCache_(wrapperObject)
+      this.addToCache_(wrapperObject)
       return wrapperObject
     }
 
@@ -129,7 +129,33 @@ function CommonService_() {
      * @return {Array[Object]} The objects.
      */
     getAll() {
-      return database().getData(this.getApiPath())
+      const dbObjects = database().getData(this.getApiPath()).results.filter(dbObject => dbObject.visible === true)
+      const dbObjectIds = dbObjects.map(dbObject => dbObject.id)
+      let baseObjects
+
+      switch(this._modelClass) {
+        case Channel_():
+          baseObjects = youtube().getChannels(dbObjectIds)
+          break
+        case Playlist_():
+          baseObjects = youtube().getPlaylists(dbObjectIds)
+          break
+        case WrapperSpreadsheet_():
+          baseObjects = dbObjectIds.map(dbObjectId => SpreadsheetApp.openById(dbObjectId))
+          break
+        case Video_():
+          baseObjects = youtube().getVideos(dbObjectIds)
+          break
+        default:
+          throw new Error("No model class found for this service")
+      }
+
+      return dbObjects.map(dbObject => {
+        const baseObject = baseObjects.find(baseObject => baseObject.id === dbObject.id)
+        const wrapperObject = new (this._modelClass)(baseObject, dbObject)
+        this.addToCache_(wrapperObject)
+        return wrapperObject
+      })
     }
 
     /**
@@ -217,13 +243,22 @@ function YoutubeService_() {
      * @return {Array[Object]} The formatted objects.
      */
     formatMetadata_(objects) {
-      const keysToRemove = ["etag", "snippet", "contentDetails", "statistics"]
+      const keysToRemove = ["etag"]
+      const keysToMerge = ["snippet", "contentDetails", "statistics"]
       const keysToReplace = [{ oldKey: "channelId", newKey: "channel" }]
 
       return objects.map(object => {
 
         // Remove keys that aren't in the database metadata
         keysToRemove.forEach(key => {
+          if (object[key] !== undefined) {
+            delete object[key]
+          }
+        })
+
+        // Merge properties for unwanted keys with parent properties
+        // For example, "object.snippet.title" becomes "object.title"
+        keysToMerge.forEach(key => {
           if (object[key] !== undefined) {
             object = { ...object, ...object[key] }
             delete object[key]
@@ -376,7 +411,6 @@ function YoutubeService_() {
       let stringOfIds = ""
 
       while ((stringOfIds = arrayOfIds.splice(-50).join(",")) && stringOfIds !== undefined) {
-        console.log(stringOfIds)
         videos.push(...YouTube.Videos.list("snippet,contentDetails,statistics", {id: stringOfIds}).items)
 
         if (videos.length % 1000 < 50 && videos.length > 50) {
@@ -482,14 +516,18 @@ function DatabaseService_() {
      * @param {Object | Array[Object]} [data] - The metadata to send.
      * @return {Object} The response object.
      */
-    fetchResponse_(apiPath = "", method = "GET", data = {}) {
+    fetchResponse_(apiPath = "", method = "GET", data) {
       const url = `https://${this.getDomain()}/api/${apiPath}`
       const options = {
         method: method,
         contentType: "application/json",
         headers: { Authorization: settings().getAuthToken() },
-        payload: JSON.stringify(data)
       }
+
+      if (data !== undefined) {
+        options.payload = JSON.stringify(data)
+      }
+
       const response = UrlFetchApp.fetch(url, options)
       return JSON.parse(response.getContentText())
     }

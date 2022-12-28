@@ -97,7 +97,7 @@ function CommonModel_() {
 
       changes.forEach(change => {
         this._dbObject[change.key] = change.value
-        cosole.log(change.message)
+        console.log(change.message)
       })
 
       if (applyChanges === true) {

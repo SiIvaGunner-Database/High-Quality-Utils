@@ -35,7 +35,8 @@ function Channel_() {
      * @return {WrapperSpreadsheet} The spreadsheet object.
      */
     getSpreadsheet() {
-      return spreadsheets().getById(this.getDatabaseObject().productionSpreadsheet)
+      const spreadsheetKey = (settings().isDevMode() ? "productionSpreadsheet" : "developmentSpreadsheet")
+      return spreadsheets().getById(this.getDatabaseObject()[spreadsheetKey])
     }
 
     /**
@@ -48,9 +49,10 @@ function Channel_() {
 
     /**
      * Get all public playlists on the channel.
+     * @param {Number} [limit] - The video count limit.
      * @return {Array[Playlist]} An array of playlists.
      */
-    getPlaylists() {
+    getPlaylists(limit) {
       const playlists = []
       let nextPageToken = ""
 
@@ -62,7 +64,12 @@ function Channel_() {
         }
         const playlist = YouTube.Playlists.list("snippet,contentDetails", parameters)
         playlists.push(...playlist.items)
-        nextPageToken = playlist.nextPageToken
+
+        if (limit !== undefined && playlists.length >= limit) {
+          nextPageToken = null
+        } else {
+          nextPageToken = playlist.nextPageToken
+        }
       }
 
       return playlists
@@ -76,7 +83,7 @@ function Channel_() {
     getVideos(limit) {
       const channel = YouTube.Channels.list("contentDetails", { id: this.getId() }).items[0]
       const uploadsPlaylistId = channel.contentDetails.relatedPlaylists.uploads
-      return this.getPlaylistItems(uploadsPlaylistId, limit)
+      return youtube().getPlaylistItems(uploadsPlaylistId, limit)
     }
 
     /**

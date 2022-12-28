@@ -113,7 +113,7 @@ function Tests_() {
       // Custom functions
       this.test_("getSpreadsheet", channel.getSpreadsheet())
       this.test_("getSheet", channel.getSheet())
-      this.test_("getPlaylists", channel.getPlaylists())
+      this.test_("getPlaylists", channel.getPlaylists(100))
       this.test_("getVideos", channel.getVideos(100))
       this.test_("getYoutubeStatus", channel.getYoutubeStatus())
     }
