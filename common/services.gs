@@ -250,7 +250,7 @@ function YoutubeService_() {
      * @return {Array[Object]} The formatted objects.
      */
     formatMetadata_(objects) {
-      const keysToRemove = ["etag"]
+      const keysToRemove = ["etag", "kind"]
       const keysToMerge = ["snippet", "contentDetails", "statistics"]
       const keysToReplace = [{ oldKey: "channelId", newKey: "channel" }]
 

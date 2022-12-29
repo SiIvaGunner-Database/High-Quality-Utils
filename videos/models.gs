@@ -37,7 +37,7 @@ function Video_() {
      * @return {Channel} The channel object.
      */
     getChannel() {
-      return videos().getById(this.getDatabaseObject().channel)
+      return channels().getById(this.getDatabaseObject().channel)
     }
 
     /**
