@@ -141,7 +141,7 @@ function CommonService_() {
           baseObjects = youtube().getPlaylists(dbObjectIds)
           break
         case WrapperSpreadsheet_():
-          baseObjects = dbObjectIds.map(dbObjectId => SpreadsheetApp.openById(dbObjectId))
+          // Spreadsheets can't be selected in mass, so the base objects variable isn't necessary here
           break
         case Video_():
           baseObjects = youtube().getVideos(dbObjectIds)
@@ -151,7 +151,14 @@ function CommonService_() {
       }
 
       return dbObjects.map(dbObject => {
-        const baseObject = baseObjects.find(baseObject => baseObject.id === dbObject.id)
+        let baseObject
+
+        if (this._modelClass === WrapperSpreadsheet_()) {
+          baseObject = SpreadsheetApp.openById(dbObject.id)
+        } else {
+          baseObject = baseObjects.find(baseObject => baseObject.id === dbObject.id)
+        }
+
         const wrapperObject = new (this._modelClass)(baseObject, dbObject)
         this.addToCache_(wrapperObject)
         return wrapperObject

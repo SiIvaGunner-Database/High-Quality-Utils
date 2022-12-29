@@ -7,13 +7,13 @@ let CommonModel
 function CommonModel_() {
   if (CommonModel === undefined) CommonModel = class CommonModel {
     /**
-     * Create a database object.
+     * Create a common model object.
      * @param {Object} baseObject - The base object (YouTube, Google Sheets, etc.).
      * @param {Object} databaseObject - The database metadata.
      * @param {Object} service - The related service object.
      * @param {Object} [columnConfig] - The optional column map configuration for objects with corresponding sheets.
      */
-    constructor(baseObject, databaseObject, service, columnConfig = { sortColumn: 1, columns: [] }) {
+    constructor(baseObject, databaseObject, service, columnConfig = { sortColumn: 1, columns: {} }) {
       this._ogObject = baseObject
       this._dbObject = databaseObject
       this._service = service
@@ -27,6 +27,28 @@ function CommonModel_() {
      */
     getColumnConfig() {
       return this._columnConfig
+    }
+
+    /**
+     * Get row and column values for use in a sheet.
+     * @return {Array[Array[Object]]} The values.
+     */
+    getValues() {
+      return [Object.values(this._columnConfig.columns).map(columnKey => {
+        const dbObject = this.getDatabaseObject()
+        let value = dbObject[columnKey]
+        console.log(value, value.toString().length, value.toString().endsWith("Z"))
+
+        if (value === undefined || value === null) {
+          value = ""
+        } else if (columnKey === "id") {
+          value = utils().formatYoutubeHyperlink(value)
+        } else if (value.toString().match(/^.+T.+Z$/) !== null) {
+          value = utils().formatDate(value)
+        }
+
+        return value
+      })]
     }
 
     /**
@@ -97,7 +119,7 @@ function CommonModel_() {
 
       changes.forEach(change => {
         this._dbObject[change.key] = change.value
-        console.log(change.message)
+        // console.log(change.message)
       })
 
       if (applyChanges === true) {

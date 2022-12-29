@@ -47,6 +47,7 @@ function WrapperSheet_() {
     constructor(parentSpreadsheet, sheetObject) {
       this._parentSpreadsheet = parentSpreadsheet
       this._sheetObject = sheetObject
+      this._rowHeight = 21 // Force the default height of 21 pixels 
     }
 
     /**
@@ -77,34 +78,24 @@ function WrapperSheet_() {
 
     /**
      * Insert a range of data into a sheet.
-     * @param {Object | Array[CommonModel | Object]} data - The data to insert.
+     * @param {Array[Array[Object]]} data - The data to insert.
      */
     insertValues(data) {
-      // Convert to Array[]
-      data = Object.values(data)
       this.getBaseObject().insertRowsBefore(2, data.length)
       this.updateValues(data, 2)
     }
 
     /**
      * Update a range of data in a sheet.
-     * @param {Object | Array[CommonModel | Object]} data - The data to insert.
+     * @param {Array[Array[Object]]} data - The data to insert.
      * @param {Number} row - The row to update.
      */
     updateValues(data, row) {
-      // Convert to Array[Array[]]
-      data = Object.values(data).map(object => {
-        if (typeof object === CommonModel_()) {
-          // Get the values for keys listed in the column config
-          const columns = object.getColumnConfig().columns
-          return Object.values(columns).map(column => object.getDatabaseObject()[column])
-        } else {
-          return Object.values(object)
-        }
-      })
-
-      // Update the data range
-      this.getBaseObject().getRange(row, 1, data.length, sheet.getLastColumn()).setValues(data)
+      const firstColumn = 1
+      const lastColumn = this.getBaseObject().getLastColumn()
+      const sheet = this.getBaseObject()
+      sheet.setRowHeightsForced(row, data.length, this._rowHeight)
+      sheet.getRange(row, firstColumn, data.length, lastColumn).setValues(data)
     }
 
     /**
@@ -114,7 +105,9 @@ function WrapperSheet_() {
      */
     sort(column, ascending = true) {
       const sheet = this.getBaseObject()
-      sheet.setFrozenRows(1) // Freeze the header row
+      const firstRow = 1
+      sheet.setFrozenRows(firstRow) // Freeze the header row
+      sheet.setRowHeightsForced(firstRow, sheet.getLastRow(), this._rowHeight)
       sheet.sort(column, ascending)
     }
   }

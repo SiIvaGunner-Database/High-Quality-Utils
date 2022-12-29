@@ -13,7 +13,7 @@ function Tests_() {
       this._testResults = []
       this._channelId = "UCCPGE1kAoonfPsbieW41ZZA" // VvvvvaVvvvvvr
       this._playlistId = "PLC2x5lNg_Y5Nsw1EKWGzHq5-VdzpJHWAR" // HuniePop
-      this._spreadsheetId = "1JhARnRkPEtwGFGgmxIBFoWixB7QR2K_toz38-tTHDOM" // Copy of SiIvaGunner Bootlegs Database
+      this._spreadsheetId = "1HP9FdYkb1Kuqcq-ND69yG1ojqCLYSRoVfF-KwlNdIuM" // SiIvaGunner Playground
       this._videoId = "NzoneDE0A2o" // The Inn - Fire Emblem
     }
 
@@ -201,8 +201,8 @@ function Tests_() {
       this.test_("getBaseObject", sheet.getBaseObject())
       this.test_("getSpreadsheet", sheet.getSpreadsheet())
       this.test_("getValues", sheet.getValues())
-      this.test_("insertValues", sheet.insertValues(data))
-      this.test_("updateValues", sheet.updateValues(data, 2))
+      this.test_("insertValues", sheet.insertValues(data.getValues()))
+      this.test_("updateValues", sheet.updateValues(data.getValues(), 2))
       this.test_("sort", sheet.sort(data.getColumnConfig().sortColumn, false))
     }
 
