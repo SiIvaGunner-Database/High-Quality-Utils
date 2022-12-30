@@ -34,7 +34,7 @@ function Playlist_() {
      * @return {WrapperSpreadsheet} The spreadsheet object.
      */
     getSpreadsheet() {
-      const spreadsheetKey = (settings().isDevMode() ? "productionSpreadsheet" : "developmentSpreadsheet")
+      const spreadsheetKey = (settings().isDevModeEnabled() ? "productionSpreadsheet" : "developmentSpreadsheet")
       return spreadsheets().getById(this.getDatabaseObject()[spreadsheetKey])
     }
 
@@ -47,13 +47,13 @@ function Playlist_() {
     }
 
     /**
-     * Get the appropriate metadata from videos in a YouTube playlist.
-     * @param {String} playlistId - The YouTube playlist ID.
-     * @param {Number} [limit] - The video count limit.
-     * @return {Array[Object]} The video objects.
+     * Get all videos in the playlist.
+     * @param {Number} [limit] - An optional video count limit.
+     * @param {String} [nextPageToken] - An optional page token to start getting results from.
+     * @return {Array[Array[Video], String|null]} An array containing the videos and next page token.
      */
-    getVideos(limit) {
-      return youtube().getPlaylistItems(super.getId(), limit)
+    getVideos(limit, nextPageToken) {
+      return videos().getByPlaylistId(super.getId(), limit, nextPageToken)
     }
 
     /**

@@ -8,17 +8,19 @@ function CommonModel_() {
   if (CommonModel === undefined) CommonModel = class CommonModel {
     /**
      * Create a common model object.
-     * @param {Object} baseObject - The base object (YouTube, Google Sheets, etc.).
+     * @param {Object} originalObject - The base object (YouTube, Google Sheets, etc.).
      * @param {Object} databaseObject - The database metadata.
      * @param {Object} service - The related service object.
      * @param {Object} [columnConfig] - The optional column map configuration for objects with corresponding sheets.
      */
-    constructor(baseObject, databaseObject, service, columnConfig = { sortColumn: 1, columns: {} }) {
-      this._ogObject = baseObject
-      this._dbObject = databaseObject
+    constructor(originalObject, databaseObject, service, columnConfig = { sortColumn: 1, columns: {} }) {
+      this._originalObject = originalObject
+      this._databaseObject = databaseObject
       this._service = service
       this._columnConfig = columnConfig // TODO? consider moving column config to web app; it could make it easier to configure individual sheets
+      this._id = (databaseObject !== undefined ? databaseObject.id : originalObject.id)
       this._changes
+      service.addToCache_(this)
     }
 
     /**
@@ -31,9 +33,10 @@ function CommonModel_() {
 
     /**
      * Get row and column values for use in a sheet.
+     * @param {String} [wikiName] - An optional wiki name to use in a hyperlink for the title if a value is provided.
      * @return {Array[Array[Object]]} The values.
      */
-    getValues() {
+    getValues(wiki) {
       return [Object.values(this._columnConfig.columns).map(columnKey => {
         const dbObject = this.getDatabaseObject()
         let value = dbObject[columnKey]
@@ -43,6 +46,8 @@ function CommonModel_() {
           value = ""
         } else if (columnKey === "id") {
           value = utils().formatYoutubeHyperlink(value)
+        } else if (columnKey === "title" && wiki !== undefined) {
+          value = utils().formatFandomHyperlink(value, wiki)
         } else if (value.toString().match(/^.+T.+Z$/) !== null) {
           value = utils().formatDate(value)
         }
@@ -52,19 +57,19 @@ function CommonModel_() {
     }
 
     /**
-     * Get the base object ID.
-     * @return {String} The base object ID.
+     * Get the object ID.
+     * @return {String} The object ID.
      */
     getId() {
-      return this.getBaseObject().id
+      return this._id
     }
 
     /**
      * Get the base object.
      * @return {Object} The base object.
      */
-    getBaseObject() {
-      return this._ogObject
+    getOriginalObject() {
+      return this._originalObject
     }
 
     /**
@@ -72,7 +77,7 @@ function CommonModel_() {
      * @return {Object} The database metadata.
      */
     getDatabaseObject() {
-      return this._dbObject
+      return this._databaseObject
     }
 
     /**
@@ -84,7 +89,7 @@ function CommonModel_() {
         /** @type {{ object: this; key: string; value: any; message: string; }[]} */
         this._changes = []
 
-        Object.entries(this.getBaseObject()).forEach(([key, currentValue]) => {
+        Object.entries(this.getOriginalObject()).forEach(([key, currentValue]) => {
           const oldValue = this.getDatabaseObject()[key]
 
           if (oldValue !== currentValue) {
@@ -118,7 +123,7 @@ function CommonModel_() {
       const changes = this.getChanges()
 
       changes.forEach(change => {
-        this._dbObject[change.key] = change.value
+        this.getDatabaseObject()[change.key] = change.value
         // console.log(change.message)
       })
 

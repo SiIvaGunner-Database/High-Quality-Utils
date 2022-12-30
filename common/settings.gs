@@ -10,7 +10,7 @@ function Settings_() {
      * Create a settings object.
      */
     constructor() {
-      this._devMode = false
+      this._isDevModeEnabled = false
       this._authToken = ""
     }
 
@@ -54,7 +54,7 @@ function Settings_() {
      * Enable development mode for development evironment testing.
      */
     enableDevMode() {
-      this._devMode = true
+      this._isDevModeEnabled = true
     }
 
     /**
@@ -62,15 +62,15 @@ function Settings_() {
      * Development mode is disabled by default.
      */
     disableDevMode() {
-      this._devMode = false
+      this._isDevModeEnabled = false
     }
 
     /**
      * Get the current status of development mode.
      * @return {Boolean} True if development mode is enabled, else false.
      */
-    isDevMode() {
-      return this._devMode
+    isDevModeEnabled() {
+      return this._isDevModeEnabled
     }
 
     /**

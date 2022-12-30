@@ -15,34 +15,33 @@ function CommonService_() {
     constructor(modelClass, apiPath) {
       this._modelClass = modelClass
       this._apiPath = apiPath
-      this._cache = []
-      this._lastCachedObject = {}
-      this._useCache = true
+      this._cache = new Map()
+      this._isCacheEnabled = true
       this._changes
     }
 
     /**
      * Enable data caching.
+     * Caching is enabled by default.
      */
     enableCache() {
-      this._useCache = true
+      this._isCacheEnabled = true
     }
 
     /**
      * Disable data caching.
      */
     disableCache() {
-      this._useCache = true
+      this._isCacheEnabled = true
     }
 
     /**
-     * Add an object to the cache.
-     * @param {Object} object - The object.
+     * Add a common model object to the cache.
+     * @param {CommonModel} object - The object to cache.
      */
     addToCache_(object) {
-      if (this._useCache === true) {
-        this._lastCachedObject = object
-        this._cache.push(object)
+      if (this._isCacheEnabled === true) {
+        this._cache.set(object.getId(), object)
       }
     }
 
@@ -52,26 +51,16 @@ function CommonService_() {
      * @return {Boolean} True if the object is cached, else false.
      */
     isCached_(objectId) {
-      return this._useCache === true && this.getCachedObject_(objectId) !== undefined
+      return (this._isCacheEnabled === true && this.getCachedObject_(objectId) !== undefined)
     }
 
     /**
-     * Get a cached object by its ID.
+     * Get a cached common model object by its ID.
      * @param {String} objectId - The object ID.
-     * @return {Object} The cached object.
+     * @return {CommonModel} The cached object.
      */
     getCachedObject_(objectId) {
-      if (this._lastCachedObject.id === objectId) {
-        return this._lastCachedObject
-      }
-
-      const cachedObject = this._cache.find(obj => obj.id === objectId)
-
-      if (cachedObject !== undefined) {
-        this._lastCachedObject = cachedObject
-      }
-
-      return cachedObject
+      return this._cache.get(objectId)
     }
 
     /**
@@ -84,85 +73,70 @@ function CommonService_() {
     }
 
     /**
-     * Get an object by its ID.
+     * Get a common model object by its ID.
      * @param {String} objectId - The object ID.
-     * @return {Object} The object.
+     * @return {CommonModel} The object.
      */
     getById(objectId) {
       if (this.isCached_(objectId)) {
         return this.getCachedObject_(objectId)
       }
 
-      let baseObject
+      const dbObject = database().getData(this.getApiPath(objectId))
+      let originalObject
 
       switch(this._modelClass) {
         case Channel_():
-          baseObject = youtube().getChannel(objectId)
+          originalObject = youtube().getChannel(objectId)
           break
         case Playlist_():
-          baseObject = youtube().getPlaylist(objectId)
+          originalObject = youtube().getPlaylist(objectId)
           break
         case WrapperSpreadsheet_():
-          baseObject = SpreadsheetApp.openById(objectId)
+          originalObject = SpreadsheetApp.openById(objectId)
           break
         case Video_():
-          baseObject = youtube().getVideo(objectId)
+          originalObject = youtube().getVideo(objectId)
           break
         default:
           throw new Error("No model class found for this service")
       }
 
-      const dbObject = database().getData(this.getApiPath(objectId))
-
-      if (baseObject !== undefined && dbObject === undefined) {
-        dbObject = {id: baseObject.id}
-        database().postData(this.getApiPath(), dbObject)
-      }
-
-      const wrapperObject = new (this._modelClass)(baseObject, dbObject)
-      this.addToCache_(wrapperObject)
-      return wrapperObject
+      return new (this._modelClass)(originalObject, dbObject)
     }
 
     /**
-     * Get all objects.
-     * @return {Array[Object]} The objects.
+     * Get all common model objects in the web application database.
+     * @return {Array[CommonModel]} The objects.
      */
     getAll() {
       const dbObjects = database().getData(this.getApiPath()).results.filter(dbObject => dbObject.visible === true)
       const dbObjectIds = dbObjects.map(dbObject => dbObject.id)
-      let baseObjects
+      let originalObjects
 
       switch(this._modelClass) {
         case Channel_():
-          baseObjects = youtube().getChannels(dbObjectIds)
+          originalObjects = youtube().getChannels(dbObjectIds)
           break
         case Playlist_():
-          baseObjects = youtube().getPlaylists(dbObjectIds)
+          originalObjects = youtube().getPlaylists(dbObjectIds)
           break
         case WrapperSpreadsheet_():
-          // Spreadsheets can't be selected in mass, so the base objects variable isn't necessary here
+          originalObjects = dbObjectIds.map(spreadsheetId => {
+            const spreadsheet = SpreadsheetApp.openById(spreadsheetId)
+            spreadsheet.id = spreadsheet.getId()
+            return spreadsheet
+          })
           break
         case Video_():
-          baseObjects = youtube().getVideos(dbObjectIds)
+          originalObjects = youtube().getVideos(dbObjectIds)
           break
         default:
           throw new Error("No model class found for this service")
       }
 
-      return dbObjects.map(dbObject => {
-        let baseObject
-
-        if (this._modelClass === WrapperSpreadsheet_()) {
-          baseObject = SpreadsheetApp.openById(dbObject.id)
-        } else {
-          baseObject = baseObjects.find(baseObject => baseObject.id === dbObject.id)
-        }
-
-        const wrapperObject = new (this._modelClass)(baseObject, dbObject)
-        this.addToCache_(wrapperObject)
-        return wrapperObject
-      })
+      const originalObjectMap = new Map(originalObjects.map(originalObject => [originalObject.id, originalObject]))
+      return dbObjects.map(dbObject => new (this._modelClass)(originalObjectMap.get(dbObject.id), dbObject))
     }
 
     /**
@@ -311,6 +285,47 @@ function YoutubeService_() {
     }
 
     /**
+     * Get the metadata from public playlists on a YouTube channel.
+     * @param {String} channelId - The YouTube channel ID.
+     * @param {Number} [limit] - An optional playlist count limit.
+     * @param {String} [pageToken] - An optional page token to start getting results from.
+     * @return {Array[Array[Object], String|null]} An array containing the metadata and next page token.
+     */
+    getChannelPlaylists(channelId, limit, pageToken = "") {
+      const playlists = []
+
+      while (pageToken !== null) {
+        const parameters = {
+          channelId: channelId,
+          maxResults: 50,
+          pageToken: pageToken
+        }
+        const playlist = YouTube.Playlists.list("snippet,contentDetails", parameters)
+        playlists.push(...playlist.items)
+        pageToken = playlist.nextPageToken
+
+        if (limit !== undefined && playlists.length >= limit) {
+          break
+        }
+      }
+
+      return [playlists, pageToken]
+    }
+
+    /**
+     * Get the metadata from public uploads on a YouTube channel.
+     * @param {String} channelId - The YouTube channel ID.
+     * @param {Number} [limit] - An optional video count limit.
+     * @param {String} [pageToken] - An optional page token to start getting results from.
+     * @return {Array[Array[Object], String|null]} An array containing the metadata and next page token.
+     */
+    getChannelVideos(channelId, limit, pageToken) {
+      const channel = YouTube.Channels.list("contentDetails", { id: channelId }).items[0]
+      const uploadsPlaylistId = channel.contentDetails.relatedPlaylists.uploads
+      return youtube().getPlaylistVideos(uploadsPlaylistId, limit, pageToken)
+    }
+
+    /**
      * Get the metadata from a YouTube playlist.
      * @param {String} playlistId - The YouTube playlist ID.
      * @return {Object} The playlist object.
@@ -372,30 +387,29 @@ function YoutubeService_() {
     /**
      * Get the metadata from videos in a YouTube playlist.
      * @param {String} playlistId - The YouTube playlist ID.
-     * @param {Number} [limit] - The video count limit.
-     * @return {Array[Object]} The video objects.
+     * @param {Number} [limit] - An optional video count limit.
+     * @param {String} [pageToken] - An optional page token to start getting results from.
+     * @return {Array[Array[Object], String|null]} An array containing the metadata and next page token.
      */
-    getPlaylistItems(playlistId, limit) {
+    getPlaylistVideos(playlistId, limit, pageToken = "") {
       const itemIds = []
-      let nextPageToken = ""
 
-      while (nextPageToken !== null) {
+      while (pageToken !== null) {
         const parameters = {
           playlistId: playlistId,
           maxResults: 50,
-          pageToken: nextPageToken
+          pageToken: pageToken
         }
         const playlist = YouTube.PlaylistItems.list("snippet", parameters)
         itemIds.push(...playlist.items.map(item => item.snippet.resourceId.videoId))
+        pageToken = playlist.nextPageToken
 
         if (limit !== undefined && itemIds.length >= limit) {
-          nextPageToken = null
-        } else {
-          nextPageToken = playlist.nextPageToken
+          break
         }
       }
 
-      return this.getVideos(itemIds)
+      return [this.getVideos(itemIds), pageToken]
     }
 
     /**
@@ -465,7 +479,7 @@ function DatabaseService_() {
      * @return {String} The web application domain, usually "siivagunnerdatabase.net".
      */
     getDomain() {
-      if (settings().isDevMode()) {
+      if (settings().isDevModeEnabled()) {
         return "dev.siivagunnerdatabase.net"
       } else {
         return "siivagunnerdatabase.net"

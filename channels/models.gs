@@ -35,7 +35,7 @@ function Channel_() {
      * @return {WrapperSpreadsheet} The spreadsheet object.
      */
     getSpreadsheet() {
-      const spreadsheetKey = (settings().isDevMode() ? "productionSpreadsheet" : "developmentSpreadsheet")
+      const spreadsheetKey = (settings().isDevModeEnabled() ? "productionSpreadsheet" : "developmentSpreadsheet")
       return spreadsheets().getById(this.getDatabaseObject()[spreadsheetKey])
     }
 
@@ -49,41 +49,22 @@ function Channel_() {
 
     /**
      * Get all public playlists on the channel.
-     * @param {Number} [limit] - The video count limit.
-     * @return {Array[Playlist]} An array of playlists.
+     * @param {Number} [limit] - An optional video count limit.
+     * @param {String} [pageToken] - An optional page token to start getting results from.
+     * @return {Array[Array[Playlist], String|null]} An array containing the playlists and next page token.
      */
-    getPlaylists(limit) {
-      const playlists = []
-      let nextPageToken = ""
-
-      while (nextPageToken !== null) {
-        const parameters = {
-          channelId: super.getId(),
-          maxResults: 50,
-          pageToken: nextPageToken
-        }
-        const playlist = YouTube.Playlists.list("snippet,contentDetails", parameters)
-        playlists.push(...playlist.items)
-
-        if (limit !== undefined && playlists.length >= limit) {
-          nextPageToken = null
-        } else {
-          nextPageToken = playlist.nextPageToken
-        }
-      }
-
-      return playlists
+    getPlaylists(limit, pageToken) {
+      return playlists().getByChannelId(super.getId(), limit, pageToken)
     }
 
     /**
-     * Get the metadata from a YouTube channel's uploads.
-     * @param {Number} [limit] - The video count limit.
-     * @return {Array[Object]} The video objects.
+     * Get all public videos on the channel.
+     * @param {Number} [limit] - An optional video count limit.
+     * @param {String} [pageToken] - An optional page token to start getting results from.
+     * @return {Array[Array[Video], String|null]} An array containing the videos and next page token.
      */
-    getVideos(limit) {
-      const channel = YouTube.Channels.list("contentDetails", { id: this.getId() }).items[0]
-      const uploadsPlaylistId = channel.contentDetails.relatedPlaylists.uploads
-      return youtube().getPlaylistItems(uploadsPlaylistId, limit)
+    getVideos(limit, pageToken) {
+      return videos().getByChannelId(super.getId(), limit, pageToken)
     }
 
     /**

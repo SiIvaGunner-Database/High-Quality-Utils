@@ -21,7 +21,7 @@ function WrapperSpreadsheet_() {
      * @return {WrapperSheet} The sheet object.
      */
     getSheet(sheetName) {
-      const sheet = this.getBaseObject().getSheetByName(sheetName)
+      const sheet = this.getOriginalObject().getSheetByName(sheetName)
       return new (WrapperSheet_())(this, sheet)
     }
   }
@@ -54,7 +54,7 @@ function WrapperSheet_() {
      * Get the base sheet object.
      * @return {Sheet} The base object.
      */
-    getBaseObject() {
+    getOriginalObject() {
       return this._sheetObject
     }
 
@@ -71,7 +71,7 @@ function WrapperSheet_() {
      * @return {Array[Array[Object]]} The values.
      */
     getValues() {
-      const data = this.getBaseObject().getDataRange().getValues()
+      const data = this.getOriginalObject().getDataRange().getValues()
       data.shift() // Remove the header row
       return data
     }
@@ -81,7 +81,7 @@ function WrapperSheet_() {
      * @param {Array[Array[Object]]} data - The data to insert.
      */
     insertValues(data) {
-      this.getBaseObject().insertRowsBefore(2, data.length)
+      this.getOriginalObject().insertRowsBefore(2, data.length)
       this.updateValues(data, 2)
     }
 
@@ -92,8 +92,8 @@ function WrapperSheet_() {
      */
     updateValues(data, row) {
       const firstColumn = 1
-      const lastColumn = this.getBaseObject().getLastColumn()
-      const sheet = this.getBaseObject()
+      const lastColumn = this.getOriginalObject().getLastColumn()
+      const sheet = this.getOriginalObject()
       sheet.setRowHeightsForced(row, data.length, this._rowHeight)
       sheet.getRange(row, firstColumn, data.length, lastColumn).setValues(data)
     }
@@ -104,7 +104,7 @@ function WrapperSheet_() {
      * @param {Boolean} [ascending] - Whether or not to sort in ascending order. Defaults to true.
      */
     sort(column, ascending = true) {
-      const sheet = this.getBaseObject()
+      const sheet = this.getOriginalObject()
       const firstRow = 1
       sheet.setFrozenRows(firstRow) // Freeze the header row
       sheet.setRowHeightsForced(firstRow, sheet.getLastRow(), this._rowHeight)

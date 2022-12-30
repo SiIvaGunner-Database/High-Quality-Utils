@@ -13,6 +13,36 @@ function VideoService_() {
     constructor() {
       super(Video_(), "videos")
     }
+
+    /**
+     * Get public videos by channel ID.
+     * @param {Number} [limit] - An optional video count limit.
+     * @param {String} [pageToken] - An optional page token to start getting results from.
+     * @return {Array[Array[Video], String|null]} An array containing the videos and next page token.
+     */
+    getByChannelId(channelId, limit, pageToken) {
+      const [ytVideos, nextPageToken] = youtube().getChannelVideos(channelId, limit, pageToken)
+      const dbVideos = database().getData(super.getApiPath()).results
+        .filter(dbVideo => (dbVideo.visible === true && dbVideo.channel === channelId))
+      const dbVideoMap = new Map(dbVideos.map(dbVideo => [dbVideo.id, dbVideo]))
+      const wrapperVideos = ytVideos.map(ytVideo => new (Video_())(ytVideo, dbVideoMap.get(ytVideo.id)))
+      return [wrapperVideos, nextPageToken]
+    }
+
+    /**
+     * Get public videos by playlist ID.
+     * @param {Number} [limit] - An optional video count limit.
+     * @param {String} [pageToken] - An optional page token to start getting results from.
+     * @return {Array[Array[Video], String|null]} An array containing the videos and next page token.
+     */
+    getByPlaylistId(playlistId, limit, pageToken) {
+      const [ytVideos, nextPageToken] = youtube().getPlaylistVideos(playlistId, limit, pageToken)
+      const dbVideos = database().getData(super.getApiPath()).results
+        .filter(dbVideo => (dbVideo.visible === true && dbVideo.playlists.includes(playlistId) === true))
+      const dbVideoMap = new Map(dbVideos.map(dbVideo => [dbVideo.id, dbVideo]))
+      const wrapperVideos = ytVideos.map(ytVideo => new (Video_())(ytVideo, dbVideoMap.get(ytVideo.id)))
+      return [wrapperVideos, nextPageToken]
+    }
   }
 
   return VideoService
