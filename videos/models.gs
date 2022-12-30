@@ -69,7 +69,7 @@ function Video_() {
      * @return {String} Either "Documented" or "Undocumented".
      */
     getWikiStatus() {
-      // TODO? consider using the Fandom API instead; it's slower but more consistent
+      // TODO use the Fandom API instead; it's slower but more consistent
       const wiki = this.getChannel().getDatabaseObject().wiki
       const pageName = super.getDatabaseObject().title
       const encodedPageName = encodeURIComponent(utils().formatFandomPageName(pageName))

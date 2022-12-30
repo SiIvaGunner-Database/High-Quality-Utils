@@ -17,7 +17,7 @@ function CommonModel_() {
       this._originalObject = originalObject
       this._databaseObject = databaseObject
       this._service = service
-      this._columnConfig = columnConfig // TODO? consider moving column config to web app; it could make it easier to configure individual sheets
+      this._columnConfig = columnConfig
       this._id = (databaseObject !== undefined ? databaseObject.id : originalObject.id)
       this._changes
       service.addToCache_(this)

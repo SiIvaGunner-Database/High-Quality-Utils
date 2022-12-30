@@ -98,8 +98,6 @@ function CommonService_() {
         case Video_():
           originalObject = youtube().getVideo(objectId)
           break
-        default:
-          throw new Error("No model class found for this service")
       }
 
       return new (this._modelClass)(originalObject, dbObject)
@@ -112,7 +110,7 @@ function CommonService_() {
     getAll() {
       const dbObjects = database().getData(this.getApiPath()).results.filter(dbObject => dbObject.visible === true)
       const dbObjectIds = dbObjects.map(dbObject => dbObject.id)
-      let originalObjects
+      let originalObjects = []
 
       switch(this._modelClass) {
         case Channel_():
@@ -131,8 +129,6 @@ function CommonService_() {
         case Video_():
           originalObjects = youtube().getVideos(dbObjectIds)
           break
-        default:
-          throw new Error("No model class found for this service")
       }
 
       const originalObjectMap = new Map(originalObjects.map(originalObject => [originalObject.id, originalObject]))
