@@ -21,7 +21,13 @@ function PlaylistService_() {
      * @return {Array[Array[Playlist], String|null]} An array containing the playlists and next page token.
      */
     getByChannelId(channelId, limit, pageToken) {
-      const [ytPlaylists, nextPageToken] = youtube().getChannelPlaylists(channelId, limit, pageToken)
+      let ytPlaylists = []
+      let nextPageToken
+
+      if (settings().isYoutubeApiEnabled() === true) {
+        [ytPlaylists, nextPageToken] = youtube().getChannelPlaylists(channelId, limit, pageToken)
+      }
+
       const dbPlaylists = database().getData(super.getApiPath()).results
         .filter(dbPlaylist => (dbPlaylist.visible === true && dbPlaylist.channel === channelId))
       const dbPlaylistMap = new Map(dbPlaylists.map(dbPlaylist => [dbPlaylist.id, dbPlaylist]))

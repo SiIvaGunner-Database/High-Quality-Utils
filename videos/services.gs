@@ -21,7 +21,13 @@ function VideoService_() {
      * @return {Array[Array[Video], String|null]} An array containing the videos and next page token.
      */
     getByChannelId(channelId, limit, pageToken) {
-      const [ytVideos, nextPageToken] = youtube().getChannelVideos(channelId, limit, pageToken)
+      let ytVideos = []
+      let nextPageToken
+
+      if (settings().isYoutubeApiEnabled() === true) {
+        [ytVideos, nextPageToken] = youtube().getChannelVideos(channelId, limit, pageToken)
+      }
+
       const dbVideos = database().getData(super.getApiPath()).results
         .filter(dbVideo => (dbVideo.visible === true && dbVideo.channel === channelId))
       const dbVideoMap = new Map(dbVideos.map(dbVideo => [dbVideo.id, dbVideo]))
@@ -36,7 +42,13 @@ function VideoService_() {
      * @return {Array[Array[Video], String|null]} An array containing the videos and next page token.
      */
     getByPlaylistId(playlistId, limit, pageToken) {
-      const [ytVideos, nextPageToken] = youtube().getPlaylistVideos(playlistId, limit, pageToken)
+      let ytVideos = []
+      let nextPageToken
+
+      if (settings().isYoutubeApiEnabled() === true) {
+        [ytVideos, nextPageToken] = youtube().getPlaylistVideos(playlistId, limit, pageToken)
+      }
+
       const dbVideos = database().getData(super.getApiPath()).results
         .filter(dbVideo => (dbVideo.visible === true && dbVideo.playlists.includes(playlistId) === true))
       const dbVideoMap = new Map(dbVideos.map(dbVideo => [dbVideo.id, dbVideo]))

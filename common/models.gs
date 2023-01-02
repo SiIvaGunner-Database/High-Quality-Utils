@@ -89,19 +89,21 @@ function CommonModel_() {
         /** @type {{ object: this; key: string; value: any; message: string; }[]} */
         this._changes = []
 
-        Object.entries(this.getOriginalObject()).forEach(([key, currentValue]) => {
-          const oldValue = this.getDatabaseObject()[key]
+        if (this.getOriginalObject() !== undefined && this.getDatabaseObject() !== undefined) {
+          Object.entries(this.getOriginalObject()).forEach(([key, currentValue]) => {
+            const oldValue = this.getDatabaseObject()[key]
 
-          if (oldValue !== currentValue) {
-            const change = {
-              object: this,
-              key: key,
-              value: currentValue,
-              message: `Old ${key}: ${oldValue}\nNew ${key}: ${currentValue}`
+            if (oldValue !== currentValue) {
+              const change = {
+                object: this,
+                key: key,
+                value: currentValue,
+                message: `Old ${key}: ${oldValue}\nNew ${key}: ${currentValue}`
+              }
+              this._changes.push(change)
             }
-            this._changes.push(change)
-          }
-        })
+          })
+        }
       }
 
       return this._changes

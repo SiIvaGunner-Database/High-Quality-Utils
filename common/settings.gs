@@ -11,6 +11,7 @@ function Settings_() {
      */
     constructor() {
       this._isDevModeEnabled = false
+      this._isYoutubeApiEnabled = true
       this._authToken = ""
     }
 
@@ -71,6 +72,29 @@ function Settings_() {
      */
     isDevModeEnabled() {
       return this._isDevModeEnabled
+    }
+
+    /**
+     * Enable the YouTube API to include YouTube metadata in objects returned by services.
+     * The YouTube API is enabled by default.
+     */
+    enableYoutubeApi() {
+      this._isYoutubeApiEnabled = true
+    }
+
+    /**
+     * Disable the YouTube API to include YouTube metadata in objects returned by services.
+     */
+    disableYoutubeApi() {
+      this._isYoutubeApiEnabled = false
+    }
+
+    /**
+     * Get the current status of the YouTube API.
+     * @return {Boolean} True if the YouTube API is enabled, else false.
+     */
+    isYoutubeApiEnabled() {
+      return this._isYoutubeApiEnabled
     }
 
     /**

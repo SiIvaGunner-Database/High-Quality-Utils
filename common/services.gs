@@ -87,16 +87,22 @@ function CommonService_() {
 
       switch(this._modelClass) {
         case Channel_():
-          originalObject = youtube().getChannel(objectId)
+          if (settings().isYoutubeApiEnabled() === true) {
+            originalObject = youtube().getChannel(objectId)
+          }
           break
         case Playlist_():
-          originalObject = youtube().getPlaylist(objectId)
+          if (settings().isYoutubeApiEnabled() === true) {
+            originalObject = youtube().getPlaylist(objectId)
+          }
           break
         case WrapperSpreadsheet_():
           originalObject = SpreadsheetApp.openById(objectId)
           break
         case Video_():
-          originalObject = youtube().getVideo(objectId)
+          if (settings().isYoutubeApiEnabled() === true) {
+            originalObject = youtube().getVideo(objectId)
+          }
           break
       }
 
@@ -114,10 +120,14 @@ function CommonService_() {
 
       switch(this._modelClass) {
         case Channel_():
-          originalObjects = youtube().getChannels(dbObjectIds)
+          if (settings().isYoutubeApiEnabled() === true) {
+            originalObjects = youtube().getChannels(dbObjectIds)
+          }
           break
         case Playlist_():
-          originalObjects = youtube().getPlaylists(dbObjectIds)
+          if (settings().isYoutubeApiEnabled() === true) {
+            originalObjects = youtube().getPlaylists(dbObjectIds)
+          }
           break
         case WrapperSpreadsheet_():
           originalObjects = dbObjectIds.map(spreadsheetId => {
@@ -127,7 +137,9 @@ function CommonService_() {
           })
           break
         case Video_():
-          originalObjects = youtube().getVideos(dbObjectIds)
+          if (settings().isYoutubeApiEnabled() === true) {
+            originalObjects = youtube().getVideos(dbObjectIds)
+          }
           break
       }
 
