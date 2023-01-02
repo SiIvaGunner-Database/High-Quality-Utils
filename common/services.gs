@@ -557,7 +557,14 @@ function DatabaseService_() {
         options.payload = JSON.stringify(data)
       }
 
-      const response = UrlFetchApp.fetch(url, options)
+      let response
+
+      try {
+        response = UrlFetchApp.fetch(url, options)
+      } catch (error) {
+        throw new Error(`${url}\n${error.message}`)
+      }
+
       return JSON.parse(response.getContentText())
     }
   }

@@ -34,7 +34,7 @@ function Playlist_() {
      * @return {WrapperSpreadsheet} The spreadsheet object.
      */
     getSpreadsheet() {
-      const spreadsheetKey = (settings().isDevModeEnabled() ? "productionSpreadsheet" : "developmentSpreadsheet")
+      const spreadsheetKey = (settings().isDevModeEnabled() === true ? "developmentSpreadsheet" : "productionSpreadsheet")
       return spreadsheets().getById(this.getDatabaseObject()[spreadsheetKey])
     }
 
