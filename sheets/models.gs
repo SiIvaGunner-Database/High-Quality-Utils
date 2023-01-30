@@ -21,7 +21,7 @@ function WrapperSpreadsheet_() {
      * @return {WrapperSheet} The sheet object.
      */
     getSheet(sheetName) {
-      const sheet = this.getOriginalObject().getSheetByName(sheetName)
+      const sheet = super.getOriginalObject().getSheetByName(sheetName)
       return new (WrapperSheet_())(this, sheet)
     }
   }

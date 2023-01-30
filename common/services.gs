@@ -297,12 +297,12 @@ function YoutubeService_() {
      * @param {String} channelId - The YouTube channel ID.
      * @param {Number} [limit] - An optional playlist count limit.
      * @param {String} [pageToken] - An optional page token to start getting results from.
-     * @return {Array[Array[Object], String|null]} An array containing the metadata and next page token.
+     * @return {Array[Array[Object], String|undefined]} An array containing the metadata and next page token.
      */
     getChannelPlaylists(channelId, limit, pageToken = "") {
       const playlists = []
 
-      while (pageToken !== null) {
+      while (pageToken !== undefined) {
         const parameters = {
           channelId: channelId,
           maxResults: 50,
@@ -325,7 +325,7 @@ function YoutubeService_() {
      * @param {String} channelId - The YouTube channel ID.
      * @param {Number} [limit] - An optional video count limit.
      * @param {String} [pageToken] - An optional page token to start getting results from.
-     * @return {Array[Array[Object], String|null]} An array containing the metadata and next page token.
+     * @return {Array[Array[Object], String|undefined]} An array containing the metadata and next page token.
      */
     getChannelVideos(channelId, limit, pageToken) {
       const channel = YouTube.Channels.list("contentDetails", { id: channelId }).items[0]
@@ -397,12 +397,12 @@ function YoutubeService_() {
      * @param {String} playlistId - The YouTube playlist ID.
      * @param {Number} [limit] - An optional video count limit.
      * @param {String} [pageToken] - An optional page token to start getting results from.
-     * @return {Array[Array[Object], String|null]} An array containing the metadata and next page token.
+     * @return {Array[Array[Object], String|undefined]} An array containing the metadata and next page token.
      */
     getPlaylistVideos(playlistId, limit, pageToken = "") {
       const itemIds = []
 
-      while (pageToken !== null) {
+      while (pageToken !== undefined) {
         const parameters = {
           playlistId: playlistId,
           maxResults: 50,

@@ -36,7 +36,7 @@ function Channel_() {
      */
     getSpreadsheet() {
       const spreadsheetKey = (settings().isDevModeEnabled() === true ? "developmentSpreadsheet" : "productionSpreadsheet")
-      return spreadsheets().getById(this.getDatabaseObject()[spreadsheetKey])
+      return spreadsheets().getById(super.getDatabaseObject()[spreadsheetKey])
     }
 
     /**
@@ -44,14 +44,14 @@ function Channel_() {
      * @return {WrapperSheet} The sheet object.
      */
     getSheet() {
-      return this.getSpreadsheet().getSheet(this.getDatabaseObject().title)
+      return this.getSpreadsheet().getSheet(super.getDatabaseObject().title)
     }
 
     /**
      * Get all public playlists on the channel.
      * @param {Number} [limit] - An optional video count limit.
      * @param {String} [pageToken] - An optional page token to start getting results from.
-     * @return {Array[Array[Playlist], String|null]} An array containing the playlists and next page token.
+     * @return {Array[Array[Playlist], String|undefined]} An array containing the playlists and next page token.
      */
     getPlaylists(limit, pageToken) {
       return playlists().getByChannelId(super.getId(), limit, pageToken)
@@ -61,7 +61,7 @@ function Channel_() {
      * Get all public videos on the channel.
      * @param {Number} [limit] - An optional video count limit.
      * @param {String} [pageToken] - An optional page token to start getting results from.
-     * @return {Array[Array[Video], String|null]} An array containing the videos and next page token.
+     * @return {Array[Array[Video], String|undefined]} An array containing the videos and next page token.
      */
     getVideos(limit, pageToken) {
       return videos().getByChannelId(super.getId(), limit, pageToken)

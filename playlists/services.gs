@@ -18,7 +18,7 @@ function PlaylistService_() {
      * Get public playlists by channel ID.
      * @param {Number} [limit] - An optional video count limit.
      * @param {String} [pageToken] - An optional page token to start getting results from.
-     * @return {Array[Array[Playlist], String|null]} An array containing the playlists and next page token.
+     * @return {Array[Array[Playlist], String|undefined]} An array containing the playlists and next page token.
      */
     getByChannelId(channelId, limit, pageToken) {
       let ytPlaylists = []

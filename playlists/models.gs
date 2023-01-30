@@ -35,7 +35,7 @@ function Playlist_() {
      */
     getSpreadsheet() {
       const spreadsheetKey = (settings().isDevModeEnabled() === true ? "developmentSpreadsheet" : "productionSpreadsheet")
-      return spreadsheets().getById(this.getDatabaseObject()[spreadsheetKey])
+      return spreadsheets().getById(super.getDatabaseObject()[spreadsheetKey])
     }
 
     /**
@@ -43,14 +43,15 @@ function Playlist_() {
      * @return {Channel} The channel object.
      */
     getChannel() {
-      return channels().getById(this.getDatabaseObject().channel)
+      const channelId = (super.getDatabaseObject() !== undefined ? super.getDatabaseObject().channel : super.getOriginalObject().channel)
+      return channels().getById(channelId)
     }
 
     /**
      * Get all videos in the playlist.
      * @param {Number} [limit] - An optional video count limit.
      * @param {String} [nextPageToken] - An optional page token to start getting results from.
-     * @return {Array[Array[Video], String|null]} An array containing the videos and next page token.
+     * @return {Array[Array[Video], String|undefined]} An array containing the videos and next page token.
      */
     getVideos(limit, nextPageToken) {
       return videos().getByPlaylistId(super.getId(), limit, nextPageToken)

@@ -18,7 +18,7 @@ function VideoService_() {
      * Get public videos by channel ID.
      * @param {Number} [limit] - An optional video count limit.
      * @param {String} [pageToken] - An optional page token to start getting results from.
-     * @return {Array[Array[Video], String|null]} An array containing the videos and next page token.
+     * @return {Array[Array[Video], String|undefined]} An array containing the videos and next page token.
      */
     getByChannelId(channelId, limit, pageToken) {
       let ytVideos = []
@@ -39,7 +39,7 @@ function VideoService_() {
      * Get public videos by playlist ID.
      * @param {Number} [limit] - An optional video count limit.
      * @param {String} [pageToken] - An optional page token to start getting results from.
-     * @return {Array[Array[Video], String|null]} An array containing the videos and next page token.
+     * @return {Array[Array[Video], String|undefined]} An array containing the videos and next page token.
      */
     getByPlaylistId(playlistId, limit, pageToken) {
       let ytVideos = []

@@ -37,7 +37,8 @@ function Video_() {
      * @return {Channel} The channel object.
      */
     getChannel() {
-      return channels().getById(this.getDatabaseObject().channel)
+      const channelId = (super.getDatabaseObject() !== undefined ? super.getDatabaseObject().channel : super.getOriginalObject().channel)
+      return channels().getById(channelId)
     }
 
     /**
@@ -71,7 +72,12 @@ function Video_() {
     getWikiStatus() {
       // TODO use the Fandom API instead; it's slower but more consistent
       const wiki = this.getChannel().getDatabaseObject().wiki
-      const pageName = super.getDatabaseObject().title
+
+      if (wiki === undefined || wiki === "") {
+        return ""
+      }
+
+      const pageName = (super.getDatabaseObject() !== undefined ? super.getDatabaseObject().title : super.getOriginalObject().title)
       const encodedPageName = encodeURIComponent(utils().formatFandomPageName(pageName))
       const url = `https://${wiki}.fandom.com/wiki/${encodedPageName}`
       const options = { muteHttpExceptions: true }
