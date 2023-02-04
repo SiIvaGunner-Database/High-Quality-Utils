@@ -82,7 +82,14 @@ function CommonService_() {
         return this.getCachedObject_(objectId)
       }
 
-      const dbObject = database().getData(this.getApiPath(objectId))
+      let dbObject
+
+      try {
+        dbObject = database().getData(this.getApiPath(objectId))
+      } catch (error) {
+        console.log(error.message)
+      }
+
       let originalObject
 
       switch(this._modelClass) {
