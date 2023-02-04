@@ -553,7 +553,7 @@ function DatabaseService_() {
      * @return {Object} The response object.
      */
     fetchResponse_(apiPath = "", method = "GET", data) {
-      const url = `https://${this.getDomain()}/api/${apiPath}`
+      let url = `https://${this.getDomain()}/api/${apiPath}`
       const options = {
         method: method,
         contentType: "application/json",
@@ -564,15 +564,32 @@ function DatabaseService_() {
         options.payload = JSON.stringify(data)
       }
 
-      let response
+      let responseJSON = {}
+      let responseResults = []
 
       try {
-        response = UrlFetchApp.fetch(url, options)
+        do {
+          if (responseJSON.next !== undefined && responseJSON.next !== null) {
+            url = responseJSON.next
+            console.log(url)
+          }
+
+          const responseObject = UrlFetchApp.fetch(url, options)
+          responseJSON = JSON.parse(responseObject.getContentText())
+
+          if (responseJSON.results !== undefined && responseJSON.results !== null) {
+            responseResults.push(...responseJSON.results)
+          }
+        } while (method === "GET" && responseJSON.next !== undefined && responseJSON.next !== null)
       } catch (error) {
         throw new Error(`${url}\n${error.message}`)
       }
 
-      return JSON.parse(response.getContentText())
+      if (responseJSON.results !== undefined && responseJSON.results !== null && responseResults.length > responseJSON.results.length) {
+        responseJSON.results = responseResults
+      }
+
+      return responseJSON
     }
   }
 
