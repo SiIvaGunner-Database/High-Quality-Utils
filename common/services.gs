@@ -117,11 +117,29 @@ function CommonService_() {
     }
 
     /**
+     * Get common model objects filtered by given parameters.
+     * @param {Object} [databaseParameters] - An optional key-value object map to filter database results.
+     * @param {Array[Object]} [originalObjects] - An optional list of original object metadata to include in the returned objects.
+     * @return {Array[CommonModel]} The objects.
+     */
+    getByFilter(databaseParameters, originalObjects) {
+      const dbObjects = database().getData(this.getApiPath(), databaseParameters).results
+
+      if (originalObjects !== undefined) {
+        const dbObjectMap = new Map(dbObjects.map(dbObject => [dbObject.id, dbObject]))
+        return originalObjects.map(ogObject => new (this._modelClass)(ogObject, dbObjectMap.get(ogObject.id)))
+      } else {
+        return dbObjects.map(dbObject => new (this._modelClass)(undefined, dbObject))
+      }
+    }
+
+    /**
      * Get all common model objects in the web application database.
      * @return {Array[CommonModel]} The objects.
      */
     getAll() {
-      const dbObjects = database().getData(this.getApiPath()).results.filter(dbObject => dbObject.visible === true)
+      const parameters = { "visible": true }
+      const dbObjects = database().getData(this.getApiPath(), parameters).results
       const dbObjectIds = dbObjects.map(dbObject => dbObject.id)
       let originalObjects = []
 
@@ -487,6 +505,10 @@ function DatabaseService_() {
      * Create a database service.
      */
     constructor() {
+      this._GET = "GET"
+      this._POST = "POST"
+      this._PUT = "PUT"
+      this._DELETE = "DELETE"
     }
 
     /**
@@ -505,10 +527,11 @@ function DatabaseService_() {
      * Get metadata from the siivagunnerdatabase.net API.
      * This will fail if the user doesn't have permission.
      * @param {String} [apiPath] - The path to append to "siivagunnerdatabase.net/api/".
+     * @param {Object} [parameters] - An optional parameter map to append to the URL. E.g. "{'id': 0}" becomes "?id=0".
      * @return {Object} The response object.
      */
-    getData(apiPath) {
-      return this.fetchResponse_(apiPath, "GET")
+    getData(apiPath, parameters) {
+      return this.fetchResponse_(apiPath, this._GET, parameters)
     }
 
     /**
@@ -519,7 +542,7 @@ function DatabaseService_() {
      * @return {Object} The response object.
      */
     postData(apiPath, data) {
-      return this.fetchResponse_(apiPath, "POST", data)
+      return this.fetchResponse_(apiPath, this._POST, data)
     }
 
     /**
@@ -530,7 +553,7 @@ function DatabaseService_() {
      * @return {Object} The response object.
      */
     putData(apiPath, data) {
-      return this.fetchResponse_(apiPath, "PUT", data)
+      return this.fetchResponse_(apiPath, this._PUT, data)
     }
 
     /**
@@ -541,7 +564,7 @@ function DatabaseService_() {
      * @return {Object} The response object.
      */
     deleteData(apiPath, data) {
-      return this.fetchResponse_(apiPath, "DELETE", data)
+      return this.fetchResponse_(apiPath, this._DELETE, data)
     }
 
     /**
@@ -552,18 +575,24 @@ function DatabaseService_() {
      * @param {Object | Array[Object]} [data] - The metadata to send.
      * @return {Object} The response object.
      */
-    fetchResponse_(apiPath = "", method = "GET", data) {
-      let url = `https://${this.getDomain()}/api/${apiPath}`
+    fetchResponse_(apiPath = "", method = this._GET, data) {
       const options = {
         method: method,
         contentType: "application/json",
         headers: { Authorization: settings().getAuthToken() },
       }
 
+      let parameters = ""
+
       if (data !== undefined) {
-        options.payload = JSON.stringify(data)
+        if (method === this._GET) {
+          parameters = "?" + Object.entries(data).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join("&")
+        } else {
+          options.payload = JSON.stringify(data)
+        }
       }
 
+      let url = `https://${this.getDomain()}/api/${apiPath}${parameters}`
       let responseJSON = {}
       let responseResults = []
 
@@ -571,16 +600,16 @@ function DatabaseService_() {
         do {
           if (responseJSON.next !== undefined && responseJSON.next !== null) {
             url = responseJSON.next
-            console.log(url)
           }
 
+          console.log(url)
           const responseObject = UrlFetchApp.fetch(url, options)
           responseJSON = JSON.parse(responseObject.getContentText())
 
           if (responseJSON.results !== undefined && responseJSON.results !== null) {
             responseResults.push(...responseJSON.results)
           }
-        } while (method === "GET" && responseJSON.next !== undefined && responseJSON.next !== null)
+        } while (method === this._GET && responseJSON.next !== undefined && responseJSON.next !== null)
       } catch (error) {
         throw new Error(`${url}\n${error.message}`)
       }

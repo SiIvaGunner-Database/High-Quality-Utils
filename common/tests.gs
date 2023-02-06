@@ -95,6 +95,7 @@ function Tests_() {
       // Inherited functions
       this.test_("channels.getApiPath", channels().getApiPath(this._channelId))
       this.test_("channels.getById", channels().getById(this._channelId))
+      this.test_("channels.getByFilter", channels().getByFilter())
       this.test_("channels.getAll", channels().getAll())
       this.test_("channels.getAllChanges", channels().getAllChanges())
       this.test_("channels.hasAnyChanges", channels().hasAnyChanges())
@@ -133,6 +134,7 @@ function Tests_() {
       // Inherited functions
       this.test_("playlists.getApiPath", playlists().getApiPath(this._playlistId))
       this.test_("playlists.getById", playlists().getById(this._playlistId))
+      this.test_("playlists.getByFilter", playlists().getByFilter())
       this.test_("playlists.getAll", playlists().getAll())
       this.test_("playlists.getAllChanges", playlists().getAllChanges())
       this.test_("playlists.hasAnyChanges", playlists().hasAnyChanges())
@@ -176,6 +178,7 @@ function Tests_() {
       // Inherited functions
       this.test_("spreadsheets.getApiPath", spreadsheets().getApiPath(this._spreadsheetId))
       this.test_("spreadsheets.getById", spreadsheets().getById(this._spreadsheetId))
+      this.test_("spreadsheets.getByFilter", spreadsheets().getByFilter())
       this.test_("spreadsheets.getAll", spreadsheets().getAll())
       this.test_("spreadsheets.getAllChanges", spreadsheets().getAllChanges())
       this.test_("spreadsheets.hasAnyChanges", spreadsheets().hasAnyChanges())
@@ -225,6 +228,7 @@ function Tests_() {
       // Inherited functions
       this.test_("videos.getApiPath", videos().getApiPath(this._videoId))
       this.test_("videos.getById", videos().getById(this._videoId))
+      this.test_("videos.getByFilter", videos().getByFilter())
       this.test_("videos.getAll", videos().getAll())
       this.test_("videos.getAllChanges", videos().getAllChanges())
       this.test_("videos.hasAnyChanges", videos().hasAnyChanges())

@@ -16,22 +16,24 @@ function PlaylistService_() {
 
     /**
      * Get public playlists by channel ID.
-     * @param {Number} [limit] - An optional video count limit.
+     * @param {Number} [limit] - An optional playlist count limit.
      * @param {String} [pageToken] - An optional page token to start getting results from.
      * @return {Array[Array[Playlist], String|undefined]} An array containing the playlists and next page token.
      */
     getByChannelId(channelId, limit, pageToken) {
-      let ytPlaylists = []
+      let ytPlaylists
       let nextPageToken
+      let wrapperPlaylists
 
       if (settings().isYoutubeApiEnabled() === true) {
         [ytPlaylists, nextPageToken] = youtube().getChannelPlaylists(channelId, limit, pageToken)
       }
 
-      const dbPlaylists = database().getData(super.getApiPath()).results
-        .filter(dbPlaylist => (dbPlaylist.visible === true && dbPlaylist.channel === channelId))
-      const dbPlaylistMap = new Map(dbPlaylists.map(dbPlaylist => [dbPlaylist.id, dbPlaylist]))
-      const wrapperPlaylists = ytPlaylists.map(ytPlaylist => new (Playlist_())(ytPlaylist, dbPlaylistMap.get(ytPlaylist.id)))
+      const parameters = {
+        "visible": true,
+        "channel": channelId
+      }
+      wrapperPlaylists = super.getByFilter(parameters, ytPlaylists)
       return [wrapperPlaylists, nextPageToken]
     }
   }

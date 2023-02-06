@@ -21,17 +21,19 @@ function VideoService_() {
      * @return {Array[Array[Video], String|undefined]} An array containing the videos and next page token.
      */
     getByChannelId(channelId, limit, pageToken) {
-      let ytVideos = []
+      let ytVideos
       let nextPageToken
+      let wrapperVideos
 
       if (settings().isYoutubeApiEnabled() === true) {
         [ytVideos, nextPageToken] = youtube().getChannelVideos(channelId, limit, pageToken)
       }
 
-      const dbVideos = database().getData(super.getApiPath()).results
-        .filter(dbVideo => (dbVideo.visible === true && dbVideo.channel === channelId))
-      const dbVideoMap = new Map(dbVideos.map(dbVideo => [dbVideo.id, dbVideo]))
-      const wrapperVideos = ytVideos.map(ytVideo => new (Video_())(ytVideo, dbVideoMap.get(ytVideo.id)))
+      const parameters = {
+        "visible": true,
+        "channel": channelId
+      }
+      wrapperVideos = super.getByFilter(parameters, ytVideos)
       return [wrapperVideos, nextPageToken]
     }
 
@@ -42,17 +44,19 @@ function VideoService_() {
      * @return {Array[Array[Video], String|undefined]} An array containing the videos and next page token.
      */
     getByPlaylistId(playlistId, limit, pageToken) {
-      let ytVideos = []
+      let ytVideos
       let nextPageToken
+      let wrapperVideos
 
       if (settings().isYoutubeApiEnabled() === true) {
         [ytVideos, nextPageToken] = youtube().getPlaylistVideos(playlistId, limit, pageToken)
       }
 
-      const dbVideos = database().getData(super.getApiPath()).results
-        .filter(dbVideo => (dbVideo.visible === true && dbVideo.playlists.includes(playlistId) === true))
-      const dbVideoMap = new Map(dbVideos.map(dbVideo => [dbVideo.id, dbVideo]))
-      const wrapperVideos = ytVideos.map(ytVideo => new (Video_())(ytVideo, dbVideoMap.get(ytVideo.id)))
+      const parameters = {
+        "visible": true
+        // "playlists": playlistId // TODO - make this work
+      }
+      wrapperVideos = super.getByFilter(parameters, ytVideos)
       return [wrapperVideos, nextPageToken]
     }
   }
