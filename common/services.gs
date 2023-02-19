@@ -17,7 +17,6 @@ function CommonService_() {
       this._apiPath = apiPath
       this._cache = new Map()
       this._isCacheEnabled = true
-      this._changes
     }
 
     /**
@@ -173,50 +172,20 @@ function CommonService_() {
     }
 
     /**
-     * Get a list of differences between the base object and the database object.
-     * @return {Array[String]} An array of database object keys for any new values.
-     */
-    getAllChanges() {
-      if (this._changes === undefined) {
-        /** @type {{ object: this; key: string; value: any; message: string; }[]} */
-        this._changes = []
-
-        this.getAll().forEach(object => {
-          this._changes.push(...object.getChanges())
-        })
-      }
-
-      return this._changes
-    }
-
-    /**
-     * Get whether or not the base object has any differences from the database object.
-     * @return {Boolean} True if there are any differences, else false.
-     */
-    hasAnyChanges() {
-      return this.getAllChanges().length > 0
-    }
-
-    /**
-     * Update all objects.
+     * Update a list of common model objects.
+     * @param {Array[CommonModel]} objects - The objects to update.
      * @param {Object} [applyChanges] - Whether or not to apply the update to the database. Defaults to true.
      */
-    updateAll(applyChanges = true) {
-      const objects = this.getAll()
-      let changes = []
-
+    updateAll(objects, applyChanges = true) {
       objects.forEach(object => {
-        if (object.hasChanges()) {
+        if (object.hasChanges() === true) {
           object.update(false)
-          changes.push(object.getChanges())
         }
       })
 
       if (applyChanges === true) {
         database().putData(this.getApiPath(), objects)
       }
-
-      this._changes = []
     }
   }
 

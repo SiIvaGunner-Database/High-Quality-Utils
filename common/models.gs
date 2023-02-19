@@ -95,10 +95,10 @@ function CommonModel_() {
 
             if (oldValue !== currentValue) {
               const change = {
-                object: this,
                 key: key,
                 value: currentValue,
-                message: `Old ${key}: ${oldValue}\nNew ${key}: ${currentValue}`
+                message: `Old ${key}: ${oldValue}\nNew ${key}: ${currentValue}`,
+                timestamp: utils().formatDate()
               }
               this._changes.push(change)
             }

@@ -88,9 +88,9 @@ function WrapperSheet_() {
     /**
      * Update a range of data in a sheet.
      * @param {Array[Array[Object]]} data - The data to insert.
-     * @param {Number} row - The row to update.
+     * @param {Number} [row] - An optional row number to update from. Defaults to 2.
      */
-    updateValues(data, row) {
+    updateValues(data, row = 2) {
       const firstColumn = 1
       const lastColumn = this.getOriginalObject().getLastColumn()
       const sheet = this.getOriginalObject()

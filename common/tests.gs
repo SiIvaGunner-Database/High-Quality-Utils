@@ -44,8 +44,9 @@ function Tests_() {
     testCommonUtils() {
       console.log("TESTING COMMON UTILS")
       const pageName = "Test Name - { [ \" ' + ' \" ] }"
-      this.test_("utils.formatDate", utils().formatDate(new Date()))
+      this.test_("utils.formatDate", utils().formatDate())
       this.test_("utils.formatLength", utils().formatLength("PT1H43M1S"))
+      this.test_("utils.formatHyperlink", utils().formatHyperlink("siivagunnerdatabase.net", "siivagunnerdb"))
       this.test_("utils.formatYoutubeHyperlink", utils().formatYoutubeHyperlink(this._videoId))
       this.test_("utils.formatFandomHyperlink", utils().formatFandomHyperlink(pageName, "siivagunner"))
       this.test_("utils.formatFandomPageName", utils().formatFandomPageName(pageName))
@@ -97,9 +98,7 @@ function Tests_() {
       this.test_("channels.getById", channels().getById(this._channelId))
       this.test_("channels.getByFilter", channels().getByFilter())
       this.test_("channels.getAll", channels().getAll())
-      this.test_("channels.getAllChanges", channels().getAllChanges())
-      this.test_("channels.hasAnyChanges", channels().hasAnyChanges())
-      this.test_("channels.updateAll", channels().updateAll(false))
+      this.test_("channels.updateAll", channels().updateAll(channels().getAll(), false))
     }
 
     /** Run channel model tests. */
@@ -120,6 +119,8 @@ function Tests_() {
       this.test_("channel.getPlaylists", channel.getPlaylists(this._limit))
       this.test_("channel.getVideos", channel.getVideos(this._limit))
       this.test_("channel.getYoutubeStatus", channel.getYoutubeStatus())
+      this.test_("channel.getSpreadsheetHyperlink", channel.getSpreadsheetHyperlink())
+      this.test_("channel.getWikiHyperlink", channel.getSpreadsheetHyperlink())
     }
 
     /** Run playlist tests. */
@@ -136,9 +137,7 @@ function Tests_() {
       this.test_("playlists.getById", playlists().getById(this._playlistId))
       this.test_("playlists.getByFilter", playlists().getByFilter())
       this.test_("playlists.getAll", playlists().getAll())
-      this.test_("playlists.getAllChanges", playlists().getAllChanges())
-      this.test_("playlists.hasAnyChanges", playlists().hasAnyChanges())
-      this.test_("playlists.updateAll", playlists().updateAll(false))
+      this.test_("playlists.updateAll", playlists().updateAll(playlists().getAll(), false))
       // Custom functions
       this.test_("playlists.getByChannelId", playlists().getByChannelId(this._channelId, this._limit))
     }
@@ -180,9 +179,7 @@ function Tests_() {
       this.test_("spreadsheets.getById", spreadsheets().getById(this._spreadsheetId))
       this.test_("spreadsheets.getByFilter", spreadsheets().getByFilter())
       this.test_("spreadsheets.getAll", spreadsheets().getAll())
-      this.test_("spreadsheets.getAllChanges", spreadsheets().getAllChanges())
-      this.test_("spreadsheets.hasAnyChanges", spreadsheets().hasAnyChanges())
-      this.test_("spreadsheets.updateAll", spreadsheets().updateAll(false))
+      this.test_("spreadsheets.updateAll", spreadsheets().updateAll(spreadsheets().getAll(), false))
     }
 
     /** Run spreadsheet model tests. */
@@ -230,9 +227,7 @@ function Tests_() {
       this.test_("videos.getById", videos().getById(this._videoId))
       this.test_("videos.getByFilter", videos().getByFilter())
       this.test_("videos.getAll", videos().getAll())
-      this.test_("videos.getAllChanges", videos().getAllChanges())
-      this.test_("videos.hasAnyChanges", videos().hasAnyChanges())
-      this.test_("videos.updateAll", videos().updateAll(false))
+      this.test_("videos.updateAll", videos().updateAll(videos().getAll(), false))
       // Custom functions
       this.test_("videos.getByChannelId", videos().getByChannelId(this._channelId, this._limit))
       this.test_("videos.getByPlaylistId", videos().getByPlaylistId(this._playlistId, this._limit))

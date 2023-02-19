@@ -74,13 +74,32 @@ function Channel_() {
     getYoutubeStatus() {
       const statuses = youtube().getStatuses()
 
-      try {
-        youtube().getChannel(super.getId())
-        return statuses.public
-      } catch (error) {
-        console.log(error)
+      if (settings().isYoutubeApiEnabled() === false) {
+        return super.getDatabaseObject().youtubeStatus
+      } else if (super.getOriginalObject() === undefined) {
         return statuses.deleted
+      } else {
+        return statuses.public
       }
+    }
+
+    /**
+     * Get a hyperlink to the channel's associated spreadsheet.
+     * @return {String} The hyperlink formula.
+     */
+    getSpreadsheetHyperlink() {
+      const dbObject = super.getDatabaseObject()
+      const spreadsheetId = (settings().isDevModeEnabled() === true ? dbObject.developmentSpreadsheet : dbObject.productionSpreadsheet)
+      return utils().formatHyperlink(`https://docs.google.com/spreadsheets/d/${spreadsheetId}`, spreadsheetId)
+    }
+
+    /**
+     * Get a hyperlink to the channel's associated wiki.
+     * @return {String} The hyperlink formula.
+     */
+    getWikiHyperlink() {
+      const wiki = super.getDatabaseObject().wiki
+      return utils().formatHyperlink(`https://${wiki}.fandom.com/wiki/`, wiki)
     }
   }
 

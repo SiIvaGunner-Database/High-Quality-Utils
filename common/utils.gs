@@ -8,10 +8,10 @@ function Utils_() {
   if (Utils === undefined) Utils = class Utils {
     /**
      * Get a date in the format "yyyy-MM-dd   HH:mm:ss".
-     * @param {String | Date} date - The date to be formatted.
+     * @param {String | Date} [date] - An optional date to format. Defaults to the current date.
      * @return {Date} The formatted date.
      */
-    formatDate(date) {
+    formatDate(date = new Date()) {
       return Utilities.formatDate(new Date(date), "UTC", "yyyy-MM-dd   HH:mm:ss")
     }
 
@@ -53,36 +53,52 @@ function Utils_() {
     }
 
     /**
-     * Get a formatted sheet hyperlink to a YouTube video, playlist, or channel URL.
-     * @param {String} youtubeId - The video, playlist, or channel ID.
-     * @return {String} The formatted hyperlink.
+     * Get a formatted hyperlink.
+     * @param {String} url - The URL to link to.
+     * @param {String} label - The label to show.
+     * @return {String} The hyperlink formula.
      */
-    formatYoutubeHyperlink(youtubeId) {
-      let hyperlink = ""
-
-      if (youtubeId.length === 11) {
-        hyperlink = '=HYPERLINK("https://www.youtube.com/watch?v=' + youtubeId + '", "' + youtubeId + '")'
-      } else if (youtubeId.includes("PL")) {
-        hyperlink = '=HYPERLINK("https://www.youtube.com/playlist?list=' + youtubeId + '", "' + youtubeId + '")'
-      } else if (youtubeId.includes("UC")) {
-        hyperlink = '=HYPERLINK("https://www.youtube.com/channel/' + youtubeId + '", "' + youtubeId + '")'
+    formatHyperlink(url, label) {
+      if (label !== undefined) {
+        return `=HYPERLINK("${url}", "${label}")`
+      } else {
+        return ""
       }
-
-      return hyperlink
     }
 
     /**
-     * Get a sheet hyperlink to a Fandom page URL.
+     * Get a hyperlink to a YouTube video, playlist, or channel URL.
+     * @param {String} youtubeId - The video, playlist, or channel ID.
+     * @return {String} The hyperlink formula.
+     */
+    formatYoutubeHyperlink(youtubeId) {
+      let url = ""
+
+      if (youtubeId.length === 11) {
+        url = `https://www.youtube.com/watch?v=${youtubeId}`
+      } else if (youtubeId.includes("PL")) {
+        url = `https://www.youtube.com/playlist?list=${youtubeId}`
+      } else if (youtubeId.includes("UC")) {
+        url = `https://www.youtube.com/channel/${youtubeId}`
+      } else {
+        return youtubeId
+      }
+
+      return this.formatHyperlink(url, youtubeId)
+    }
+
+    /**
+     * Get a hyperlink to a Fandom page URL.
      * @param {String} pageName - The name of the wiki page.
      * @param {String} wikiName - The name of the wiki.
-     * @return {String} The formatted hyperlink.
+     * @return {String} The hyperlink formula.
      */
     formatFandomHyperlink(pageName, wikiName) {
       const wikiUrl = `https://${wikiName}.fandom.com/wiki/`
-      pageName = pageName.replace(/Reupload: /g, "").replace(/Reup: /g, "")
-      const simplePageName = pageName.replace(/"/g, '""').replace(/ \(GiIvaSunner\)/g, "")
-      const encodedPageName = encodeURIComponent(this.formatFandomPageName(pageName))
-      return '=HYPERLINK("' + wikiUrl + encodedPageName + '", "' + simplePageName + '")'
+      const safePageName = pageName.replace(/Reupload: /g, "").replace(/Reup: /g, "")
+      const simplePageName = safePageName.replace(/"/g, '""').replace(/ \(GiIvaSunner\)/g, "")
+      const encodedPageName = encodeURIComponent(this.formatFandomPageName(safePageName))
+      return this.formatHyperlink(wikiUrl + encodedPageName, simplePageName)
     }
 
     /**
