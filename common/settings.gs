@@ -117,6 +117,15 @@ function Settings_() {
       sheets().disableCache()
       videos().disableCache()
     }
+
+    /**
+     * Deletes all triggers associated with the project.
+     */
+    deleteTriggers() {
+      ScriptApp.getProjectTriggers().forEach(trigger => {
+        ScriptApp.deleteTrigger(trigger)
+      })
+    }
   }
 
   return Settings
