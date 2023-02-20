@@ -177,14 +177,18 @@ function CommonService_() {
      * @param {Object} [applyChanges] - Whether or not to apply the update to the database. Defaults to true.
      */
     updateAll(objects, applyChanges = true) {
+      const dbObjects = []
+
       objects.forEach(object => {
         if (object.hasChanges() === true) {
           object.update(false)
         }
+
+        dbObjects.push(object.getDatabaseObject())
       })
 
       if (applyChanges === true) {
-        database().putData(this.getApiPath(), objects)
+        database().putData(this.getApiPath(), dbObjects)
       }
     }
   }
@@ -253,6 +257,17 @@ function YoutubeService_() {
           if (object[keys.oldKey] !== undefined) {
             object[keys.newKey] = object[keys.oldKey]
             delete object[keys.oldKey]
+          }
+        })
+
+        // Convert additional keys into valid values for the database
+        Object.entries(object).forEach(([key, value]) => {
+          if (typeof value === "object") {
+            // Convert sub-objects into sorted string representations of themselves
+            object[key] = utils().stringifySortedObject(value)
+          } else if (typeof value === "string" && Number.isInteger(Number(value)) === true) {
+            // Convert numerical strings into numbers
+            object[key] = Number(value)
           }
         })
 

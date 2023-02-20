@@ -7,6 +7,42 @@ let Utils
 function Utils_() {
   if (Utils === undefined) Utils = class Utils {
     /**
+     * Get a string with the first letter capitalized.
+     * @param {String} value - The value to capitalize.
+     * @return {String} The capitalized value.
+     */
+    capitalizeString(value) {
+      return value.charAt(0).toUpperCase() + value.slice(1)
+    }
+
+    /**
+     * Get a stringified object with all keys sorted alphabetically.
+     * @param {String} object - The object to stringify.
+     * @return {String} The stringified object.
+     */
+    stringifySortedObject(object) {
+      return JSON.stringify(this.sortObject(object))
+    }
+
+    /**
+     * Get an object with all keys sorted alphabetically.
+     * @param {String} object - The object to sort.
+     * @return {String} The sort object.
+     */
+    sortObject(object) {
+      return Object.fromEntries(
+        Object.entries(object).map(([key, value]) => {
+          if (typeof value === "object") {
+            // Sort any sub-objects
+            return [key, this.sortObject(value)]
+          } else {
+            return [key, value]
+          }
+        }).sort()
+      )
+    }
+
+    /**
      * Get a date in the format "yyyy-MM-dd   HH:mm:ss".
      * @param {String | Date} [date] - An optional date to format. Defaults to the current date.
      * @return {Date} The formatted date.

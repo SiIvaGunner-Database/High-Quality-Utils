@@ -44,6 +44,10 @@ function Tests_() {
     testCommonUtils() {
       console.log("TESTING COMMON UTILS")
       const pageName = "Test Name - { [ \" ' + ' \" ] }"
+      const object = {"a": {"b": "c"}}
+      this.test_("utils.capitalizeString", utils().capitalizeString())
+      this.test_("utils.stringifySortedObject", utils().stringifySortedObject(object))
+      this.test_("utils.sortObject", utils().sortObject(object))
       this.test_("utils.formatDate", utils().formatDate())
       this.test_("utils.formatLength", utils().formatLength("PT1H43M1S"))
       this.test_("utils.formatHyperlink", utils().formatHyperlink("siivagunnerdatabase.net", "siivagunnerdb"))
