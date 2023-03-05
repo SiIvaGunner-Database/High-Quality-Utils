@@ -93,11 +93,12 @@ function CommonModel_() {
           Object.entries(this.getOriginalObject()).forEach(([key, currentValue]) => {
             const oldValue = this.getDatabaseObject()[key]
 
-            if (oldValue !== currentValue || JSON.stringify(currentValue) !== JSON.stringify(currentValue)) {
+            // "!=" is intentionally used instead of "!==" here
+            if (oldValue != currentValue) {
               const change = {
                 key: key,
                 label: utils().capitalizeString(key),
-                oldValue: currentValue,
+                oldValue: oldValue,
                 newValue: currentValue,
                 message: `Old ${key} [${typeof oldValue}]: ${oldValue}\n\nNew ${key} [${typeof currentValue}]: ${currentValue}`,
                 timestamp: utils().formatDate()
@@ -127,8 +128,7 @@ function CommonModel_() {
       const changes = this.getChanges()
 
       changes.forEach(change => {
-        this.getDatabaseObject()[change.key] = change.value
-        // console.log(change.message)
+        this.getDatabaseObject()[change.key] = change.newValue
       })
 
       if (applyChanges === true) {

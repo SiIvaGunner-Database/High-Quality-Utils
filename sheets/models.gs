@@ -81,6 +81,10 @@ function WrapperSheet_() {
      * @param {Array[Array[Object]]} data - The data to insert.
      */
     insertValues(data) {
+      if (data.length === 0) {
+        return
+      }
+
       this.getOriginalObject().insertRowsBefore(2, data.length)
       this.updateValues(data, 2)
     }

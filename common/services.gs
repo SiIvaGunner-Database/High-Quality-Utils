@@ -235,7 +235,6 @@ function YoutubeService_() {
       const keysToReplace = [{ oldKey: "channelId", newKey: "channel" }]
 
       return objects.map(object => {
-
         // Remove keys that aren't in the database metadata
         keysToRemove.forEach(key => {
           if (object[key] !== undefined) {
@@ -265,9 +264,12 @@ function YoutubeService_() {
           if (typeof value === "object") {
             // Convert sub-objects into sorted string representations of themselves
             object[key] = utils().stringifySortedObject(value)
-          } else if (typeof value === "string" && Number.isInteger(Number(value)) === true) {
+          } else if (typeof value === "string" && value !== "" && Number.isInteger(Number(value)) === true) {
             // Convert numerical strings into numbers
             object[key] = Number(value)
+          } else if (typeof value === "string" && value.slice(-1) === "\n") {
+            // Remove new lines found at the end of strings
+            object[key] = value.slice(0, -1)
           }
         })
 
