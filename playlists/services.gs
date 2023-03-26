@@ -16,22 +16,23 @@ function PlaylistService_() {
 
     /**
      * Get public playlists by channel ID.
-     * @param {Number} [limit] - An optional playlist count limit.
-     * @param {String} [pageToken] - An optional page token to start getting results from.
+     * @param {String} [channelId] - The channel ID.
+     * @param {Object} [options] - An optional object of options to include: { parameters: Object; limit: Number; pageToken: String; }
      * @return {Array[Array[Playlist], String|undefined]} An array containing the playlists and next page token.
      */
-    getByChannelId(channelId, limit, pageToken) {
+    getByChannelId(channelId, options = {}) {
       let ytPlaylists
       let nextPageToken
       let wrapperPlaylists
 
       if (settings().isYoutubeApiEnabled() === true) {
-        [ytPlaylists, nextPageToken] = youtube().getChannelPlaylists(channelId, limit, pageToken)
+        [ytPlaylists, nextPageToken] = youtube().getChannelPlaylists(channelId, options.limit, options.pageToken)
       }
 
       const parameters = {
         "visible": true,
-        "channel": channelId
+        "channel": channelId,
+        ...options
       }
       wrapperPlaylists = super.getByFilter(parameters, ytPlaylists)
       return [wrapperPlaylists, nextPageToken]

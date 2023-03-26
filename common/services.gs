@@ -588,7 +588,7 @@ function DatabaseService_() {
             url = responseJSON.next
           }
 
-          console.log(url)
+          console.log(method, "\n", url, "\n", options.payload)
           const responseObject = UrlFetchApp.fetch(url, options)
           responseJSON = JSON.parse(responseObject.getContentText())
 

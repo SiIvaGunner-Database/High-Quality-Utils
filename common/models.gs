@@ -86,7 +86,7 @@ function CommonModel_() {
      */
     getChanges() {
       if (this._changes === undefined) {
-        /** @type {{ object: this; key: string; value: any; message: string; }[]} */
+        /** @type {{ key: String; labe: String; oldValue: any; newValue: any; message: String; timestamp: Date; }[]} */
         this._changes = []
 
         if (this.getOriginalObject() !== undefined && this.getDatabaseObject() !== undefined) {

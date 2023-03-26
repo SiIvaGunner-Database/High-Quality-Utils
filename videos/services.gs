@@ -16,45 +16,48 @@ function VideoService_() {
 
     /**
      * Get public videos by channel ID.
-     * @param {Number} [limit] - An optional video count limit.
-     * @param {String} [pageToken] - An optional page token to start getting results from.
+     * @param {String} channelId - The channel ID.
+     * @param {Object} [options] - An optional object of options to include: { parameters: Object; limit: Number; pageToken: String; }
      * @return {Array[Array[Video], String|undefined]} An array containing the videos and next page token.
      */
-    getByChannelId(channelId, limit, pageToken) {
+    getByChannelId(channelId, options = {}) {
       let ytVideos
       let nextPageToken
       let wrapperVideos
 
       if (settings().isYoutubeApiEnabled() === true) {
-        [ytVideos, nextPageToken] = youtube().getChannelVideos(channelId, limit, pageToken)
+        [ytVideos, nextPageToken] = youtube().getChannelVideos(channelId, options.limit, options.pageToken)
       }
 
       const parameters = {
         "visible": true,
-        "channel": channelId
+        "channel": channelId,
+        ...options
       }
+
       wrapperVideos = super.getByFilter(parameters, ytVideos)
       return [wrapperVideos, nextPageToken]
     }
 
     /**
      * Get public videos by playlist ID.
-     * @param {Number} [limit] - An optional video count limit.
-     * @param {String} [pageToken] - An optional page token to start getting results from.
+     * @param {String} playlistId - The playlist ID.
+     * @param {Object} [options] - An optional object of options to include: { parameters: Object; limit: Number; pageToken: String; }
      * @return {Array[Array[Video], String|undefined]} An array containing the videos and next page token.
      */
-    getByPlaylistId(playlistId, limit, pageToken) {
+    getByPlaylistId(playlistId, options = {}) {
       let ytVideos
       let nextPageToken
       let wrapperVideos
 
       if (settings().isYoutubeApiEnabled() === true) {
-        [ytVideos, nextPageToken] = youtube().getPlaylistVideos(playlistId, limit, pageToken)
+        [ytVideos, nextPageToken] = youtube().getPlaylistVideos(playlistId, options.limit, options.pageToken)
       }
 
       const parameters = {
-        "visible": true
-        // "playlists": playlistId // TODO - make this work
+        "visible": true,
+        "playlists": playlistId, // TODO - make this work
+        ...options
       }
       wrapperVideos = super.getByFilter(parameters, ytVideos)
       return [wrapperVideos, nextPageToken]

@@ -143,7 +143,7 @@ function Tests_() {
       this.test_("playlists.getAll", playlists().getAll())
       this.test_("playlists.updateAll", playlists().updateAll(playlists().getAll(), false))
       // Custom functions
-      this.test_("playlists.getByChannelId", playlists().getByChannelId(this._channelId, this._limit))
+      this.test_("playlists.getByChannelId", playlists().getByChannelId(this._channelId, { "limit": this._limit }))
     }
 
     /** Run playlist model tests. */
@@ -233,8 +233,8 @@ function Tests_() {
       this.test_("videos.getAll", videos().getAll())
       this.test_("videos.updateAll", videos().updateAll(videos().getAll(), false))
       // Custom functions
-      this.test_("videos.getByChannelId", videos().getByChannelId(this._channelId, this._limit))
-      this.test_("videos.getByPlaylistId", videos().getByPlaylistId(this._playlistId, this._limit))
+      this.test_("videos.getByChannelId", videos().getByChannelId(this._channelId, { "limit": this._limit }))
+      this.test_("videos.getByPlaylistId", videos().getByPlaylistId(this._playlistId, { "limit": this._limit }))
     }
 
     /** Run video model tests. */
