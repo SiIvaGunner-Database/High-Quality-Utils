@@ -216,11 +216,11 @@ function YoutubeService_() {
      */
     getStatuses() {
       return {
-        public: "Public",
-        unlisted: "Unlisted",
-        private: "Private",
-        unavailable: "Unavailable",
-        deleted: "Deleted"
+        "public": "Public",
+        "unlisted": "Unlisted",
+        "private": "Private",
+        "unavailable": "Unavailable",
+        "deleted": "Deleted"
       }
     }
 
@@ -232,7 +232,7 @@ function YoutubeService_() {
     formatMetadata_(objects) {
       const keysToRemove = ["etag", "kind"]
       const keysToMerge = ["snippet", "contentDetails", "statistics"]
-      const keysToReplace = [{ oldKey: "channelId", newKey: "channel" }]
+      const keysToReplace = [{ "oldKey": "channelId", "newKey": "channel" }]
 
       return objects.map(object => {
         // Remove keys that aren't in the database metadata
@@ -297,7 +297,7 @@ function YoutubeService_() {
       let stringOfIds = ""
 
       while ((stringOfIds = arrayOfIds.splice(-50).join(",")) && stringOfIds !== undefined) {
-        channels.push(...YouTube.Channels.list("snippet,statistics", {id: stringOfIds}).items)
+        channels.push(...YouTube.Channels.list("snippet,statistics", { "id": stringOfIds }).items)
       }
 
       return this.formatMetadata_(channels)
@@ -315,9 +315,9 @@ function YoutubeService_() {
 
       while (pageToken !== undefined) {
         const parameters = {
-          channelId: channelId,
-          maxResults: 50,
-          pageToken: pageToken
+          "channelId": channelId,
+          "maxResults": 50,
+          "pageToken": pageToken
         }
         const playlist = YouTube.Playlists.list("snippet,contentDetails", parameters)
         playlists.push(...playlist.items)
@@ -339,7 +339,7 @@ function YoutubeService_() {
      * @return {Array[Array[Object], String|undefined]} An array containing the metadata and next page token.
      */
     getChannelVideos(channelId, limit, pageToken) {
-      const channel = YouTube.Channels.list("contentDetails", { id: channelId }).items[0]
+      const channel = YouTube.Channels.list("contentDetails", { "id": channelId }).items[0]
       const uploadsPlaylistId = channel.contentDetails.relatedPlaylists.uploads
       return youtube().getPlaylistVideos(uploadsPlaylistId, limit, pageToken)
     }
@@ -364,7 +364,7 @@ function YoutubeService_() {
       let stringOfIds = ""
 
       while ((stringOfIds = arrayOfIds.splice(-50).join(",")) && stringOfIds !== undefined) {
-        playlists.push(...YouTube.Playlists.list("snippet,contentDetails", {id: stringOfIds}).items)
+        playlists.push(...YouTube.Playlists.list("snippet,contentDetails", { "id": stringOfIds }).items)
       }
 
       return this.formatMetadata_(playlists)
@@ -377,11 +377,11 @@ function YoutubeService_() {
      */
     addToPlaylist(playlistId, videoId) {
       const resource = {
-        snippet: {
-          playlistId: playlistId,
-          resourceId: {
-            kind: "youtube#video",
-            videoId: videoId
+        "snippet": {
+          "playlistId": playlistId,
+          "resourceId": {
+            "kind": "youtube#video",
+            "videoId": videoId
           }
         }
       }
@@ -395,8 +395,8 @@ function YoutubeService_() {
      */
     removeFromPlaylist(playlistId, videoId) {
       const parameters = {
-        playlistId: playlistId,
-        videoId: videoId
+        "playlistId": playlistId,
+        "videoId": videoId
       }
       const playlist = YouTube.PlaylistItems.list("snippet", parameters)
       const deletionId = playlist.items[0].id
@@ -415,9 +415,9 @@ function YoutubeService_() {
 
       while (pageToken !== undefined) {
         const parameters = {
-          playlistId: playlistId,
-          maxResults: 50,
-          pageToken: pageToken
+          "playlistId": playlistId,
+          "maxResults": 50,
+          "pageToken": pageToken
         }
         const playlist = YouTube.PlaylistItems.list("snippet", parameters)
         itemIds.push(...playlist.items.map(item => item.snippet.resourceId.videoId))
@@ -451,7 +451,7 @@ function YoutubeService_() {
       let stringOfIds = ""
 
       while ((stringOfIds = arrayOfIds.splice(-50).join(",")) && stringOfIds !== undefined) {
-        videos.push(...YouTube.Videos.list("snippet,contentDetails,statistics", {id: stringOfIds}).items)
+        videos.push(...YouTube.Videos.list("snippet,contentDetails,statistics", { "id": stringOfIds }).items)
 
         if (videos.length % 1000 < 50 && videos.length > 50) {
           console.log(`Found ${videos.length} videos...`)
@@ -563,9 +563,9 @@ function DatabaseService_() {
      */
     fetchResponse_(apiPath = "", method = this._GET, data) {
       const options = {
-        method: method,
-        contentType: "application/json",
-        headers: { Authorization: settings().getAuthToken() },
+        "method": method,
+        "contentType": "application/json",
+        "headers": { "Authorization": settings().getAuthToken() },
       }
 
       let parameters = ""

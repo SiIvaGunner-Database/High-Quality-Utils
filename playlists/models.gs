@@ -14,8 +14,8 @@ function Playlist_() {
      */
     constructor(youtubeObject, databaseObject) {
       const columnConfig = {
-        sortColumn: 5,
-        columns: {
+        "sortColumn": 5,
+        "columns": {
           1: "id",
           2: "title",
           3: "channelTitle",
@@ -80,7 +80,7 @@ function Playlist_() {
     getYoutubeStatus() {
       const statuses = youtube().getStatuses()
       const url = `https://www.youtube.com/oembed?url=https://www.youtube.com/playlist?list=${super.getId()}&format=json`
-      const options = { muteHttpExceptions: true }
+      const options = { "muteHttpExceptions": true }
       const responseCode = UrlFetchApp.fetch(url, options).getResponseCode()
 
       switch(responseCode) {

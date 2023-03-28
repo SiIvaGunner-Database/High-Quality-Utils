@@ -14,8 +14,8 @@ function Channel_() {
      */
     constructor(youtubeObject, databaseObject) {
       const columnConfig = {
-        sortColumn: 5,
-        columns: {
+        "sortColumn": 5,
+        "columns": {
           1: "id",
           2: "title",
           3: "wiki",

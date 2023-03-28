@@ -13,7 +13,7 @@ function CommonModel_() {
      * @param {Object} service - The related service object.
      * @param {Object} [columnConfig] - The optional column map configuration for objects with corresponding sheets.
      */
-    constructor(originalObject, databaseObject, service, columnConfig = { sortColumn: 1, columns: {} }) {
+    constructor(originalObject, databaseObject, service, columnConfig = { "sortColumn": 1, "columns": {} }) {
       this._originalObject = originalObject
       this._databaseObject = databaseObject
       this._service = service
@@ -96,12 +96,12 @@ function CommonModel_() {
             // "!=" is intentionally used instead of "!==" here
             if (oldValue != currentValue) {
               const change = {
-                key: key,
-                label: utils().capitalizeString(key),
-                oldValue: oldValue,
-                newValue: currentValue,
-                message: `Old ${key} [${typeof oldValue}]: ${oldValue}\n\nNew ${key} [${typeof currentValue}]: ${currentValue}`,
-                timestamp: utils().formatDate()
+                "key": key,
+                "label": utils().capitalizeString(key),
+                "oldValue": oldValue,
+                "newValue": currentValue,
+                "message": `Old ${key} [${typeof oldValue}]: ${oldValue}\n\nNew ${key} [${typeof currentValue}]: ${currentValue}`,
+                "timestamp": utils().formatDate()
               }
               this._changes.push(change)
             }

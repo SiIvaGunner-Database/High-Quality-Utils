@@ -14,8 +14,8 @@ function Video_() {
      */
     constructor(youtubeObject, databaseObject) {
       const columnConfig = {
-        sortColumn: 5,
-        columns: {
+        "sortColumn": 5,
+        "columns": {
           1: "id",
           2: "title",
           3: "wikiStatus",
@@ -80,7 +80,7 @@ function Video_() {
       const pageName = (super.getDatabaseObject() !== undefined ? super.getDatabaseObject().title : super.getOriginalObject().title)
       const encodedPageName = encodeURIComponent(utils().formatFandomPageName(pageName))
       const url = `https://${wiki}.fandom.com/wiki/${encodedPageName}`
-      const options = { muteHttpExceptions: true }
+      const options = { "muteHttpExceptions": true }
       const responseCode = UrlFetchApp.fetch(url, options).getResponseCode()
 
       switch(responseCode) {

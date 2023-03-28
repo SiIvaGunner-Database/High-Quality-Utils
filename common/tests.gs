@@ -79,7 +79,7 @@ function Tests_() {
     testCommonDatabaseService() {
       console.log("TESTING COMMON DATABASE SERVICE")
       const apiPath = "channels"
-      const data = { id: "id" }
+      const data = { "id": "id" }
       this.test_("database.getDomain", database().getDomain())
       this.test_("database.getData", database().getData(apiPath))
       this.test_("database.postData", database().postData(apiPath, data))
@@ -265,8 +265,8 @@ function Tests_() {
      */
     test_(logMessage, actualValue, expectedValue) {
       const testStatuses = {
-        pass: "PASS",
-        fail: "FAIL"
+        "pass": "PASS",
+        "fail": "FAIL"
       }
       let testResult = testStatuses.fail
       let pass = false

@@ -161,8 +161,8 @@ function Utils_() {
      */
     logAlert(message) {
       const data = {
-        author: 2, // spreadsheet-bot
-        message: message
+        "author": 2, // spreadsheet-bot
+        "message": message
       }
       database().postData("alerts", data)
     }

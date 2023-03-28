@@ -52,6 +52,14 @@ function Settings_() {
     }
 
     /**
+     * Get the account ID for spreadsheet-bot.
+     * @return {Number} The account ID.
+     */
+    getBotId() {
+      return 2
+    }
+
+    /**
      * Enable development mode for development evironment testing.
      */
     enableDevMode() {
