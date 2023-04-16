@@ -130,6 +130,10 @@ function Utils_() {
      * @return {String} The hyperlink formula.
      */
     formatFandomHyperlink(pageName, wikiName) {
+      if (wikiName === undefined) {
+        return pageName
+      }
+
       const wikiUrl = `https://${wikiName}.fandom.com/wiki/`
       const safePageName = pageName.replace(/Reupload: /g, "").replace(/Reup: /g, "")
       const simplePageName = safePageName.replace(/"/g, '""').replace(/ \(GiIvaSunner\)/g, "")
@@ -153,6 +157,77 @@ function Utils_() {
       pageName = pageName.replace(/\​\|\​_/g, "L")
       pageName = pageName.replace(/Nigga/g, "N----")
       return pageName
+    }
+
+    /**
+     * Fetch all category members in the provided category.
+     * @param {String} wikiName - The name of the channel's wiki.
+     * @param {String} categoryTitle - The title of the fandom category.
+     * @return {Array[Object]} The category members.
+     */
+    fetchFandomCategoryMembers(wikiName, categoryTitle) {
+      const categoryMembers = []
+      let cmcontinue = ""
+
+      while (cmcontinue !== undefined) {
+        let url = `https://${wikiName}.fandom.com/api.php?` 
+        const params = {
+          "action": "query",
+          "format": "json",
+          "cmcontinue": encodeURIComponent(cmcontinue),
+          "cmlimit": "50",
+          "cmtitle": "Category:" + encodeURIComponent(categoryTitle),
+          "list": "categorymembers"
+        }
+
+        Object.entries(params).forEach(([key, value]) => url += `&${key}=${value}`)
+        const response = UrlFetchApp.fetch(url)
+        const content = JSON.parse(response.getContentText())
+        categoryMembers.push(...content.query.categorymembers)
+        cmcontinue = (content.continue !== undefined ? content.continue.cmcontinue : undefined)
+      }
+
+      return categoryMembers
+    }
+
+    /**
+     * Fetch the video ID from a video article.
+     * If the video isn't unlisted or removed, use the YouTube API instead.
+     * @param {String} wikiName - The name of the channel's wiki.
+     * @param {String} videoTitle - The title of the video.
+     * @return {String} The video ID.
+     */
+    fetchFandomVideoId(wikiName, videoTitle) {
+      let url = `https://${wikiName}.fandom.com/api.php?`
+      const params = {
+        "action": "query",
+        "format": "json",
+        "prop": "revisions",
+        "rvprop": "content",
+        "titles": encodeURIComponent(videoTitle)
+      }
+
+      Object.entries(params).forEach(([key, value]) => url += `&${key}=${value}`)
+      console.info(url)
+
+      const response = UrlFetchApp.fetch(url)
+      const content = response.getContentText().replace(/\\n/g, "").replace(/\|/g, "\n")
+
+      // If no link parameter is found in the rip template
+      if (content.includes("\nlink") === false) {
+        throw new Error(`No ID found for the video title "${videoTitle}"\n${url}`)
+      }
+
+      // Extract the value from the link parameter in the rip template
+      const idPattern = new RegExp("link(.*)\n")
+      let id = idPattern.exec(content).toString().split(",").pop().replace("=", "").trim()
+
+      // If the value is not a plain video ID, remove extra URL and HTML components
+      if (id.length !== 11) {
+        id = id.replace(/.*v=/g, "").replace(/.*be\//g, "").replace(/<.*/g, "").replace(/ .*/g, "")
+      }
+
+      return id
     }
 
     /**

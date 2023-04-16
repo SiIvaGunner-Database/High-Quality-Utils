@@ -116,6 +116,16 @@ function CommonService_() {
     }
 
     /**
+     * Get common model objects by their IDs.
+     * @param {String} objectId - The object IDs.
+     * @return {Array[CommonModel]} The objects.
+     */
+    getByIds(objectIds) {
+      // TODO - update to use getByFilter()
+      return objectIds.map(objectId => this.getById(objectId))
+    }
+
+    /**
      * Get common model objects filtered by given parameters.
      * @param {Object} [databaseParameters] - An optional key-value object map to filter database results.
      * @param {Array[Object]} [originalObjects] - An optional list of original object metadata to include in the returned objects.

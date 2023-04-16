@@ -54,6 +54,8 @@ function Tests_() {
       this.test_("utils.formatYoutubeHyperlink", utils().formatYoutubeHyperlink(this._videoId))
       this.test_("utils.formatFandomHyperlink", utils().formatFandomHyperlink(pageName, "siivagunner"))
       this.test_("utils.formatFandomPageName", utils().formatFandomPageName(pageName))
+      this.test_("utils.fetchFandomCategoryMembers", utils().fetchFandomCategoryMembers("siivagunner", "Rips featuring..."))
+      this.test_("utils.fetchFandomVideoId", utils().fetchFandomVideoId("siivagunner", "The Inn - Fire Emblem"))
       this.test_("utils.logAlert", utils().logAlert("You can shut up now."))
     }
 
