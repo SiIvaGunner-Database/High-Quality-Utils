@@ -175,7 +175,7 @@ function Utils_() {
           "action": "query",
           "format": "json",
           "cmcontinue": encodeURIComponent(cmcontinue),
-          "cmlimit": "50",
+          "cmlimit": "500",
           "cmtitle": "Category:" + encodeURIComponent(categoryTitle),
           "list": "categorymembers"
         }
