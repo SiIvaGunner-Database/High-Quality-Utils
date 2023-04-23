@@ -66,6 +66,14 @@ function Video_() {
     }
 
     /**
+     * Get a hyperlink to the associated wiki article.
+     * @return {String} The hyperlink formula.
+     */
+    getWikiHyperlink() {
+      return utils().formatFandomHyperlink(super.getDatabaseObject().title, this.getChannel().getDatabaseObject().wiki)
+    }
+
+    /**
      * Get the status of the video on the channel wiki.
      * @return {String} Either "Documented" or "Undocumented".
      */

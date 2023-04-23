@@ -31,7 +31,7 @@ function Channel_() {
     }
 
     /**
-     * Get the associated spreadsheet object.
+     * Get the associated videos spreadsheet object.
      * @return {WrapperSpreadsheet} The spreadsheet object.
      */
     getSpreadsheet() {
@@ -40,11 +40,20 @@ function Channel_() {
     }
 
     /**
-     * Get the associated sheet object.
+     * Get the associated videos sheet object.
      * @return {WrapperSheet} The sheet object.
      */
     getSheet() {
       return this.getSpreadsheet().getSheet(super.getDatabaseObject().title)
+    }
+
+    /**
+     * Get the associated changelog spreadsheet object.
+     * @return {WrapperSpreadsheet} The sheet object.
+     */
+    getChangelogSpreadsheet() {
+      const spreadsheetKey = (settings().isDevModeEnabled() === true ? "developmentChangelogSpreadsheet" : "productionChangelogSpreadsheet")
+      return spreadsheets().getById(super.getDatabaseObject()[spreadsheetKey])
     }
 
     /**
@@ -55,6 +64,15 @@ function Channel_() {
      */
     getPlaylists(limit, pageToken) {
       return playlists().getByChannelId(super.getId(), limit, pageToken)
+    }
+
+    /**
+     * Get the associated undocumented rips playlist, if it exists.
+     * @return {Playlist} The playlist object.
+     */
+    getUndocumentedRipsPlaylist() {
+      const playlistKey = (settings().isDevModeEnabled() === true ? "developmentUndocumentedRipsPlaylist" : "productionUndocumentedRipsPlaylist")
+      return playlists().getById(super.getDatabaseObject()[playlistKey])
     }
 
     /**

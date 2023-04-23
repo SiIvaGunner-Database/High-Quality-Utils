@@ -45,6 +45,8 @@ function Tests_() {
       console.log("TESTING COMMON UTILS")
       const pageName = "Test Name - { [ \" ' + ' \" ] }"
       const object = {"a": {"b": "c"}}
+
+      // Custom functions
       this.test_("utils.capitalizeString", utils().capitalizeString())
       this.test_("utils.stringifySortedObject", utils().stringifySortedObject(object))
       this.test_("utils.sortObject", utils().sortObject(object))
@@ -63,6 +65,8 @@ function Tests_() {
     testCommonYoutubeService() {
       console.log("TESTING COMMON YOUTUBE SERVICE")
       const testPlaylistId = "PLn8P5M1uNQk5_q_y1BVxgP68xhKQ2eM3F"
+
+      // Custom functions
       this.test_("youtube.getStatuses", youtube().getStatuses())
       this.test_("youtube.getChannel", youtube().getChannel(this._channelId))
       this.test_("youtube.getChannels", youtube().getChannels([this._channelId, "UC6ajqR7lEYf-33Gsj4lgVOA"]))
@@ -82,6 +86,8 @@ function Tests_() {
       console.log("TESTING COMMON DATABASE SERVICE")
       const apiPath = "channels"
       const data = { "id": "id" }
+
+      // Custom functions
       this.test_("database.getDomain", database().getDomain())
       this.test_("database.getData", database().getData(apiPath))
       this.test_("database.postData", database().postData(apiPath, data))
@@ -99,6 +105,7 @@ function Tests_() {
     /** Run channel service tests. */
     testChannelService() {
       console.log("TESTING CHANNEL SERVICE")
+
       // Inherited functions
       this.test_("channels.getApiPath", channels().getApiPath(this._channelId))
       this.test_("channels.getById", channels().getById(this._channelId))
@@ -111,6 +118,7 @@ function Tests_() {
     testChannelModel() {
       console.log("TESTING CHANNEL MODEL")
       const channel = channels().getById(this._channelId)
+
       // Inherited functions
       this.test_("channel.getColumnConfig", channel.getColumnConfig())
       this.test_("channel.getId", channel.getId())
@@ -119,10 +127,14 @@ function Tests_() {
       this.test_("channel.getChanges", channel.getChanges())
       this.test_("channel.hasChanges", channel.hasChanges())
       this.test_("channel.update", channel.update(false))
+      this.test_("channel.createDatabaseObject", channel.createDatabaseObject({}, false))
+
       // Custom functions
       this.test_("channel.getSpreadsheet", channel.getSpreadsheet())
       this.test_("channel.getSheet", channel.getSheet())
+      this.test_("channel.getChangelogSpreadsheet", channel.getChangelogSpreadsheet())
       this.test_("channel.getPlaylists", channel.getPlaylists(this._limit))
+      this.test_("channel.getUndocumentedRipsPlaylist", channel.getUndocumentedRipsPlaylist())
       this.test_("channel.getVideos", channel.getVideos(this._limit))
       this.test_("channel.getYoutubeStatus", channel.getYoutubeStatus())
       this.test_("channel.getSpreadsheetHyperlink", channel.getSpreadsheetHyperlink())
@@ -138,12 +150,14 @@ function Tests_() {
     /** Run playlist service tests. */
     testPlaylistService() {
       console.log("TESTING PLAYLIST SERVICE")
+
       // Inherited functions
       this.test_("playlists.getApiPath", playlists().getApiPath(this._playlistId))
       this.test_("playlists.getById", playlists().getById(this._playlistId))
       this.test_("playlists.getByFilter", playlists().getByFilter())
       this.test_("playlists.getAll", playlists().getAll())
       this.test_("playlists.updateAll", playlists().updateAll(playlists().getAll(), false))
+
       // Custom functions
       this.test_("playlists.getByChannelId", playlists().getByChannelId(this._channelId, { "limit": this._limit }))
     }
@@ -153,6 +167,7 @@ function Tests_() {
       console.log("TESTING PLAYLIST MODEL")
       const playlist = playlists().getById(this._playlistId)
       const testPlaylist = playlists().getById("PLn8P5M1uNQk5_q_y1BVxgP68xhKQ2eM3F")
+
       // Inherited functions
       this.test_("playlist.getColumnConfig", playlist.getColumnConfig())
       this.test_("playlist.getId", playlist.getId())
@@ -161,6 +176,8 @@ function Tests_() {
       this.test_("playlist.getChanges", playlist.getChanges())
       this.test_("playlist.hasChanges", playlist.hasChanges())
       this.test_("playlist.update", playlist.update(false))
+      this.test_("playlist.createDatabaseObject", playlist.createDatabaseObject({}, false))
+
       // Custom functions
       this.test_("playlist.getSpreadsheet", playlist.getSpreadsheet())
       this.test_("playlist.getChannel", playlist.getChannel())
@@ -180,6 +197,7 @@ function Tests_() {
     /** Run spreadsheet service tests. */
     testSpreadsheetService() {
       console.log("TESTING SPREADSHEET SERVICE")
+
       // Inherited functions
       this.test_("spreadsheets.getApiPath", spreadsheets().getApiPath(this._spreadsheetId))
       this.test_("spreadsheets.getById", spreadsheets().getById(this._spreadsheetId))
@@ -192,6 +210,7 @@ function Tests_() {
     testSpreadsheetModel() {
       console.log("TESTING SPREADSHEET MODEL")
       const spreadsheet = spreadsheets().getById(this._spreadsheetId)
+
       // Inherited functions
       this.test_("spreadsheet.getColumnConfig", spreadsheet.getColumnConfig())
       this.test_("spreadsheet.getId", spreadsheet.getId())
@@ -200,6 +219,8 @@ function Tests_() {
       this.test_("spreadsheet.getChanges", spreadsheet.getChanges())
       this.test_("spreadsheet.hasChanges", spreadsheet.hasChanges())
       this.test_("spreadsheet.update", spreadsheet.update(false))
+      this.test_("spreadsheet.createDatabaseObject", spreadsheet.createDatabaseObject({}, false))
+
       // Custom functions
       this.test_("spreadsheet.getSheet", spreadsheet.getSheet("1d!eCI0ak"))
     }
@@ -211,9 +232,12 @@ function Tests_() {
       const video = videos().getById(this._videoId)
       const channel = channels().getById(this._channelId)
       const values = video.getValues(channel.getDatabaseObject().wiki)
+
+      // Custom functions
       this.test_("sheet.getOriginalObject", sheet.getOriginalObject())
       this.test_("sheet.getSpreadsheet", sheet.getSpreadsheet())
       this.test_("sheet.getValues", sheet.getValues())
+      this.test_("sheet.getRowIndexOfValue", sheet.getRowIndexOfValue(this._videoId))
       this.test_("sheet.insertValues", sheet.insertValues(values))
       this.test_("sheet.updateValues", sheet.updateValues(values, 2))
       this.test_("sheet.sort", sheet.sort(video.getColumnConfig().sortColumn, false))
@@ -228,12 +252,14 @@ function Tests_() {
     /** Run video service tests. */
     testVideoService() {
       console.log("TESTING VIDEO SERVICE")
+
       // Inherited functions
       this.test_("videos.getApiPath", videos().getApiPath(this._videoId))
       this.test_("videos.getById", videos().getById(this._videoId))
       this.test_("videos.getByFilter", videos().getByFilter())
       this.test_("videos.getAll", videos().getAll())
       this.test_("videos.updateAll", videos().updateAll(videos().getAll(), false))
+
       // Custom functions
       this.test_("videos.getByChannelId", videos().getByChannelId(this._channelId, { "limit": this._limit }))
       this.test_("videos.getByPlaylistId", videos().getByPlaylistId(this._playlistId, { "limit": this._limit }))
@@ -242,6 +268,7 @@ function Tests_() {
     /** Run video model tests. */
     testVideoModel() {
       console.log("TESTING VIDEO MODEL")
+
       // Inherited functions
       const video = videos().getById(this._videoId)
       this.test_("video.getColumnConfig", video.getColumnConfig())
@@ -251,9 +278,12 @@ function Tests_() {
       this.test_("video.getChanges", video.getChanges())
       this.test_("video.hasChanges", video.hasChanges())
       this.test_("video.update", video.update(false))
+      this.test_("video.createDatabaseObject", video.createDatabaseObject({}, false))
+
       // Custom functions
       this.test_("video.getChannel", video.getChannel())
       this.test_("video.getYoutubeStatus", video.getYoutubeStatus())
+      this.test_("video.getWikiHyperlink", video.getWikiHyperlink())
       this.test_("video.getWikiStatus", video.getWikiStatus())
     }
 

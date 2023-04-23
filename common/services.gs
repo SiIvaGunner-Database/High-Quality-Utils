@@ -184,7 +184,7 @@ function CommonService_() {
     /**
      * Update a list of common model objects.
      * @param {Array[CommonModel]} objects - The objects to update.
-     * @param {Object} [applyChanges] - Whether or not to apply the update to the database. Defaults to true.
+     * @param {Boolean} [applyChanges] - Whether or not to apply the update to the database. Defaults to true.
      */
     updateAll(objects, applyChanges = true) {
       const dbObjects = []

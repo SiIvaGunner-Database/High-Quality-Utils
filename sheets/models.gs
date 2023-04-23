@@ -77,6 +77,19 @@ function WrapperSheet_() {
     }
 
     /**
+     * Get the row index of the first cell containing a specified value.
+     * @param {Object} findText - The value to search for.
+     * @param {Number} [column] - A column index to search through. Defaults to 1.
+     * @return {Number} The row index of the cell.
+     */
+    getRowIndexOfValue(findText, column = 1) {
+      const sheet = this.getOriginalObject()
+      const numberOfRows = sheet.getLastRow() - 1
+      const searchRange = sheet.getRange(2, column, numberOfRows)
+      return searchRange.createTextFinder(findText).findNext().getRowIndex()
+    }
+
+    /**
      * Insert a range of data into a sheet.
      * @param {Array[Array[Object]]} data - The data to insert.
      */
@@ -93,13 +106,14 @@ function WrapperSheet_() {
      * Update a range of data in a sheet.
      * @param {Array[Array[Object]]} data - The data to insert.
      * @param {Number} [row] - An optional row number to update from. Defaults to 2.
+     * @param {Number} [column] - An optional column number to update from. Defaults to 1.
      */
-    updateValues(data, row = 2) {
-      const firstColumn = 1
-      const lastColumn = this.getOriginalObject().getLastColumn()
+    updateValues(data, row = 2, column = 1) {
       const sheet = this.getOriginalObject()
-      sheet.setRowHeightsForced(row, data.length, this._rowHeight)
-      sheet.getRange(row, firstColumn, data.length, lastColumn).setValues(data)
+      const numberOfRows = data.length
+      const numberOfColumns = data[0].length
+      sheet.setRowHeightsForced(row, numberOfRows, this._rowHeight)
+      sheet.getRange(row, column, numberOfRows, numberOfColumns).setValues(data)
     }
 
     /**

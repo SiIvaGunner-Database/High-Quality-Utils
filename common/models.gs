@@ -121,8 +121,8 @@ function CommonModel_() {
     }
 
     /**
-     * Update the database object and apply the changes to both the web application and Google Sheets.
-     * @param {Object} [applyChanges] - Whether or not to apply the update to the database. Defaults to true.
+     * Update the database object and apply the changes to the web application.
+     * @param {Boolean} [applyChanges] - Whether or not to apply the update to the database. Defaults to true.
      */
     update(applyChanges = true) {
       const changes = this.getChanges()
@@ -136,6 +136,24 @@ function CommonModel_() {
       }
 
       this._changes = []
+    }
+
+    /**
+     * Create the database object and apply the changes to the web application.
+     * @param {Object} [defaults] - An object of default values to add to the database object.
+     * @param {Boolean} [applyChanges] - Whether or not to apply the update to the database. Defaults to true.
+     */
+    createDatabaseObject(defaults = {}, applyChanges = true) {
+      this._databaseObject = {
+        "visible": true,
+        ...defaults
+      }
+
+      this.update(false)
+
+      if (applyChanges === true) {
+        database().postData(service.getApiPath(), this.getDatabaseObject())
+      }
     }
   }
 
