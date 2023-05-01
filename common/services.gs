@@ -112,6 +112,10 @@ function CommonService_() {
           break
       }
 
+      if (originalObject === undefined && dbObject === undefined) {
+        throw new Error(`No data found for object ID "${objectId}"`)
+      }
+
       return new (this._modelClass)(originalObject, dbObject)
     }
 

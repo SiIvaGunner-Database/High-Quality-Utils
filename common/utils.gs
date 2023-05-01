@@ -227,6 +227,10 @@ function Utils_() {
         id = id.replace(/.*v=/g, "").replace(/.*be\//g, "").replace(/<.*/g, "").replace(/ .*/g, "")
       }
 
+      if (id.length !== 11) {
+        throw new Error(`Failed to get valid video ID; instead got "${id}"`)
+      }
+
       return id
     }
 
