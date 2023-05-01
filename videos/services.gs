@@ -32,7 +32,7 @@ function VideoService_() {
       const parameters = {
         "visible": true,
         "channel": channelId,
-        ...options
+        ...options.parameters
       }
 
       wrapperVideos = super.getByFilter(parameters, ytVideos)
@@ -57,7 +57,7 @@ function VideoService_() {
       const parameters = {
         "visible": true,
         "playlists": playlistId, // TODO - make this work
-        ...options
+        ...options.parameters
       }
       wrapperVideos = super.getByFilter(parameters, ytVideos)
       return [wrapperVideos, nextPageToken]

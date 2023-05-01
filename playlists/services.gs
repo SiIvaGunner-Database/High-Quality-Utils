@@ -32,7 +32,7 @@ function PlaylistService_() {
       const parameters = {
         "visible": true,
         "channel": channelId,
-        ...options
+        ...options.parameters
       }
       wrapperPlaylists = super.getByFilter(parameters, ytPlaylists)
       return [wrapperPlaylists, nextPageToken]

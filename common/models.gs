@@ -132,7 +132,7 @@ function CommonModel_() {
       })
 
       if (applyChanges === true) {
-        database().putData(service.getApiPath(), this.getDatabaseObject())
+        database().putData(this._service.getApiPath(), this.getDatabaseObject())
       }
 
       this._changes = []
@@ -152,7 +152,7 @@ function CommonModel_() {
       this.update(false)
 
       if (applyChanges === true) {
-        database().postData(service.getApiPath(), this.getDatabaseObject())
+        database().postData(this._service.getApiPath(), this.getDatabaseObject())
       }
     }
   }

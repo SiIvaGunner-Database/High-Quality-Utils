@@ -113,7 +113,8 @@ function CommonService_() {
       }
 
       if (originalObject === undefined && dbObject === undefined) {
-        throw new Error(`No data found for object ID "${objectId}"`)
+        console.warn(`No data found for object with ID "${objectId}"`)
+        return undefined
       }
 
       return new (this._modelClass)(originalObject, dbObject)
@@ -148,10 +149,14 @@ function CommonService_() {
 
     /**
      * Get all common model objects in the web application database.
+     * @param {Object} [databaseParameters] - An optional key-value object map to filter database results.
      * @return {Array[CommonModel]} The objects.
      */
-    getAll() {
-      const parameters = { "visible": true }
+    getAll(databaseParameters = {}) {
+      const parameters = {
+        "visible": true,
+        ...databaseParameters
+      }
       const dbObjects = database().getData(this.getApiPath(), parameters).results
       const dbObjectIds = dbObjects.map(dbObject => dbObject.id)
       let originalObjects = []
@@ -194,6 +199,11 @@ function CommonService_() {
       const dbObjects = []
 
       objects.forEach(object => {
+        if (object.getDatabaseObject() === undefined) {
+          console.warn(`Object with ID "${object.getId()}" hasn't been created yet`)
+          return
+        }
+
         if (object.hasChanges() === true) {
           object.update(false)
         }
@@ -201,7 +211,7 @@ function CommonService_() {
         dbObjects.push(object.getDatabaseObject())
       })
 
-      if (applyChanges === true) {
+      if (applyChanges === true && dbObjects.length > 0) {
         database().putData(this.getApiPath(), dbObjects)
       }
     }
