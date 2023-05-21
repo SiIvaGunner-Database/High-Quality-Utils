@@ -160,6 +160,21 @@ function Utils_() {
     }
 
     /**
+     * Splits of string of YouTube IDs or URLs into an array of ID strings.
+     * @param {String} stringOfIds - The string of IDs or URLs.
+     * @return {Array[String]} The array of individual IDs.
+     */
+    splitStringOfIds(stringOfIds) {
+      const ids = stringOfIds.replace(/ /g, "").split(",")
+
+      ids.forEach((id, index) => {
+        id = id.replace("&feature=youtu.be", "").replace(/h.*list=/, "").replace(/\(.*/, "")
+      })
+
+      return ids
+    }
+
+    /**
      * Fetch all category members in the provided category.
      * @param {String} wikiName - The name of the channel's wiki.
      * @param {String} categoryTitle - The title of the fandom category.

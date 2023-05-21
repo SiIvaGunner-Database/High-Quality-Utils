@@ -61,7 +61,7 @@ function Video_() {
       } else if (contentText.includes('"status":"UNPLAYABLE"')) {
         return statuses.unavailable
       } else {
-        throw (InvalidResponseError_())(contentText)
+        throw new (InvalidResponseError_())(contentText)
       }
     }
 
