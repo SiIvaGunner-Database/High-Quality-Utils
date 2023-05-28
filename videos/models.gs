@@ -54,7 +54,7 @@ function Video_() {
         return statuses.unlisted
       } else if (contentText.includes('"status":"OK"')) {
         return statuses.public
-      } else if (contentText.includes('"This video is private."')) {
+      } else if (contentText.includes('"This video is private"')) {
         return statuses.private
       } else if (contentText.includes('"status":"ERROR"')) {
         return statuses.deleted
