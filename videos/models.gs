@@ -61,7 +61,7 @@ function Video_() {
       } else if (contentText.includes('"status":"UNPLAYABLE"')) {
         return statuses.unavailable
       } else {
-        throw new (InvalidResponseError_())(contentText)
+        throw new Error(`Unable to find status from URL: ${url}`)
       }
     }
 
@@ -97,7 +97,7 @@ function Video_() {
         case 404:
           return "Undocumented"
         default:
-          throw new (InvalidResponseError_())(responseCode)
+          throw new Error(`Unexpected response: ${responseCode}`)
       }
     }
   }

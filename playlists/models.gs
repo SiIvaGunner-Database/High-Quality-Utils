@@ -92,7 +92,7 @@ function Playlist_() {
         case 404:
           return statuses.deleted
         default:
-          throw new (InvalidResponseError_())(responseCode)
+          throw new Error(`Unexpected response: ${responseCode}`)
       }
     }
   }

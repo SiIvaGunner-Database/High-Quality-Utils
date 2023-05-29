@@ -37,7 +37,7 @@ function Settings_() {
      */
     getAuthToken() {
       if (this._authToken === undefined) {
-        throw new (MissingPropertyError_())(this.getAuthTokenKey())
+        throw new Error(`You must create a property with the key '${this.getAuthTokenKey()}' in order to use this method`)
       }
 
       return `Token ${this._authToken}`
