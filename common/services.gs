@@ -77,7 +77,9 @@ function CommonService_() {
      * @return {CommonModel} The object.
      */
     getById(objectId) {
-      if (this.isCached_(objectId)) {
+      if (!objectId) {
+        return undefined
+      } else if (this.isCached_(objectId)) {
         return this.getCachedObject_(objectId)
       }
 

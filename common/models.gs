@@ -36,7 +36,7 @@ function CommonModel_() {
      * @param {String} [wikiName] - An optional wiki name to use in a hyperlink for the title if a value is provided.
      * @return {Array[Array[Object]]} The values.
      */
-    getValues(wiki) {
+    getValues(wikiName) {
       return [Object.values(this._columnConfig.columns).map(columnKey => {
         const dbObject = this.getDatabaseObject()
         let value = dbObject[columnKey]
@@ -46,8 +46,8 @@ function CommonModel_() {
           value = ""
         } else if (columnKey === "id") {
           value = utils().formatYoutubeHyperlink(value)
-        } else if (columnKey === "title" && wiki !== undefined) {
-          value = utils().formatFandomHyperlink(value, wiki)
+        } else if (columnKey === "title" && wikiName !== undefined) {
+          value = utils().formatFandomHyperlink(value, wikiName)
         } else if (value.toString().match(/^.+T.+Z$/) !== null) {
           value = utils().formatDate(value)
         }

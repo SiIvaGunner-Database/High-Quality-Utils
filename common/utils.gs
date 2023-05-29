@@ -112,9 +112,9 @@ function Utils_() {
 
       if (youtubeId.length === 11) {
         url = `https://www.youtube.com/watch?v=${youtubeId}`
-      } else if (youtubeId.includes("PL")) {
+      } else if (youtubeId.includes("PL") === true) {
         url = `https://www.youtube.com/playlist?list=${youtubeId}`
-      } else if (youtubeId.includes("UC")) {
+      } else if (youtubeId.includes("UC") === true) {
         url = `https://www.youtube.com/channel/${youtubeId}`
       } else {
         return youtubeId
