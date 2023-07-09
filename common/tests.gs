@@ -238,9 +238,11 @@ function Tests_() {
       this.test_("sheet.getSpreadsheet", sheet.getSpreadsheet())
       this.test_("sheet.getValues", sheet.getValues())
       this.test_("sheet.getRowIndexOfValue", sheet.getRowIndexOfValue(this._videoId))
+      // this.test_("sheet.create", sheet.create("Sheet"))
       this.test_("sheet.insertValues", sheet.insertValues(values))
       this.test_("sheet.updateValues", sheet.updateValues(values, 2))
       this.test_("sheet.sort", sheet.sort(video.getColumnConfig().sortColumn, false))
+      this.test_("sheet.format", sheet.format(["Column"]))
     }
 
     /** Run video tests. */
