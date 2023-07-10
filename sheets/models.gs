@@ -17,7 +17,18 @@ function WrapperSpreadsheet_() {
     }
 
     /**
+     * Create a new child sheet from the spreadsheet.
+     * @param {String} sheetName - The name of the new sheet.
+     * @return {WrapperSheet} The sheet object.
+     */
+    createSheet(sheetName) {
+      const sheet = super.getOriginalObject().insertSheet(sheetName)
+      return new (WrapperSheet_())(this, sheet)
+    }
+
+    /**
      * Get a child sheet from the spreadsheet.
+     * @param {String} sheetName - The name of the sheet.
      * @return {WrapperSheet} The sheet object.
      */
     getSheet(sheetName) {
@@ -90,25 +101,20 @@ function WrapperSheet_() {
     }
 
     /**
-     * Create a new sheet to become the original object of this instance.
-     * @param {String} sheetName - The name of the new sheet.
-     */
-    create(sheetName) {
-      this._sheetObject = videoSpreadsheet.getOriginalObject().insertSheet(sheetName)
-    }
-
-    /**
      * Insert a range of data into a sheet.
      * @param {Array[Array[Object]]} data - The data to insert.
-     * @param {Array[Array[Object]]} [data] - An optional row to insert from, defaulting to 2.
+     * @param {Number} [row] - An optional row to insert from, defaulting to 2.
+     * @param {Number} [column] - An optional column to insert from, defaulting to 1.
+     * @return {WrapperSheet} The current object.
      */
-    insertValues(data, row = 2) {
+    insertValues(data, row = 2, column = 1) {
       if (data.length === 0) {
         return
       }
 
       this.getOriginalObject().insertRowsBefore(row, data.length)
-      this.updateValues(data, row)
+      this.updateValues(data, row, column)
+      return this
     }
 
     /**
@@ -116,6 +122,7 @@ function WrapperSheet_() {
      * @param {Array[Array[Object]]} data - The data to insert.
      * @param {Number} [row] - An optional row number to update from. Defaults to 2.
      * @param {Number} [column] - An optional column number to update from. Defaults to 1.
+     * @return {WrapperSheet} The current object.
      */
     updateValues(data, row = 2, column = 1) {
       const sheet = this.getOriginalObject()
@@ -123,12 +130,14 @@ function WrapperSheet_() {
       const numberOfColumns = data[0].length
       sheet.setRowHeightsForced(row, numberOfRows, this._rowHeight)
       sheet.getRange(row, column, numberOfRows, numberOfColumns).setValues(data)
+      return this
     }
 
     /**
      * Sort the given sheet, excluding the header row.
      * @param {Number} column - The column number.
      * @param {Boolean} [ascending] - Whether or not to sort in ascending order. Defaults to true.
+     * @return {WrapperSheet} The current object.
      */
     sort(column, ascending = true) {
       const sheet = this.getOriginalObject()
@@ -136,6 +145,7 @@ function WrapperSheet_() {
       sheet.setFrozenRows(firstRow) // Freeze the header row
       sheet.setRowHeightsForced(firstRow, sheet.getLastRow(), this._rowHeight)
       sheet.sort(column, ascending)
+      return this
     }
 
     /**
@@ -145,44 +155,47 @@ function WrapperSheet_() {
      * @param {Array[String]} columnLabels - A list of column labels to put into the top header row.
      * @param {Array[Number]} [dateColumnIndexes] - An optional list of columns containing date values.
      * @param {Array[Number]} [hiddenColumnIndexes] - An optional list of columns to hide from view.
+     * @return {WrapperSheet} The current object.
      */
     format(columnLabels, dateColumnIndexes, hiddenColumnIndexes) {
       const sheet = this.getOriginalObject()
       const firstRow = 1
       const lastRow = sheet.getLastRow()
 
-      // Add the column labels and remove empty columns and rows
-      sheet.getRange(firstRow, 1, 1, columnLabels.length).setValues(columnLabels)
-      sheet.deleteColumns(columnLabels.length + 1, sheet.getLastColumn() - columnLabels.length)
-      const columnValues = sheet.getRange("A:A").getValues()
-      let firstEmptyRow = columnValues.findIndex(row => row[0] === "") + 1
+      // Add the column labels
+      sheet.getRange(firstRow, 1, 1, columnLabels.length).setValues([columnLabels])
 
-      if (firstEmptyRow > -1) {
-        if (firstEmptyRow <= 2) {
-          firstEmptyRow = 3
-        }
+      // Remove all columns after the labels
+      if (sheet.getMaxColumns() > columnLabels.length) {
+        sheet.deleteColumns(columnLabels.length + 1, sheet.getMaxColumns() - columnLabels.length);
+      }
 
-        sheet.deleteRows(firstEmptyRow, lastRow - firstEmptyRow + 1)
+      // Remove all rows after the last row with data or after row 2 if all non-header rows are empty
+      if (sheet.getMaxRows() > lastRow && sheet.getMaxRows() > 2) {
+        const firstEmptyRow = (lastRow === 1 ? 3 : lastRow + 1)
+        console.log(firstEmptyRow, sheet.getMaxRows() - firstEmptyRow + 1)
+        sheet.deleteRows(firstEmptyRow, sheet.getMaxRows() - firstEmptyRow + 1)
       }
 
       // Freeze and bold the header row
       sheet.setFrozenRows(firstRow)
-      sheet.getDataRange().setFontWeight("bold")
+      sheet.getRange("A:A").setFontWeight("bold")
 
-      // Enforce height and left alignment on all cells
+      // Enforce height, left alignment, and no underlines on all cells
       sheet.setRowHeightsForced(firstRow, lastRow, this._rowHeight)
-      sheet.getDataRange().setHorizontalAlignment("left")
+      sheet.getDataRange().setHorizontalAlignment("left").setFontLine("none")
 
-      // Format date columns and hide extra columns
-      dateColumnIndexes.forEach(column => sheet.getRange(firstRow, column, lastRow).setNumberFormat("yyyy-MM-dd   HH:mm:ss"))
-      hiddenColumnIndexes.forEach(column => sheet.hideColumn(column))
+      // Format and widen date columns
+      dateColumnIndexes.forEach(column => {
+        sheet.setColumnWidth(column, 150)
+        sheet.getRange(firstRow, column, lastRow).setNumberFormat("yyyy-MM-dd   HH:mm:ss")
+      })
+
+      // Hide extra columns
+      hiddenColumnIndexes.forEach(column => sheet.hideColumns(column))
+      return this
     }
   }
 
   return WrapperSheet
-}
-
-function test() {
-  console.log(SpreadsheetApp.openById("1uRgcmhoRNBPabK0JnTpjUxxaickBH0iGCXRrSDhkxO0").getSheetByName("Index").getRange("B:B").getValues())
-  // console.log(spreadsheets().getById("1uRgcmhoRNBPabK0JnTpjUxxaickBH0iGCXRrSDhkxO0").getSheet("Index").getRowIndexOfValue("", 2))
 }

@@ -222,6 +222,7 @@ function Tests_() {
       this.test_("spreadsheet.createDatabaseObject", spreadsheet.createDatabaseObject({}, false))
 
       // Custom functions
+      this.test_("spreadsheet.createSheet", sheet.create("New Sheet"))
       this.test_("spreadsheet.getSheet", spreadsheet.getSheet("1d!eCI0ak"))
     }
 
@@ -238,7 +239,6 @@ function Tests_() {
       this.test_("sheet.getSpreadsheet", sheet.getSpreadsheet())
       this.test_("sheet.getValues", sheet.getValues())
       this.test_("sheet.getRowIndexOfValue", sheet.getRowIndexOfValue(this._videoId))
-      // this.test_("sheet.create", sheet.create("Sheet"))
       this.test_("sheet.insertValues", sheet.insertValues(values))
       this.test_("sheet.updateValues", sheet.updateValues(values, 2))
       this.test_("sheet.sort", sheet.sort(video.getColumnConfig().sortColumn, false))

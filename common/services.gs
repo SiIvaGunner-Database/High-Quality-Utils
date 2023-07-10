@@ -88,7 +88,7 @@ function CommonService_() {
       try {
         dbObject = database().getData(this.getApiPath(objectId))
       } catch (error) {
-        console.log(error.message)
+        console.warn("No database object found\n", error.stack)
       }
 
       let originalObject
@@ -614,7 +614,7 @@ function DatabaseService_() {
             url = responseJSON.next
           }
 
-          console.log(method, "\n", url, "\n", options.payload)
+          console.log("Method:", method, "\nURL:", url, "\nPayload:", options.payload)
           const responseObject = UrlFetchApp.fetch(url, options)
           responseJSON = JSON.parse(responseObject.getContentText())
 

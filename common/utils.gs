@@ -148,15 +148,11 @@ function Utils_() {
      * @return {String} The formatted page name.
      */
     formatFandomPageName(pageName) {
-      pageName = pageName.replace(/#/g, "")
-      pageName = pageName.replace(/\|/g, "")
-      pageName = pageName.replace(/\[/g, "(")
-      pageName = pageName.replace(/\]/g, ")")
-      pageName = pageName.replace(/\{/g, "(")
-      pageName = pageName.replace(/\}/g, ")")
-      pageName = pageName.replace(/\​\|\​_/g, "L")
-      pageName = pageName.replace(/Nigga/g, "N----")
-      return pageName
+      return pageName.replace(/(#|\|)/g, "")
+        .replace(/(\[|\{})/g, "(")
+        .replace(/(\]|\})/g, ")")
+        .replace(/\​\|\​_/g, "L")
+        .replace(/Nigga/ig, "N----")
     }
 
     /**
@@ -168,7 +164,8 @@ function Utils_() {
       const ids = stringOfIds.replace(/ /g, "").split(",")
 
       ids.forEach((id, index) => {
-        id = id.replace("&feature=youtu.be", "").replace(/h.*list=/, "").replace(/\(.*/, "")
+        // Replace YouTube URL content and whitespace
+        ids[index] = id.replace(/(http.*(list|v)=|http.*\/channel\/|&feature=youtu\.be|\(.*|\s+)/ig, "")
       })
 
       return ids

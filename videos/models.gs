@@ -61,7 +61,13 @@ function Video_() {
       } else if (contentText.includes('"status":"UNPLAYABLE"')) {
         return statuses.unavailable
       } else {
-        throw new Error(`Unable to find status from URL: ${url}`)
+        console.warn(`Unable to find status from URL: ${url}`)
+
+        if (super.getDatabaseObject() !== undefined && super.getDatabaseObject().videoStatus !== "") {
+          return super.getDatabaseObject().videoStatus
+        } else {
+          return statuses.public
+        }
       }
     }
 

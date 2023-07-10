@@ -146,6 +146,7 @@ function CommonModel_() {
     createDatabaseObject(defaults = {}, applyChanges = true) {
       this._databaseObject = {
         "visible": true,
+        "author": settings().getBotId(),
         ...defaults
       }
 
