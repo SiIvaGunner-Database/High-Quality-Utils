@@ -204,6 +204,9 @@ function Tests_() {
       this.test_("spreadsheets.getByFilter", spreadsheets().getByFilter())
       this.test_("spreadsheets.getAll", spreadsheets().getAll())
       this.test_("spreadsheets.updateAll", spreadsheets().updateAll(spreadsheets().getAll(), false))
+
+      // Custom functions
+      this.test_("spreadsheets.getChannelSpreadsheet", spreadsheet.getChannelSpreadsheet())
     }
 
     /** Run spreadsheet model tests. */
@@ -222,7 +225,7 @@ function Tests_() {
       this.test_("spreadsheet.createDatabaseObject", spreadsheet.createDatabaseObject({}, false))
 
       // Custom functions
-      this.test_("spreadsheet.createSheet", sheet.create("New Sheet"))
+      this.test_("spreadsheet.createSheet", spreadsheet.createSheet("New Sheet"))
       this.test_("spreadsheet.getSheet", spreadsheet.getSheet("1d!eCI0ak"))
     }
 

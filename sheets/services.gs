@@ -13,6 +13,19 @@ function SpreadsheetService_() {
     constructor() {
       super(WrapperSpreadsheet_(), "spreadsheets")
     }
+
+    /**
+     * Get the SiIvaGunner Channels spreadsheet.
+     * return {WrapperSpreadsheet} The spreadsheet object.
+     */
+    getChannelSpreadsheet() {
+      const spreadsheetId = (
+        settings().isDevModeEnabled() === true
+        ? "1EDz_beMzXpxv8CpRhEu_GhcYCbT6EOP4JBDw93XoGdU" // Copy of SiIvaGunner Channels spreadsheet
+        : "16PLJOqdZOdLXguKmUlUwZfu-1rVXzuJLHbY18BUSOAw" // SiIvaGunner Channels spreadsheet
+      )
+      return super.getById(spreadsheetId)
+    }
   }
 
   return SpreadsheetService
