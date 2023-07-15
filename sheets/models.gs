@@ -179,7 +179,7 @@ function WrapperSheet_() {
 
       // Freeze and bold the header row
       sheet.setFrozenRows(firstRow)
-      sheet.getRange("A:A").setFontWeight("bold")
+      sheet.getRange("1:1").setFontWeight("bold")
 
       // Enforce height, left alignment, and no underlines on all cells
       sheet.setRowHeightsForced(firstRow, lastRow, this._rowHeight)

@@ -130,7 +130,7 @@ function Utils_() {
      * @return {String} The hyperlink formula.
      */
     formatFandomHyperlink(pageName, wikiName) {
-      if (wikiName === undefined) {
+      if (wikiName === undefined || wikiName === "") {
         return pageName
       }
 

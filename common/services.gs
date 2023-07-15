@@ -479,9 +479,9 @@ function YoutubeService_() {
       while ((stringOfIds = arrayOfIds.splice(-50).join(",")) && stringOfIds !== undefined) {
         videos.push(...YouTube.Videos.list("snippet,contentDetails,statistics", { "id": stringOfIds }).items)
 
-        if (videos.length % 1000 < 50 && videos.length > 50) {
-          console.log(`Found ${videos.length} videos...`)
-        }
+        // if (videos.length % 1000 < 50 && videos.length > 50) {
+        //   console.log(`Found ${videos.length} videos...`)
+        // }
       }
 
       return this.formatMetadata_(videos)
