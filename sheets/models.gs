@@ -173,7 +173,6 @@ function WrapperSheet_() {
       // Remove all rows after the last row with data or after row 2 if all non-header rows are empty
       if (sheet.getMaxRows() > lastRow && sheet.getMaxRows() > 2) {
         const firstEmptyRow = (lastRow === 1 ? 3 : lastRow + 1)
-        console.log(firstEmptyRow, sheet.getMaxRows() - firstEmptyRow + 1)
         sheet.deleteRows(firstEmptyRow, sheet.getMaxRows() - firstEmptyRow + 1)
       }
 
