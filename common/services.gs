@@ -293,9 +293,9 @@ function YoutubeService_() {
           } else if (typeof value === "string" && value !== "" && Number.isInteger(Number(value)) === true) {
             // Convert numerical strings into numbers
             object[key] = Number(value)
-          } else if (typeof value === "string" && value.slice(-1) === "\n") {
-            // Remove new lines found at the end of strings
-            object[key] = value.slice(0, -1)
+          } else if (typeof value === "string") {
+            // Remove spaces, new lines, etc. from the start and end of strings
+            object[key] = value.trim()
           }
         })
 

@@ -100,7 +100,7 @@ function CommonModel_() {
                 "label": utils().capitalizeString(key),
                 "oldValue": oldValue,
                 "newValue": currentValue,
-                "message": `Old ${key} [${typeof oldValue}]: ${oldValue}\n\nNew ${key} [${typeof currentValue}]: ${currentValue}`,
+                "message": `Old ${key} [${typeof oldValue}]: ${JSON.stringify(oldValue)}\n\nNew ${key} [${typeof currentValue}]: ${JSON.stringify(currentValue)}`,
                 "timestamp": utils().formatDate()
               }
               this._changes.push(change)

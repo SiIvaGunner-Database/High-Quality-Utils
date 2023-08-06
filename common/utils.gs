@@ -220,7 +220,7 @@ function Utils_() {
       }
 
       Object.entries(params).forEach(([key, value]) => url += `&${key}=${value}`)
-      console.info(url)
+      // console.log(url)
 
       const response = UrlFetchApp.fetch(url)
       const content = response.getContentText().replace(/\\n/g, "").replace(/\|/g, "\n")

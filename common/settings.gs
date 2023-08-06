@@ -19,15 +19,15 @@ function Settings_() {
      * Set an admin authentication token for access to the siivagunnerdatabase.net API.
      * The authentication token must be set before service classes can be used.
      * The value can be set manually by going to project settings and adding a script property with the key "authToken".
-     * @param {ScriptProperties} scriptProperties - The script properties object.
+     * @param {Properties} properties - The properties object.
      * @param {String} [value] - The optional authentication token value. Overwrites any token value previously set.
      */
-    setAuthToken(scriptProperties, value) {
+    setAuthToken(properties, value) {
       if (value !== undefined) {
-        scriptProperties.setProperty(this.getAuthTokenKey(), value)
+        properties.setProperty(this.getAuthTokenKey(), value)
       }
 
-      this._authToken = scriptProperties.getProperty(this.getAuthTokenKey())
+      this._authToken = properties.getProperty(this.getAuthTokenKey())
     }
 
     /**
