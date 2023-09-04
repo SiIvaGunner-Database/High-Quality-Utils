@@ -83,7 +83,7 @@ function Playlist_() {
       const options = { "muteHttpExceptions": true }
       const responseCode = UrlFetchApp.fetch(url, options).getResponseCode()
 
-      switch(responseCode) {
+      switch (responseCode) {
         case 200:
           // TODO differentiate between public and unlisted
           return statuses.public

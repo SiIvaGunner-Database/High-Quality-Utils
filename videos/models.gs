@@ -97,7 +97,7 @@ function Video_() {
       const options = { "muteHttpExceptions": true }
       const responseCode = UrlFetchApp.fetch(url, options).getResponseCode()
 
-      switch(responseCode) {
+      switch (responseCode) {
         case 200:
           return "Documented"
         case 404:

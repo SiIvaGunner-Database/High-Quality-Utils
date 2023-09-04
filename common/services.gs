@@ -93,7 +93,7 @@ function CommonService_() {
 
       let originalObject
 
-      switch(this._modelClass) {
+      switch (this._modelClass) {
         case Channel_():
           if (settings().isYoutubeApiEnabled() === true) {
             originalObject = youtube().getChannel(objectId)
@@ -124,11 +124,12 @@ function CommonService_() {
 
     /**
      * Get common model objects by their IDs.
-     * @param {String} objectId - The object IDs.
+     * @param {Array[String]} objectIds - The object IDs.
      * @return {Array[CommonModel]} The objects.
      */
     getByIds(objectIds) {
-      // TODO - update to use getByFilter()
+      // TODO - test and update to the following:
+      // return this.getAll({ "id__in": objectIds.join(",") })
       return objectIds.map(objectId => this.getById(objectId))
     }
 
@@ -152,18 +153,19 @@ function CommonService_() {
     /**
      * Get all common model objects in the web application database.
      * @param {Object} [databaseParameters] - An optional key-value object map to filter database results.
+     * @param {Number} [limit] - An optional result count limit.
      * @return {Array[CommonModel]} The objects.
      */
-    getAll(databaseParameters = {}) {
+    getAll(databaseParameters = {}, limit) {
       const parameters = {
         "visible": true,
         ...databaseParameters
       }
-      const dbObjects = database().getData(this.getApiPath(), parameters).results
+      const dbObjects = database().getData(this.getApiPath(), parameters, limit).results
       const dbObjectIds = dbObjects.map(dbObject => dbObject.id)
       let originalObjects = []
 
-      switch(this._modelClass) {
+      switch (this._modelClass) {
         case Channel_():
           if (settings().isYoutubeApiEnabled() === true) {
             originalObjects = youtube().getChannels(dbObjectIds)
@@ -536,10 +538,11 @@ function DatabaseService_() {
      * This will fail if the user doesn't have permission.
      * @param {String} [apiPath] - The path to append to "siivagunnerdatabase.net/api/".
      * @param {Object} [parameters] - An optional parameter map to append to the URL. E.g. "{'id': 0}" becomes "?id=0".
+     * @param {Number} [limit] - An optional result count limit.
      * @return {Object} The response object.
      */
-    getData(apiPath, parameters) {
-      return this.fetchResponse_(apiPath, this._GET, parameters)
+    getData(apiPath, parameters, limit) {
+      return this.fetchResponse_(apiPath, this._GET, parameters, limit)
     }
 
     /**
@@ -581,9 +584,10 @@ function DatabaseService_() {
      * @param {String} [apiPath] - An optional path to append to "siivagunnerdatabase.net/api/".
      * @param {String} [method] - An optional method to use. Defaults to "GET".
      * @param {Object | Array[Object]} [data] - The metadata to send.
+     * @param {Number} [limit] - An optional result count limit.
      * @return {Object} The response object.
      */
-    fetchResponse_(apiPath = "", method = this._GET, data) {
+    fetchResponse_(apiPath = "", method = this._GET, data, limit) {
       const options = {
         "method": method,
         "contentType": "application/json",
@@ -617,7 +621,14 @@ function DatabaseService_() {
           if (responseJSON.results !== undefined && responseJSON.results !== null) {
             responseResults.push(...responseJSON.results)
           }
-        } while (method === this._GET && responseJSON.next !== undefined && responseJSON.next !== null)
+
+          // Continue while a next page exists and the result count hasn't passed the limit
+        } while (
+          method === this._GET
+          && responseJSON.next !== undefined
+          && responseJSON.next !== null
+          && (limit === undefined || responseResults.length < limit)
+        )
       } catch (error) {
         throw new Error(`${url}\n${error.message}`)
       }
