@@ -33,6 +33,11 @@ function WrapperSpreadsheet_() {
      */
     getSheet(sheetName) {
       const sheet = super.getOriginalObject().getSheetByName(sheetName)
+
+      if (sheet === null) {
+        throw new Error(`No sheet found with the name "${sheetName}" in spreadsheet "${super.getId()}"`)
+      }
+
       return new (WrapperSheet_())(this, sheet)
     }
   }
