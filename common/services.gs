@@ -137,10 +137,15 @@ function CommonService_() {
      * Get common model objects filtered by given parameters.
      * @param {Object} [databaseParameters] - An optional key-value object map to filter database results.
      * @param {Array[Object]} [originalObjects] - An optional list of original object metadata to include in the returned objects.
+     * @param {Number} [limit] - An optional result count limit.
      * @return {Array[CommonModel]} The objects.
      */
-    getByFilter(databaseParameters, originalObjects) {
-      const dbObjects = database().getData(this.getApiPath(), databaseParameters).results
+    getByFilter(databaseParameters, originalObjects, limit) {
+      if (originalObjects !== undefined && originalObjects.length === 0) {
+        return []
+      }
+
+      const dbObjects = database().getData(this.getApiPath(), databaseParameters, limit).results
 
       if (originalObjects !== undefined) {
         const dbObjectMap = new Map(dbObjects.map(dbObject => [dbObject.id, dbObject]))
@@ -369,7 +374,12 @@ function YoutubeService_() {
     getChannelVideos(channelId, limit, pageToken) {
       const channel = YouTube.Channels.list("contentDetails", { "id": channelId }).items[0]
       const uploadsPlaylistId = channel.contentDetails.relatedPlaylists.uploads
-      return youtube().getPlaylistVideos(uploadsPlaylistId, limit, pageToken)
+      try {
+        return youtube().getPlaylistVideos(uploadsPlaylistId, limit, pageToken)
+      } catch (error) {
+        console.warn("No channel videos found\n", error.stack)
+        return [[], undefined]
+      }
     }
 
     /**
@@ -426,9 +436,21 @@ function YoutubeService_() {
         "playlistId": playlistId,
         "videoId": videoId
       }
-      const playlist = YouTube.PlaylistItems.list("snippet", parameters)
-      const deletionId = playlist.items[0].id
-      YouTube.PlaylistItems.remove(deletionId)
+      let playlist
+
+      try {
+        playlist = YouTube.PlaylistItems.list("snippet", parameters)
+      } catch (error) {
+        console.warn(`Failed to fetch video with ID "${videoId}" from playlist with ID "${playlistId}"\n`, error.stack)
+        return
+      }
+
+      const itemToDelete = playlist.items[0]
+      if (itemToDelete !== undefined) {
+        YouTube.PlaylistItems.remove(itemToDelete.id)
+      } else {
+        console.warn(`Video with ID "${videoId}" not found in playlist with ID "${playlistId}"`)
+      }
     }
 
     /**

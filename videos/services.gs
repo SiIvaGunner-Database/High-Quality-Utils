@@ -26,7 +26,7 @@ function VideoService_() {
       let wrapperVideos
 
       if (settings().isYoutubeApiEnabled() === true) {
-        [ytVideos, nextPageToken] = youtube().getChannelVideos(channelId, options.limit, options.pageToken)
+        [ytVideos, nextPageToken] = youtube().getChannelVideos(channelId, (options.youtubeLimit | options.limit), options.pageToken)
       }
 
       const parameters = {
@@ -35,7 +35,7 @@ function VideoService_() {
         ...options.parameters
       }
 
-      wrapperVideos = super.getByFilter(parameters, ytVideos)
+      wrapperVideos = super.getByFilter(parameters, ytVideos, options.databaseLimit)
       return [wrapperVideos, nextPageToken]
     }
 
@@ -51,7 +51,7 @@ function VideoService_() {
       let wrapperVideos
 
       if (settings().isYoutubeApiEnabled() === true) {
-        [ytVideos, nextPageToken] = youtube().getPlaylistVideos(playlistId, options.limit, options.pageToken)
+        [ytVideos, nextPageToken] = youtube().getPlaylistVideos(playlistId, (options.youtubeLimit | options.limit), options.pageToken)
       }
 
       const parameters = {
@@ -59,7 +59,7 @@ function VideoService_() {
         "playlists": playlistId, // TODO - make this work
         ...options.parameters
       }
-      wrapperVideos = super.getByFilter(parameters, ytVideos)
+      wrapperVideos = super.getByFilter(parameters, ytVideos, options.databaseLimit)
       return [wrapperVideos, nextPageToken]
     }
   }
