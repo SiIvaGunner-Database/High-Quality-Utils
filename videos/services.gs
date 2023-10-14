@@ -41,6 +41,7 @@ function VideoService_() {
 
     /**
      * Get public videos by playlist ID.
+     * Currently, this method only works properly when the YouTube API is enabled.
      * @param {String} playlistId - The playlist ID.
      * @param {Object} [options] - An optional object of options to include: { parameters: Object; limit: Number; pageToken: String; }
      * @return {Array[Array[Video], String|undefined]} An array containing the videos and next page token.
@@ -54,9 +55,11 @@ function VideoService_() {
         [ytVideos, nextPageToken] = youtube().getPlaylistVideos(playlistId, (options.youtubeLimit | options.limit), options.pageToken)
       }
 
+      const playlist = playlists().getById(playlistId)
       const parameters = {
         "visible": true,
-        "playlists": playlistId, // TODO - make this work
+        "channel": playlist.getChannel().getId(),
+        // "playlists": playlistId, // TODO - make this work
         ...options.parameters
       }
       wrapperVideos = super.getByFilter(parameters, ytVideos, options.databaseLimit)

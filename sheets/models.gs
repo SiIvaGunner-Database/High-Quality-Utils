@@ -84,10 +84,19 @@ function WrapperSheet_() {
 
     /**
      * Get all data values from a sheet, excluding the header row.
+     * @param {String} [a1Notation] - An optional sheet range to get values from. Defaults to the full data range.
      * @return {Array[Array[Object]]} The values.
      */
-    getValues() {
-      const data = this.getOriginalObject().getDataRange().getValues()
+    getValues(a1Notation) {
+      let range
+
+      if (a1Notation !== undefined) {
+        range = this.getOriginalObject().getRange(a1Notation)
+      } else {
+        range = this.getOriginalObject().getDataRange()
+      }
+
+      const data = range.getValues()
       data.shift() // Remove the header row
       return data
     }

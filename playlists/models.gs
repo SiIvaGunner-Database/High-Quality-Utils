@@ -49,12 +49,11 @@ function Playlist_() {
 
     /**
      * Get all videos in the playlist.
-     * @param {Number} [limit] - An optional video count limit.
-     * @param {String} [nextPageToken] - An optional page token to start getting results from.
+     * @param {Object} [options] - An optional object of options to include: { parameters: Object; limit: Number; pageToken: String; }
      * @return {Array[Array[Video], String|undefined]} An array containing the videos and next page token.
      */
-    getVideos(limit, nextPageToken) {
-      return videos().getByPlaylistId(super.getId(), limit, nextPageToken)
+    getVideos(options) {
+      return videos().getByPlaylistId(super.getId(), options)
     }
 
     /**

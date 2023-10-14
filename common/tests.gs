@@ -135,7 +135,7 @@ function Tests_() {
       this.test_("channel.getChangelogSpreadsheet", channel.getChangelogSpreadsheet())
       this.test_("channel.getPlaylists", channel.getPlaylists(this._limit))
       this.test_("channel.getUndocumentedRipsPlaylist", channel.getUndocumentedRipsPlaylist())
-      this.test_("channel.getVideos", channel.getVideos(this._limit))
+      this.test_("channel.getVideos", channel.getVideos({ "youtubeLimit": this._limit }))
       this.test_("channel.getYoutubeStatus", channel.getYoutubeStatus())
       this.test_("channel.getSpreadsheetHyperlink", channel.getSpreadsheetHyperlink())
       this.test_("channel.getWikiHyperlink", channel.getSpreadsheetHyperlink())
@@ -181,7 +181,7 @@ function Tests_() {
       // Custom functions
       this.test_("playlist.getSpreadsheet", playlist.getSpreadsheet())
       this.test_("playlist.getChannel", playlist.getChannel())
-      this.test_("playlist.getVideos", playlist.getVideos(this._limit))
+      this.test_("playlist.getVideos", playlist.getVideos({ "youtubeLimit": this._limit }))
       this.test_("playlist.addVideo", testPlaylist.addVideo(this._videoId))
       this.test_("playlist.removeVideo", testPlaylist.removeVideo(this._videoId))
       this.test_("playlist.getYoutubeStatus", playlist.getYoutubeStatus())

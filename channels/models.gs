@@ -77,12 +77,11 @@ function Channel_() {
 
     /**
      * Get all public videos on the channel.
-     * @param {Number} [limit] - An optional video count limit.
-     * @param {String} [pageToken] - An optional page token to start getting results from.
+     * @param {Object} [options] - An optional object of options to include: { parameters: Object; limit: Number; pageToken: String; }
      * @return {Array[Array[Video], String|undefined]} An array containing the videos and next page token.
      */
-    getVideos(limit, pageToken) {
-      return videos().getByChannelId(super.getId(), limit, pageToken)
+    getVideos(options) {
+      return videos().getByChannelId(super.getId(), options)
     }
 
     /**

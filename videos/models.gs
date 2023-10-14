@@ -38,6 +38,12 @@ function Video_() {
      */
     getChannel() {
       const channelId = (super.getDatabaseObject() !== undefined ? super.getDatabaseObject().channel : super.getOriginalObject().channel)
+
+      if (channelId === undefined) {
+        // TODO do this in other places
+        throw new Error("No channel found on video object")
+      }
+
       return channels().getById(channelId)
     }
 
