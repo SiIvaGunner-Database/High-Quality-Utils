@@ -26,7 +26,7 @@ function PlaylistService_() {
       let wrapperPlaylists
 
       if (settings().isYoutubeApiEnabled() === true) {
-        [ytPlaylists, nextPageToken] = youtube().getChannelPlaylists(channelId, (options.youtubeLimit | options.limit), options.pageToken)
+        [ytPlaylists, nextPageToken] = youtube().getChannelPlaylists(channelId, (options.youtubeLimit || options.limit), options.pageToken)
       }
 
       const parameters = {
