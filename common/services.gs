@@ -372,12 +372,12 @@ function YoutubeService_() {
      * @return {Array[Array[Object], String|undefined]} An array containing the metadata and next page token.
      */
     getChannelVideos(channelId, limit, pageToken) {
-      const channel = YouTube.Channels.list("contentDetails", { "id": channelId }).items[0]
-      const uploadsPlaylistId = channel.contentDetails.relatedPlaylists.uploads
       try {
+        const channel = YouTube.Channels.list("contentDetails", { "id": channelId }).items[0]
+        const uploadsPlaylistId = channel.contentDetails.relatedPlaylists.uploads
         return youtube().getPlaylistVideos(uploadsPlaylistId, limit, pageToken)
       } catch (error) {
-        console.warn("No channel videos found\n", error.stack)
+        console.warn(`No channel videos found for ID ${channelId}\n`, error.stack)
         return [[], undefined]
       }
     }
