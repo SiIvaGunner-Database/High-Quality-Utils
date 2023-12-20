@@ -27,6 +27,15 @@ function WrapperSpreadsheet_() {
     }
 
     /**
+     * Check whether or not a sheet with the given name exists in the spreadsheet.
+     * @param {String} sheetName - The name of the sheet.
+     * @return {Boolean} True if a sheet exists, else false.
+     */
+    hasSheet(sheetName) {
+      return super.getOriginalObject().getSheetByName(sheetName) !== null
+    }
+
+    /**
      * Get a child sheet from the spreadsheet.
      * @param {String} sheetName - The name of the sheet.
      * @return {WrapperSheet} The sheet object.
