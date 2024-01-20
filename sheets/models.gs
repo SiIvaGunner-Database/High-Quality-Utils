@@ -114,13 +114,14 @@ function WrapperSheet_() {
      * Get the row index of the first cell containing a specified value.
      * @param {Object} findText - The value to search for.
      * @param {Number} [column] - A column index to search through. Defaults to 1.
-     * @return {Number} The row index of the cell.
+     * @return {Number} The row index of the cell, or -1 if no rows are found.
      */
     getRowIndexOfValue(findText, column = 1) {
       const sheet = this.getOriginalObject()
       const numberOfRows = sheet.getLastRow() - 1
       const searchRange = sheet.getRange(2, column, numberOfRows)
-      return searchRange.createTextFinder(findText).findNext().getRowIndex()
+      const resultRange = searchRange.createTextFinder(findText).findNext()
+      return resultRange === null ? -1 : resultRange.getRowIndex()
     }
 
     /**
