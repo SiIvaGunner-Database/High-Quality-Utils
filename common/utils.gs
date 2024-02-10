@@ -164,8 +164,10 @@ function Utils_() {
       const ids = stringOfIds.replace(/ /g, "").split(",")
 
       ids.forEach((id, index) => {
-        // Replace YouTube URL content and whitespace
-        ids[index] = id.replace(/(http.*(list|v)=|http.*\/channel\/|&feature=youtu\.be|\(.*|\s+)/ig, "")
+        // 1. Remove the URL's protocol and domain ("https://www.youtube.com/", "https://youtu.be/", etc.)
+        // 2. Remove everything before the video ID parameter (e.g. "?v=[video id]")
+        // 3. Remove any remaining parameters (e.g. "?param1=value1&param2=value2")
+        ids[index] = id.replace(/.*\//g, "").replace(/.*v=/g, "").replace(/[?&].*/g, "").trim()
       })
 
       return ids
