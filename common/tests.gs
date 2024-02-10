@@ -68,6 +68,7 @@ function Tests_() {
 
       // Custom functions
       this.test_("youtube.getStatuses", youtube().getStatuses())
+      this.test_("youtube.getChannelId", youtube().getChannelId(this._channelId), this._channelId)
       this.test_("youtube.getChannel", youtube().getChannel(this._channelId))
       this.test_("youtube.getChannels", youtube().getChannels([this._channelId, "UC6ajqR7lEYf-33Gsj4lgVOA"]))
       this.test_("youtube.getChannelPlaylists", youtube().getChannelPlaylists(this._channelId, this._limit))

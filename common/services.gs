@@ -311,6 +311,26 @@ function YoutubeService_() {
     }
 
     /**
+     * Get a the first channel ID returned from a search queried for the given search terms. Should be used with caution.
+     * @param {String} searchTerms - Search terms such as "https://www.youtube.com/@name" or "Channel Name".
+     * @return {String} The channel ID.
+     */
+    getChannelId(searchTerms) {
+      const options = {
+        q: searchTerms,
+        type: "channel",
+        maxResults: "1" 
+      }
+      const channelResults = YouTube.Search.list("snippet", options)
+
+      if (channelResults.items.length === 0) {
+        throw new Error(`No channel found with the name "${channelUrlName}"`)
+      }
+
+      return channelResults.items[0].id.channelId
+    }
+
+    /**
      * Get the metadata from a YouTube channel.
      * @param {String} channelId - The YouTube channel ID.
      * @return {Object} The channel object.
