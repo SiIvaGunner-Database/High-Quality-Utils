@@ -77,6 +77,7 @@ function Tests_() {
       this.test_("youtube.getPlaylists", youtube().getPlaylists([this._playlistId, "PLL0CQjrcN8D38CfZ2TuZUbb6lreHbSHSL"]))
       this.test_("youtube.addToPlaylist", youtube().addToPlaylist(testPlaylistId, this._videoId))
       this.test_("youtube.removeFromPlaylist", youtube().removeFromPlaylist(testPlaylistId, this._videoId))
+      this.test_("youtube.getPlaylistVideoIds", youtube().getPlaylistVideoIds(this._playlistId, this._limit))
       this.test_("youtube.getPlaylistVideos", youtube().getPlaylistVideos(this._playlistId, this._limit))
       this.test_("youtube.getVideo", youtube().getVideo(this._videoId))
       this.test_("youtube.getVideos", youtube().getVideos([this._videoId, "TP4XBFo8GoQ"]))

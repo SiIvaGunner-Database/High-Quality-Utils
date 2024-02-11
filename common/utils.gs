@@ -96,7 +96,8 @@ function Utils_() {
      */
     formatHyperlink(url, label) {
       if (label !== undefined) {
-        return `=HYPERLINK("${url}", "${label}")`
+        // Apostrophes are replaced with double apostrophes to prevent formula injection
+        return `=HYPERLINK("${url.replace(/"/g, '""')}", "${label.replace(/"/g, '""')}")`
       } else {
         return ""
       }
@@ -135,10 +136,10 @@ function Utils_() {
       }
 
       const wikiUrl = `https://${wikiName}.fandom.com/wiki/`
-      const safePageName = pageName.replace(/Reupload: /g, "").replace(/Reup: /g, "")
-      const simplePageName = safePageName.replace(/"/g, '""').replace(/ \(GiIvaSunner\)/g, "")
-      const encodedPageName = encodeURIComponent(this.formatFandomPageName(safePageName))
-      return this.formatHyperlink(wikiUrl + encodedPageName, simplePageName)
+      const cleanedPageName = pageName.replace("Reupload: ", "").replace("Reup: ", "")
+      const shortenedPageName = cleanedPageName.replace(" (GiIvaSunner)", "")
+      const encodedPageName = encodeURIComponent(this.formatFandomPageName(cleanedPageName))
+      return this.formatHyperlink(wikiUrl + encodedPageName, shortenedPageName)
     }
 
     /**

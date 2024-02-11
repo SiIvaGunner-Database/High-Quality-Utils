@@ -481,6 +481,18 @@ function YoutubeService_() {
      * @return {Array[Array[Object], String|undefined]} An array containing the metadata and next page token.
      */
     getPlaylistVideos(playlistId, limit, pageToken = "") {
+      const videoIds = getPlaylistVideoIds(playlistId, limit, pageToken)
+      return [this.getVideos(videoIds), pageToken]
+    }
+
+    /**
+     * Get an array of IDs from videos in a YouTube playlist.
+     * @param {String} playlistId - The YouTube playlist ID.
+     * @param {Number} [limit] - An optional video count limit.
+     * @param {String} [pageToken] - An optional page token to start getting results from.
+     * @return {Array[String]} An array of video IDs.
+     */
+    getPlaylistVideoIds(playlistId, limit, pageToken = "") {
       const itemIds = []
 
       while (pageToken !== undefined) {
@@ -498,7 +510,7 @@ function YoutubeService_() {
         }
       }
 
-      return [this.getVideos(itemIds), pageToken]
+      return itemIds
     }
 
     /**
