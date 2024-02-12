@@ -65,6 +65,7 @@ function Tests_() {
     testCommonYoutubeService() {
       console.log("TESTING COMMON YOUTUBE SERVICE")
       const testPlaylistId = "PLn8P5M1uNQk5_q_y1BVxgP68xhKQ2eM3F"
+      const temporaryPlaylist = youtube().createPlaylist({ title: "temporary secretary" }, "private")
 
       // Custom functions
       this.test_("youtube.getStatuses", youtube().getStatuses())
@@ -73,6 +74,8 @@ function Tests_() {
       this.test_("youtube.getChannels", youtube().getChannels([this._channelId, "UC6ajqR7lEYf-33Gsj4lgVOA"]))
       this.test_("youtube.getChannelPlaylists", youtube().getChannelPlaylists(this._channelId, this._limit))
       this.test_("youtube.getChannelVideos", youtube().getChannelVideos(this._channelId, this._limit))
+      this.test_("youtube.createPlaylist", youtube().createPlaylist({ title: "The Inn - Fire Emblem" }, "private"))
+      this.test_("youtube.updatePlaylist", youtube().updatePlaylist(temporaryPlaylist.id, { title: "jerry temporary" }, "private"))
       this.test_("youtube.getPlaylist", youtube().getPlaylist(this._playlistId))
       this.test_("youtube.getPlaylists", youtube().getPlaylists([this._playlistId, "PLL0CQjrcN8D38CfZ2TuZUbb6lreHbSHSL"]))
       this.test_("youtube.addToPlaylist", youtube().addToPlaylist(testPlaylistId, this._videoId))

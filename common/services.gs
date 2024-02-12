@@ -56,7 +56,7 @@ function CommonService_() {
     /**
      * Get a cached common model object by its ID.
      * @param {String} objectId - The object ID.
-     * @return {CommonModel} The cached object.
+     * @return {CommonModel} The cached model object.
      */
     getCachedObject_(objectId) {
       return this._cache.get(objectId)
@@ -74,7 +74,7 @@ function CommonService_() {
     /**
      * Get a common model object by its ID.
      * @param {String} objectId - The object ID.
-     * @return {CommonModel} The object.
+     * @return {CommonModel} The model object.
      */
     getById(objectId) {
       if (!objectId) {
@@ -125,7 +125,7 @@ function CommonService_() {
     /**
      * Get common model objects by their IDs.
      * @param {Array[String]} objectIds - The object IDs.
-     * @return {Array[CommonModel]} The objects.
+     * @return {Array[CommonModel]} The model objects.
      */
     getByIds(objectIds) {
       // TODO - test and update to the following:
@@ -138,7 +138,7 @@ function CommonService_() {
      * @param {Object} [databaseParameters] - An optional key-value object map to filter database results.
      * @param {Array[Object]} [originalObjects] - An optional list of original object metadata to include in the returned objects.
      * @param {Number} [limit] - An optional result count limit.
-     * @return {Array[CommonModel]} The objects.
+     * @return {Array[CommonModel]} The model objects.
      */
     getByFilter(databaseParameters, originalObjects, limit) {
       if (originalObjects !== undefined && originalObjects.length === 0) {
@@ -159,7 +159,7 @@ function CommonService_() {
      * Get all common model objects in the web application database.
      * @param {Object} [databaseParameters] - An optional key-value object map to filter database results.
      * @param {Number} [limit] - An optional result count limit.
-     * @return {Array[CommonModel]} The objects.
+     * @return {Array[CommonModel]} The model objects.
      */
     getAll(databaseParameters = {}, limit) {
       const parameters = {
@@ -259,8 +259,8 @@ function YoutubeService_() {
 
     /**
      * Get formatted metadata from YouTube objects modified to match corresponding database metadata.
-     * @param {Array[Object]} data - The YouTube objects.
-     * @return {Array[Object]} The formatted objects.
+     * @param {Array[Object]} data - The YouTube metadata.
+     * @return {Array[Object]} The formatted metadata.
      */
     formatMetadata_(objects) {
       const keysToRemove = ["etag", "kind"]
@@ -333,7 +333,7 @@ function YoutubeService_() {
     /**
      * Get the metadata from a YouTube channel.
      * @param {String} channelId - The YouTube channel ID.
-     * @return {Object} The channel object.
+     * @return {Object} The channel metadata.
      */
     getChannel(channelId) {
       return this.getChannels([channelId])[0]
@@ -342,7 +342,7 @@ function YoutubeService_() {
     /**
      * Get the metadata from multiple YouTube channels.
      * @param {Array[String]} channelIds - The YouTube channel IDs.
-     * @return {Array[Object]} The channel objects.
+     * @return {Array[Object]} The channel metadata.
      */
     getChannels(channelIds) {
       const channels = []
@@ -403,9 +403,47 @@ function YoutubeService_() {
     }
 
     /**
+     * Create a YouTube playlist and return the metadata.
+     * @param {Object} snippet - The snippet metadata, e.g. "{ title: 'title' }".
+     * @param {String} [privacyStatus] - The playlist privacy status, defaulting to "public".
+     * @return {Object} The newly created playlist metadata.
+     */
+    createPlaylist(snippet, privacyStatus = "public") {
+      const options = {
+        "snippet": snippet,
+        "status": {
+          "privacyStatus": privacyStatus
+        }
+      }
+      return YouTube.Playlists.insert(options, "snippet,status")
+    }
+
+    /**
+     * Update a YouTube playlist and return the metadata.
+     * @param {String} playlistId - The YouTube playlist ID.
+     * @param {Object} snippet - The snippet metadata, e.g. "{ title: 'title' }".
+     * @param {String} [privacyStatus] - The playlist privacy status, defaulting to the existing playlist status.
+     * @return {Object} The updated playlist metadata.
+     */
+    updatePlaylist(playlistId, snippet, privacyStatus) {
+      const options = {
+        "id": playlistId,
+        "snippet": snippet
+      }
+      let part = "snippet"
+
+      if (privacyStatus !== undefined) {
+        options.status = { "privacyStatus": privacyStatus }
+        part += ",status"
+      }
+
+      return YouTube.Playlists.update(options, part)
+    }
+
+    /**
      * Get the metadata from a YouTube playlist.
      * @param {String} playlistId - The YouTube playlist ID.
-     * @return {Object} The playlist object.
+     * @return {Object} The playlist metadata.
      */
     getPlaylist(playlistId) {
       return this.getPlaylists([playlistId])[0]
@@ -414,7 +452,7 @@ function YoutubeService_() {
     /**
      * Get the metadata from multiple YouTube playlists.
      * @param {Array[String]} playlistIds - The YouTube playlist IDs.
-     * @return {Array[Object]} The playlist objects.
+     * @return {Array[Object]} The playlist metadata.
      */
     getPlaylists(playlistIds) {
       const playlists = []
@@ -516,7 +554,7 @@ function YoutubeService_() {
     /**
      * Get the metadata from a YouTube video.
      * @param {String} videoId - The YouTube video ID.
-     * @return {Object} The video object.
+     * @return {Object} The video metadata.
      */
     getVideo(videoId) {
       return this.getVideos([videoId])[0]
@@ -525,7 +563,7 @@ function YoutubeService_() {
     /**
      * Get the metadata from multiple YouTube videos.
      * @param {Array[String]} videoIds - The YouTube video IDs.
-     * @return {Array[Object]} The video objects.
+     * @return {Array[Object]} The video metadata.
      */
     getVideos(videoIds) {
       const videos = []
@@ -593,7 +631,7 @@ function DatabaseService_() {
      * @param {String} [apiPath] - The path to append to "siivagunnerdatabase.net/api/".
      * @param {Object} [parameters] - An optional parameter map to append to the URL. E.g. "{'id': 0}" becomes "?id=0".
      * @param {Number} [limit] - An optional result count limit.
-     * @return {Object} The response object.
+     * @return {Object} The response metadata.
      */
     getData(apiPath, parameters, limit) {
       return this.fetchResponse_(apiPath, this._GET, parameters, limit)
@@ -604,7 +642,7 @@ function DatabaseService_() {
      * This will fail if the user doesn't have permission.
      * @param {String} [apiPath] - The path to append to "siivagunnerdatabase.net/api/".
      * @param {Object | Array[Object]} [data] - The metadata to send.
-     * @return {Object} The response object.
+     * @return {Object} The response metadata.
      */
     postData(apiPath, data) {
       return this.fetchResponse_(apiPath, this._POST, data)
@@ -615,7 +653,7 @@ function DatabaseService_() {
      * This will fail if the user doesn't have permission.
      * @param {String} [apiPath] - The path to append to "siivagunnerdatabase.net/api/".
      * @param {Object | Array[Object]} [data] - The metadata to send.
-     * @return {Object} The response object.
+     * @return {Object} The response metadata.
      */
     putData(apiPath, data) {
       return this.fetchResponse_(apiPath, this._PUT, data)
@@ -626,7 +664,7 @@ function DatabaseService_() {
      * This will fail if the user doesn't have permission.
      * @param {String} [apiPath] - The path to append to "siivagunnerdatabase.net/api/".
      * @param {Object | Array[Object]} [data] - The metadata to send.
-     * @return {Object} The response object.
+     * @return {Object} The response metadata.
      */
     deleteData(apiPath, data) {
       return this.fetchResponse_(apiPath, this._DELETE, data)
@@ -639,7 +677,7 @@ function DatabaseService_() {
      * @param {String} [method] - An optional method to use. Defaults to "GET".
      * @param {Object | Array[Object]} [data] - The metadata to send.
      * @param {Number} [limit] - An optional result count limit.
-     * @return {Object} The response object.
+     * @return {Object} The response metadata.
      */
     fetchResponse_(apiPath = "", method = this._GET, data, limit) {
       const options = {
