@@ -519,7 +519,7 @@ function YoutubeService_() {
      * @return {Array[Array[Object], String|undefined]} An array containing the metadata and next page token.
      */
     getPlaylistVideos(playlistId, limit, pageToken = "") {
-      const videoIds = getPlaylistVideoIds(playlistId, limit, pageToken)
+      const videoIds = this.getPlaylistVideoIds(playlistId, limit, pageToken)
       return [this.getVideos(videoIds), pageToken]
     }
 
