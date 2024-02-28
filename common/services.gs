@@ -324,7 +324,7 @@ function YoutubeService_() {
       const channelResults = YouTube.Search.list("snippet", options)
 
       if (channelResults.items.length === 0) {
-        throw new Error(`No channel found with the name "${channelUrlName}"`)
+        throw new Error(`No channel found with the name "${searchTerms}"`)
       }
 
       return channelResults.items[0].id.channelId
