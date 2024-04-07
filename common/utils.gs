@@ -144,16 +144,19 @@ function Utils_() {
 
     /**
      * Get a formatted page name for a Fandom page URL.
-     * Removes characters and slurs restricted by Fandom article names.
+     * Capitalizes the first letter and removes restricted characters and slurs.
      * @param {String} pageName - The name of the wiki page.
      * @return {String} The formatted page name.
      */
     formatFandomPageName(pageName) {
-      return pageName.replace(/(#|\|)/g, "")
-        .replace(/(\[|\{})/g, "(")
-        .replace(/(\]|\})/g, ")")
-        .replace(/\​\|\​_/g, "L")
-        .replace(/Nigga/ig, "N----")
+      return (pageName.charAt(0).toUpperCase() + pageName.slice(1)) // Capitalize the first letter
+        .replace(/(#|\|)/g, "") // Remove "#" and "|"
+        .replace(/(\[|\{})/g, "(") // Replace "[" and "{" with "("
+        .replace(/(\]|\})/g, ")") // Replace "]" and "}" with ")"
+        .replace(/\​\|\​_/g, "L") // Replace "|_" with "L"
+        .replace(/_/g, " ") // Replace "_" with " "
+        .replace(/ +/g, " ") // Replace repeated spaces with a single space
+        .replace(/Nigga/ig, "N----") // Censor slur
     }
 
     /**
