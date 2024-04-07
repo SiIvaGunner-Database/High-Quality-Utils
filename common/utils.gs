@@ -164,6 +164,7 @@ function Utils_() {
     splitStringOfIds(stringOfIds) {
       const ids = stringOfIds.replace(/ /g, "").split(",")
 
+      // TODO this isn't working for playlist URLs right now
       ids.forEach((id, index) => {
         // 1. Remove the URL's protocol and domain ("https://www.youtube.com/", "https://youtu.be/", etc.)
         // 2. Remove everything before the video ID parameter (e.g. "?v=[video id]")
@@ -196,6 +197,7 @@ function Utils_() {
         }
 
         Object.entries(params).forEach(([key, value]) => url += `&${key}=${value}`)
+        console.log("GET", url)
         const response = UrlFetchApp.fetch(url)
         const content = JSON.parse(response.getContentText())
         categoryMembers.push(...content.query.categorymembers)
@@ -223,7 +225,7 @@ function Utils_() {
       }
 
       Object.entries(params).forEach(([key, value]) => url += `&${key}=${value}`)
-      // console.log(url)
+      // console.log("GET", url)
 
       const response = UrlFetchApp.fetch(url)
       const content = response.getContentText().replace(/\\n/g, "").replace(/\|/g, "\n")

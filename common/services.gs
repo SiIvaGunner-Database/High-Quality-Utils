@@ -707,8 +707,11 @@ function DatabaseService_() {
           }
 
           console.log("Method:", method, "\nURL:", url, "\nPayload:", options.payload)
+          const requestStartTime = new Date().getTime()
           const responseObject = UrlFetchApp.fetch(url, options)
           responseJSON = JSON.parse(responseObject.getContentText())
+          const requestCompletionTime = new Date().getTime() - requestStartTime
+          console.log(`Request completed in ${requestCompletionTime} milliseconds`)
 
           if (responseJSON.results !== undefined && responseJSON.results !== null) {
             responseResults.push(...responseJSON.results)

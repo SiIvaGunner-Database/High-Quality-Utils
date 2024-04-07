@@ -152,7 +152,11 @@ function WrapperSheet_() {
       const sheet = this.getOriginalObject()
       const numberOfRows = data.length
       const numberOfColumns = data[0].length
+      const rowHeightsForcedStartTime = new Date().getTime()
+      // TODO remove description column from sheets and remove the row below
       sheet.setRowHeightsForced(row, numberOfRows, this._rowHeight)
+      const rowHeightsForcedCompletionTime = new Date().getTime() - rowHeightsForcedStartTime
+      console.log(`Row heights forced in ${rowHeightsForcedCompletionTime} milliseconds`)
       sheet.getRange(row, column, numberOfRows, numberOfColumns).setValues(data)
       return this
     }
