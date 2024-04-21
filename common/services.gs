@@ -263,8 +263,8 @@ function YoutubeService_() {
      * @return {Array[Object]} The formatted metadata.
      */
     formatMetadata_(objects) {
-      const keysToRemove = ["etag", "kind"]
-      const keysToMerge = ["snippet", "contentDetails", "statistics"]
+      const keysToRemove = ["etag", "kind", "channel"]
+      const keysToMerge = ["snippet", "contentDetails", "statistics", ["brandingSettings", "image"]]
       const keysToReplace = [{ "oldKey": "channelId", "newKey": "channel" }]
 
       return objects.map(object => {
@@ -281,6 +281,9 @@ function YoutubeService_() {
           if (object[key] !== undefined) {
             object = { ...object, ...object[key] }
             delete object[key]
+          } else if (Array.isArray(key) === true && object[key[0]][key[1]] !== undefined) {
+            object = { ...object, ...object[key[0]][key[1]] }
+            delete object[key[0]]
           }
         })
 
@@ -350,7 +353,7 @@ function YoutubeService_() {
       let stringOfIds = ""
 
       while ((stringOfIds = arrayOfIds.splice(-50).join(",")) && stringOfIds !== undefined) {
-        channels.push(...YouTube.Channels.list("snippet,statistics", { "id": stringOfIds }).items)
+        channels.push(...YouTube.Channels.list("snippet,statistics,brandingSettings", { "id": stringOfIds }).items)
       }
 
       return this.formatMetadata_(channels)
