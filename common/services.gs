@@ -259,6 +259,7 @@ function YoutubeService_() {
 
     /**
      * Get formatted metadata from YouTube objects modified to match corresponding database metadata.
+     * TODO: Rethink the use of this function. It's unintuitive and confusing right now.
      * @param {Array[Object]} data - The YouTube metadata.
      * @return {Array[Object]} The formatted metadata.
      */
@@ -281,7 +282,7 @@ function YoutubeService_() {
           if (object[key] !== undefined) {
             object = { ...object, ...object[key] }
             delete object[key]
-          } else if (Array.isArray(key) === true && object[key[0]][key[1]] !== undefined) {
+          } else if (Array.isArray(key) === true && object[key[0]] !== undefined && object[key[0]][key[1]] !== undefined) {
             object = { ...object, ...object[key[0]][key[1]] }
             delete object[key[0]]
           }
