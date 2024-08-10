@@ -31,6 +31,16 @@ function Channel_() {
     }
 
     /**
+     * Check whether or not the channel has a dedicated video sheet.
+     * @return {Boolean} True if the sheet exists, else false.
+     */
+    hasSheet() {
+      const spreadsheetKey = (settings().isDevModeEnabled() === true ? "developmentSpreadsheet" : "productionSpreadsheet")
+      const spreadsheetId = super.getDatabaseObject()[spreadsheetKey]
+      return spreadsheetId !== undefined && spreadsheetId !== null && this.getSpreadsheet().hasSheet() === true
+    }
+
+    /**
      * Get the associated videos spreadsheet object.
      * @return {WrapperSpreadsheet} The spreadsheet object.
      */
