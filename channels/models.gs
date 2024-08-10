@@ -37,7 +37,8 @@ function Channel_() {
     hasSheet() {
       const spreadsheetKey = (settings().isDevModeEnabled() === true ? "developmentSpreadsheet" : "productionSpreadsheet")
       const spreadsheetId = super.getDatabaseObject()[spreadsheetKey]
-      return spreadsheetId !== undefined && spreadsheetId !== null && this.getSpreadsheet().hasSheet() === true
+      return spreadsheetId !== undefined && spreadsheetId !== null
+        && this.getSpreadsheet().hasSheet(super.getDatabaseObject().title) === true
     }
 
     /**
