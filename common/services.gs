@@ -86,7 +86,9 @@ function CommonService_() {
       let dbObject
 
       try {
-        dbObject = database().getData(this.getApiPath(objectId))
+        if (this._modelClass !== WrapperSpreadsheet_()) {
+          dbObject = database().getData(this.getApiPath(objectId))
+        }
       } catch (error) {
         console.warn("No database object found\n", error.stack)
       }
