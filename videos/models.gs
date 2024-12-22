@@ -94,7 +94,7 @@ function Video_() {
       const wiki = this.getChannel().getDatabaseObject().wiki
 
       if (wiki === undefined || wiki === "") {
-        return ""
+        return "Undocumented"
       }
 
       const pageName = (super.getDatabaseObject() !== undefined ? super.getDatabaseObject().title : super.getOriginalObject().title)
