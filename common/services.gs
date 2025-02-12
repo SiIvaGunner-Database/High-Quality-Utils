@@ -682,7 +682,7 @@ function DatabaseService_() {
      * @param {String} [apiPath] - An optional path to append to "siivagunnerdatabase.net/api/".
      * @param {String} [method] - An optional method to use. Defaults to "GET".
      * @param {Object | Array[Object]} [data] - The metadata to send.
-     * @param {Number} [limit] - An optional result count limit.
+     * @param {Number} [limit] - An optional result count limit. This currently only works in increments of 1000.
      * @return {Object} The response metadata.
      */
     fetchResponse_(apiPath = "", method = this._GET, data, limit) {

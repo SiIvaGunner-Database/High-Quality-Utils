@@ -149,6 +149,7 @@ function Utils_() {
      * @return {String} The formatted page name.
      */
     formatFandomPageName(pageName) {
+      pageName = pageName.toString()
       return (pageName.charAt(0).toUpperCase() + pageName.slice(1)) // Capitalize the first letter
         .replace(/(#|\|)/g, "") // Remove "#" and "|"
         .replace(/(\[|\{})/g, "(") // Replace "[" and "{" with "("
