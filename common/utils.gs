@@ -186,9 +186,6 @@ function Utils_() {
      * @return {Array[Object]} The category members.
      */
     fetchFandomCategoryMembers(wikiName, categoryTitle) {
-      // As a temporary workaround to avoid 403 Forbidden responses on api.php calls, send a get request to the wiki's home page.
-      UrlFetchApp.fetch(`https://${wikiName}.fandom.com`);
-
       const categoryMembers = []
       let cmcontinue = ""
 
@@ -222,9 +219,6 @@ function Utils_() {
      * @return {String} The video ID.
      */
     fetchFandomVideoId(wikiName, videoTitle) {
-      // As a temporary workaround to avoid 403 Forbidden responses on api.php calls, send a get request to the wiki's home page.
-      UrlFetchApp.fetch(`https://${wikiName}.fandom.com`);
-
       let url = `https://${wikiName}.fandom.com/api.php?`
       const params = {
         "action": "query",
