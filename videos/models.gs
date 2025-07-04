@@ -56,10 +56,9 @@ function Video_() {
       const url = `https://www.youtube.com/watch?v=${super.getId()}`
       const contentText = UrlFetchApp.fetch(url).getContentText()
 
-      if (contentText.includes('"isUnlisted":true')) {
+      // Identify the status based on the content text, defaulting to public if no status is found
+      if (contentText.includes('PRIVACY_UNLISTED')) {
         return statuses.unlisted
-      } else if (contentText.includes('"status":"OK"')) {
-        return statuses.public
       } else if (contentText.includes('"This video is private"')) {
         return statuses.private
       } else if (contentText.includes('"status":"ERROR"')) {
@@ -67,13 +66,8 @@ function Video_() {
       } else if (contentText.includes('"status":"UNPLAYABLE"')) {
         return statuses.unavailable
       } else {
-        console.warn(`Unable to find status from URL: ${url}`)
-
-        if (super.getDatabaseObject() !== undefined && super.getDatabaseObject().videoStatus !== "") {
-          return super.getDatabaseObject().videoStatus
-        } else {
-          return statuses.public
-        }
+        // Note that this could return an inaccurate status if the above checks stop working from YouTube changing response content
+        return statuses.public
       }
     }
 
