@@ -47,7 +47,7 @@ function CommonModel_() {
         } else if (columnKey === "id") {
           value = utils().formatYoutubeHyperlink(value)
         } else if (columnKey === "title" && wikiName !== undefined) {
-          value = utils().formatFandomHyperlink(value, wikiName)
+          value = utils().formatWikiHyperlink(value, wikiName)
         } else if (value.toString().match(/^.+T.+Z$/) !== null) {
           value = utils().formatDate(value)
         }

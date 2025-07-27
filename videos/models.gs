@@ -76,7 +76,7 @@ function Video_() {
      * @return {String} The hyperlink formula.
      */
     getWikiHyperlink() {
-      return utils().formatFandomHyperlink(super.getDatabaseObject().title, this.getChannel().getDatabaseObject().wiki)
+      return utils().formatWikiHyperlink(super.getDatabaseObject().title, this.getChannel().getDatabaseObject().wiki)
     }
 
     /**
@@ -84,7 +84,7 @@ function Video_() {
      * @return {String} Either "Documented" or "Undocumented".
      */
     getWikiStatus() {
-      // TODO use the Fandom API instead; it's slower but more consistent
+      // TODO use the wiki API instead; it's slower but more consistent
       const wiki = this.getChannel().getDatabaseObject().wiki
 
       if (wiki === undefined || wiki === "") {
@@ -92,10 +92,11 @@ function Video_() {
       }
 
       const pageName = (super.getDatabaseObject() !== undefined ? super.getDatabaseObject().title : super.getOriginalObject().title)
-      const encodedPageName = encodeURIComponent(utils().formatFandomPageName(pageName))
-      const url = `https://${wiki}.fandom.com/wiki/${encodedPageName}`
+      const encodedPageName = encodeURIComponent(utils().formatWikiPageName(pageName, true))
+      const wikiUrl = wiki.includes("https") ? wiki : `https://${wiki}.fandom.com`
+      const pageUrl = `${wikiUrl}/wiki/${encodedPageName}`
       const options = { "muteHttpExceptions": true }
-      const responseCode = UrlFetchApp.fetch(url, options).getResponseCode()
+      const responseCode = UrlFetchApp.fetch(pageUrl, options).getResponseCode()
 
       switch (responseCode) {
         case 200:

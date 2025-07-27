@@ -127,7 +127,8 @@ function Channel_() {
      */
     getWikiHyperlink() {
       const wiki = super.getDatabaseObject().wiki
-      return utils().formatHyperlink(`https://${wiki}.fandom.com/wiki/`, wiki)
+      const wikiUrl = wiki.includes("https") ? wiki : `https://${wiki}.fandom.com`
+      return utils().formatHyperlink(wikiUrl, wiki)
     }
   }
 

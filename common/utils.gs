@@ -125,7 +125,31 @@ function Utils_() {
     }
 
     /**
-     * Get a hyperlink to a Fandom page URL.
+     * Get a hyperlink formula for a wiki page URL.
+     * @param {String} pageName - The name of the page.
+     * @param {String} wikiUrl - The wiki URL.
+     * @return {String} The hyperlink formula.
+     */
+    formatWikiHyperlink(pageName, wikiUrl) {
+      if (wikiUrl === undefined || wikiUrl === "") {
+        return pageName
+      }
+
+      // If this isn't a full URL, assume it's a Fandom wiki name 
+      if (wikiUrl.includes("https") === false) {
+        return this.formatFandomHyperlink(pageName, wikiUrl)
+      }
+
+      const cleanedPageName = pageName.replace("Reupload: ", "").replace("Reup: ", "")
+      const shortenedPageName = cleanedPageName.replace(" (GiIvaSunner)", "")
+      const encodedPageName = encodeURIComponent(this.formatWikiPageName(cleanedPageName))
+      const pageUrl = `${wikiUrl}/wiki/${encodedPageName}`
+      return this.formatHyperlink(pageUrl, shortenedPageName)
+    }
+
+    /**
+     * Get a hyperlink formula for a Fandom page URL.
+     * @deprecated since 07/27/2025. Use formatWikiHyperlink instead.
      * @param {String} pageName - The name of the wiki page.
      * @param {String} wikiName - The name of the wiki.
      * @return {String} The hyperlink formula.
@@ -143,21 +167,38 @@ function Utils_() {
     }
 
     /**
-     * Get a formatted page name for a Fandom page URL.
-     * Capitalizes the first letter and removes restricted characters and slurs.
+     * Get a formatted page name for a wiki page URL.
+     * Capitalizes the first letter and removes restricted characters.
      * @param {String} pageName - The name of the wiki page.
+     * @param {Boolean} [censorSlurs] - Whether or not to censor slurs. Defaults to true.
      * @return {String} The formatted page name.
      */
-    formatFandomPageName(pageName) {
-      pageName = pageName.toString()
-      return (pageName.charAt(0).toUpperCase() + pageName.slice(1)) // Capitalize the first letter
+    formatWikiPageName(pageName, censorSlurs = true) {
+      let formattedName = pageName.toString()
+      formattedName = (formattedName.charAt(0).toUpperCase() + formattedName.slice(1)) // Capitalize the first letter
         .replace(/(#|\|)/g, "") // Remove "#" and "|"
         .replace(/(\[|\{})/g, "(") // Replace "[" and "{" with "("
         .replace(/(\]|\})/g, ")") // Replace "]" and "}" with ")"
         .replace(/\​\|\​_/g, "L") // Replace "|_" with "L"
         .replace(/_/g, " ") // Replace "_" with " "
         .replace(/ +/g, " ") // Replace repeated spaces with a single space
-        .replace(/Nigga/ig, "N----") // Censor slur
+
+      if (censorSlurs === true) {
+        formattedName = formattedName.replace(/Nigga/ig, "N----") // Censor slur
+      }
+      
+      return formattedName
+    }
+
+    /**
+     * Get a formatted page name for a Fandom page URL.
+     * @deprecated since 07/27/2025. Use formatWikiPageName instead.
+     * Capitalizes the first letter and removes restricted characters and slurs.
+     * @param {String} pageName - The name of the wiki page.
+     * @return {String} The formatted page name.
+     */
+    formatFandomPageName(pageName) {
+      return this.formatWikiPageName(pageName, true)
     }
 
     /**
@@ -181,16 +222,23 @@ function Utils_() {
 
     /**
      * Fetch all category members in the provided category.
-     * @param {String} wikiName - The name of the channel's wiki.
+     * @param {String} wikiUrl - The the channel's wiki URL.
      * @param {String} categoryTitle - The title of the fandom category.
      * @return {Array[Object]} The category members.
      */
-    fetchFandomCategoryMembers(wikiName, categoryTitle) {
+    fetchWikiCategoryMembers(wikiUrl, categoryTitle) {
+      // If this isn't a full URL, assume it's a Fandom wiki name 
+      if (wikiUrl.includes("https") === false) {
+        wikiUrl = `https://${wikiUrl}.fandom.com` 
+      } else {
+        wikiUrl += "/w"
+      }
+
       const categoryMembers = []
       let cmcontinue = ""
 
       while (cmcontinue !== undefined) {
-        let url = `https://${wikiName}.fandom.com/api.php?` 
+        let url = `${wikiUrl}/api.php?` 
         const params = {
           "action": "query",
           "format": "json",
@@ -212,14 +260,32 @@ function Utils_() {
     }
 
     /**
-     * Fetch the video ID from a video article.
-     * If the video isn't unlisted or removed, use the YouTube API instead.
+     * Fetch all category members in the provided category.
+     * @deprecated since 07/27/2025. Use fetchWikiCategoryMembers instead.
      * @param {String} wikiName - The name of the channel's wiki.
+     * @param {String} categoryTitle - The title of the fandom category.
+     * @return {Array[Object]} The category members.
+     */
+    fetchFandomCategoryMembers(wikiName, categoryTitle) {
+      return this.fetchWikiCategoryMembers(wikiName, categoryTitle)
+    }
+
+    /**
+     * Fetch the video ID from a wiki video article.
+     * If the video isn't unlisted or removed, use the YouTube API instead.
+     * @param {String} wikiUrl - The channel's wiki URL.
      * @param {String} videoTitle - The title of the video.
      * @return {String} The video ID.
      */
-    fetchFandomVideoId(wikiName, videoTitle) {
-      let url = `https://${wikiName}.fandom.com/api.php?`
+    fetchWikiVideoId(wikiUrl, videoTitle) {
+      // If this isn't a full URL, assume it's a Fandom wiki name 
+      if (wikiUrl.includes("https") === false) {
+        wikiUrl = `https://${wikiUrl}.fandom.com` 
+      } else {
+        wikiUrl += "/w"
+      }
+
+      let url = `${wikiUrl}/api.php?`
       const params = {
         "action": "query",
         "format": "json",
@@ -253,6 +319,18 @@ function Utils_() {
       }
 
       return id
+    }
+
+    /**
+     * Fetch the video ID from a Fandom video article.
+     * If the video isn't unlisted or removed, use the YouTube API instead.
+     * @deprecated since 07/27/2025. Use fetchWikiVideoId instead.
+     * @param {String} wikiName - The name of the channel's wiki.
+     * @param {String} videoTitle - The title of the video.
+     * @return {String} The video ID.
+     */
+    fetchFandomVideoId(wikiName, videoTitle) {
+      return this.fetchWikiVideoId(wikiName, videoTitle)
     }
 
     /**
