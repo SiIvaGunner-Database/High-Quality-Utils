@@ -254,6 +254,8 @@ function Utils_() {
         const content = JSON.parse(response.getContentText())
         categoryMembers.push(...content.query.categorymembers)
         cmcontinue = (content.continue !== undefined ? content.continue.cmcontinue : undefined)
+        // Wait two seconds between requests to try to avoid 403 forbidden errors 
+        Utilities.sleep(2000)
       }
 
       return categoryMembers
