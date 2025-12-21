@@ -224,20 +224,22 @@ function Utils_() {
      * Fetch all category members in the provided category.
      * @param {String} wikiUrl - The the channel's wiki URL.
      * @param {String} categoryTitle - The title of the fandom category.
-     * @return {Array[Object]} The category members.
+     * @param {Object} [options] - An optional object of options to include: { pageLimit: Number; cmcontinue: String; }
+     * @return {Array[Object] || Array[Array[Object], String]} The category members. If options.pageLimit is provided, a cmcontinue token is also returned.
      */
-    fetchWikiCategoryMembers(wikiUrl, categoryTitle) {
-      // If this isn't a full URL, assume it's a Fandom wiki name 
+    fetchWikiCategoryMembers(wikiUrl, categoryTitle, options = {}) {
+      // If this isn't a full URL, assume it's a Fandom wiki name
       if (wikiUrl.includes("https") === false) {
-        wikiUrl = `https://${wikiUrl}.fandom.com` 
+        wikiUrl = `https://${wikiUrl}.fandom.com`
       } else {
         wikiUrl += "/w"
       }
 
       const categoryMembers = []
-      let cmcontinue = ""
+      let pageCount = 0
+      let cmcontinue = options.cmcontinue || ""
 
-      while (cmcontinue !== undefined) {
+      while (cmcontinue !== undefined && (options.pageLimit === undefined || ++pageCount < options.pageLimit)) {
         let url = `${wikiUrl}/api.php?` 
         const params = {
           "action": "query",
@@ -254,11 +256,16 @@ function Utils_() {
         const content = JSON.parse(response.getContentText())
         categoryMembers.push(...content.query.categorymembers)
         cmcontinue = (content.continue !== undefined ? content.continue.cmcontinue : undefined)
-        // Wait two seconds between requests to try to avoid 403 forbidden errors 
-        Utilities.sleep(2000)
+        // Wait three seconds between requests to try to avoid 403 forbidden errors 
+        Utilities.sleep(3000)
       }
 
-      return categoryMembers
+      // If the page limit parameter was provided, include the cmcontinue token in the return
+      if (options.pageLimit) {
+        return [categoryMembers, cmcontinue]
+      } else {
+        return categoryMembers
+      }
     }
 
     /**
@@ -266,10 +273,11 @@ function Utils_() {
      * @deprecated since 07/27/2025. Use fetchWikiCategoryMembers instead.
      * @param {String} wikiName - The name of the channel's wiki.
      * @param {String} categoryTitle - The title of the fandom category.
-     * @return {Array[Object]} The category members.
+     * @param {Object} [options] - An optional object of options to include: { pageLimit: Number; cmcontinue: String; }
+     * @return {Array[Object] || Array[Array[Object], String]} The category members. If options.pageLimit is provided, a cmcontinue token is also returned.
      */
-    fetchFandomCategoryMembers(wikiName, categoryTitle) {
-      return this.fetchWikiCategoryMembers(wikiName, categoryTitle)
+    fetchFandomCategoryMembers(wikiName, categoryTitle, options) {
+      return this.fetchWikiCategoryMembers(wikiName, categoryTitle, options)
     }
 
     /**
