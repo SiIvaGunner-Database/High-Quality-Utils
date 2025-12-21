@@ -239,7 +239,7 @@ function Utils_() {
       let pageCount = 0
       let cmcontinue = options.cmcontinue || ""
 
-      while (cmcontinue !== undefined && (options.pageLimit === undefined || ++pageCount < options.pageLimit)) {
+      while (cmcontinue !== undefined && (options.pageLimit === undefined || pageCount++ < options.pageLimit)) {
         let url = `${wikiUrl}/api.php?` 
         const params = {
           "action": "query",
