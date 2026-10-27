@@ -177,7 +177,7 @@ function Utils_() {
       let formattedName = pageName.toString()
       formattedName = (formattedName.charAt(0).toUpperCase() + formattedName.slice(1)) // Capitalize the first letter
         .replace(/(#|\|)/g, "") // Remove "#" and "|"
-        .replace(/(\[|\{})/g, "(") // Replace "[" and "{" with "("
+        .replace(/(\[|\{)/g, "(") // Replace "[" and "{" with "("
         .replace(/(\]|\})/g, ")") // Replace "]" and "}" with ")"
         .replace(/\​\|\​_/g, "L") // Replace "|_" with "L"
         .replace(/_/g, " ") // Replace "_" with " "
